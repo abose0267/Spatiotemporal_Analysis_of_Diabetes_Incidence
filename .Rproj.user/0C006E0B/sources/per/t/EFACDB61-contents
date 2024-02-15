@@ -1,0 +1,28 @@
+---
+title: "STAT489 Research Journal"
+author: "Sebastian Oberg"
+format: 
+  pdf:
+    documentclass: article
+    classoption: "letterpaper"
+    margin-left: 1in
+    margin-right: 1in
+    margin-top: 1in
+    margin-bottom: 1in
+editor: visual
+---
+
+## Feb 7 - Feb 14
+
+| Date     | Time Spent (hours) | Type of Work                                 |
+|-----------------|-----------------------|---------------------------------|
+| Feb 9th  | 1                  | Set up Github Repository with team           |
+| Feb 14th | 14                 | Read and analyzed research paper with Zotero |
+
+### Observations
+
+Over the past week, my team and I have focused on preliminary tasks, including setting up GitHub, familiarizing ourselves with the data, and practicing our R skills. Our project aims to analyze and understand the spatial and temporal variations in diabetes incidence rates and their relationship with lifestyle and demographic factors across different geographical locations. In addition, we plan to use this information to predict trends for specific regions. In the coming week, we will start performing exploratory data analysis on our dataset.
+
+The article I chose to read this week was "Geographically Weighted Regression" by David C. Wheeler and Antonio Páez, which introduces the method of Geographically Weighted Regression that was covered in class today. Using GWR, my team and I could be able to identify specific areas where interventions are critically needed or would prove most effective. This is achievable by understanding the local variations in the correlation between diabetes rates and covariates such as demographics or lifestyle habits. Compared to other models, this approach is better for our project because it considers both spatial and potentially temporal variations in these relationships. I really look forward to implementing and experimenting with this model in our project soon.
+
+{{< pagebreak >}}
