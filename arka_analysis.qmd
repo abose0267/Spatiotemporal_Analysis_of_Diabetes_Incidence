@@ -1,32 +1,29 @@
-```{r}
-library(dplyr)
-
-
-data2 <- read.csv("data/data2.csv") %>%
-  filter(YearStart == 2019, YearEnd == 2019,Topic == "Diabetes")
-data <- read.csv("data/data.csv")
-
-```
-```{r}
-colnames(data)
-```
 
 ```{r}
+data3 <- read.csv("data/500cities.csv")
+
+
 library(stringr)
+library(dplyr)
 library(sf)
 library(ggplot2)
-
-spatial_data <- st_read("data/shapes")
-data$GEOID <- data$GEOID10
-data$GEOID10 <- NULL
-data$GEOID <- as.character(data$GEOID)
-str(data$GEOID)
-str(spatial_data$GEOID)
-merged_data <- merge(spatial_data, data, by = "GEOID")
+regex_pattern <- "\\((-?\\d+\\.\\d+),\\s*(-?\\d+\\.\\d+)\\)"
+data3$latitude =  as.numeric(str_match(data3$GeoLocation, regex_pattern)[, 2])
+data3$longitude =  as.numeric(str_match(data3$GeoLocation, regex_pattern)[, 3])
+options(digits = 10)
+data3$latitude
 
 
-ggplot(merged_data) +
-  geom_sf(aes(fill = NatWalkInd))
+filtered_df_subset <- subset(data3, DataValueTypeID == "CrdPrv")
+ggplot(filtered_df_subset, aes(x = longitude, y = latitude,color=Data_Value)) +
+  geom_point() +
+  ggtitle("Spatial Plot with Latitude and Longitude") +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  theme_minimal()
+
+
+data3$Short_Question_Text
 
 ```
-
+Based on this data set, we can see that the the crude prevalence of type II diabetes seems to be consistently low along the west coast (California and Washington area). This may be because those areas promote healthy lifestyles and have areas to go exercise or hike

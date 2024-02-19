@@ -1,6 +1,0 @@
-"0","autoplot(vacdata_lm, "
-"0","         colour = scales::alpha(""black"","
-"0","                                alpha = 0.3), "
-"0","         smooth.colour = ""red"") + "
-"0","  theme_bw() +"
-"0","  theme(text = element_text(size = 20))"

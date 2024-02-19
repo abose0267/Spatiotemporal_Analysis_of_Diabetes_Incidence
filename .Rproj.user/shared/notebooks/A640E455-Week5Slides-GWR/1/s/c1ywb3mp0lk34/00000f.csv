@@ -1,6 +1,0 @@
-"0","vacdata_numeric_prop = vacdata_numeric %>% "
-"0","  mutate(vac_pop = ceiling((perc_vac/100)*population)) %>%"
-"0","  select(!perc_vac)"
-"0","vacdata_glm = glm(cbind(vac_pop, population) ~ .,"
-"0","                  data = vacdata_numeric_prop,"
-"0","                  family = binomial)"
