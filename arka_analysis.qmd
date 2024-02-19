@@ -1,0 +1,32 @@
+```{r}
+library(dplyr)
+
+
+data2 <- read.csv("data/data2.csv") %>%
+  filter(YearStart == 2019, YearEnd == 2019,Topic == "Diabetes")
+data <- read.csv("data/data.csv")
+
+```
+```{r}
+colnames(data)
+```
+
+```{r}
+library(stringr)
+library(sf)
+library(ggplot2)
+
+spatial_data <- st_read("data/shapes")
+data$GEOID <- data$GEOID10
+data$GEOID10 <- NULL
+data$GEOID <- as.character(data$GEOID)
+str(data$GEOID)
+str(spatial_data$GEOID)
+merged_data <- merge(spatial_data, data, by = "GEOID")
+
+
+ggplot(merged_data) +
+  geom_sf(aes(fill = NatWalkInd))
+
+```
+
