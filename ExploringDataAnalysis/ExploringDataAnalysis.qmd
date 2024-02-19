@@ -1,8 +1,43 @@
+---
+title: "Exploring Data Analysis"
+author: "Sebastian, Arka, and Abhinav"
+format: pdf
+---
+
 ## Performing exploratory data analysis:
 
 -   Look at the distributions and correlations of different variables. - Abhinav
 -   Plot variables over space and see if there is a noticeable trend. - Arka
--   Check for correlation between your variables. - Sebastia
--   Create summary tables with grouping variables. - Abhinav
+-   Check for correlation between your variables. - Sebastian
 
-Link to our repository here: [Spatiotemporal Analysis of Diabetes Incidence](https://github.com/abose0267/Spatiotemporal_Analysis_of_Diabetes_Incidence)
+```{r}
+# Load necessary libraries
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+
+# Read data
+EPA_SmartLocationDatabase <- read_csv("../data/EPA_SmartLocationDatabase_V3_Jan_2021_Final.csv")
+
+# Select only numeric columns for correlation matrix
+numeric_columns <- sapply(EPA_SmartLocationDatabase, is.numeric)
+numeric_data <- EPA_SmartLocationDatabase[, numeric_columns]
+
+# Compute correlation matrix for selected numeric variables
+cor_matrix <- cor(numeric_data, use = "pairwise.complete.obs")
+
+# Set threshold for significant correlations
+threshold <- 0.5
+
+# Filter correlations below threshold by setting to NA
+cor_matrix_filtered <- cor_matrix
+cor_matrix_filtered[abs(cor_matrix) < threshold] <- NA
+
+# Visualize filtered correlation matrix
+corrplot(cor_matrix_filtered, method = 'circle',
+         tl.col = "black", tl.srt = 45, tl.cex = 0.6, addrect = 2,
+         col = colorRampPalette(c("#6D9EC1", "white", "#E46726"))(200))
+```
+
+-   Create summary tables with grouping variables. - Abhinav
