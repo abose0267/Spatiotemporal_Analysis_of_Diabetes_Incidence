@@ -1,14 +1,10 @@
 ---
 title: "Exploring Data Analysis"
-author: "Sebastian, Arka, and Abhinav"
+author: "Sebastian Oberg"
 format: pdf
 ---
 
-## Performing exploratory data analysis:
-
--   Look at the distributions and correlations of different variables. - Abhinav
--   Plot variables over space and see if there is a noticeable trend. - Arka
--   Check for correlation between your variables. - Sebastian
+## -   Check for correlation between your variables. - Dataset 1, Walkability Index
 
 ```{r}
 # Load necessary libraries
@@ -17,27 +13,99 @@ library(dplyr)
 library(ggplot2)
 library(corrplot)
 
-# Read data
-EPA_SmartLocationDatabase <- read_csv("../data/EPA_SmartLocationDatabase_V3_Jan_2021_Final.csv")
+# Correct the file path to match the actual location of your CSV file
+file_path <- "../data/EPA_SmartLocationDatabase_V3_Jan_2021_Final.csv"
 
-# Select only numeric columns for correlation matrix
-numeric_columns <- sapply(EPA_SmartLocationDatabase, is.numeric)
-numeric_data <- EPA_SmartLocationDatabase[, numeric_columns]
+# Check if the file exists before attempting to read it
+if (!file.exists(file_path)) {
+  stop("The file does not exist in the specified directory.")
+}
+
+# Read data
+EPA_SmartLocationDatabase <- read_csv(file_path)
+
+# Select fewer columns of interest based on your domain knowledge or other criteria
+selected_columns <- EPA_SmartLocationDatabase %>%
+  select(TotPop, CountHU, HH, Workers, AutoOwn2p,
+         R_HiWageWk, TotEmp, D2A_JPHH,
+         D2C_TRPMX1, NatWalkInd, D3B_Ranked) # Adjusted the number of variables
+
+# Convert selected columns to a numeric matrix, if not already
+numeric_data <- data.matrix(selected_columns)
+
+# Ensure all selected data is numeric and finite
+numeric_data <- ifelse(!is.finite(numeric_data), NA, numeric_data)
 
 # Compute correlation matrix for selected numeric variables
 cor_matrix <- cor(numeric_data, use = "pairwise.complete.obs")
 
-# Set threshold for significant correlations
-threshold <- 0.5
+# Increase the size of the plot to make it more readable
+png(filename = "correlation_matrix.png", width = 10, height = 10, units = 'in', res = 300)
+par(mar = c(5, 5, 5, 5)) # Increase margin size if variable names are cut off
 
-# Filter correlations below threshold by setting to NA
-cor_matrix_filtered <- cor_matrix
-cor_matrix_filtered[abs(cor_matrix) < threshold] <- NA
+# Visualize the correlation matrix
+corrplot(
+  cor_matrix,
+  method = 'color', # Use color to represent correlation
+  type = 'upper', # Show only the upper half of the matrix
+  order = 'hclust', # Hierarchical clustering order
+  tl.cex = 1.2, # Increase text size for variable names
+  number.cex = 1.2, # Increase text size for correlation coefficients
+  number.digits = 2, # Reduce the number of digits to enhance readability
+  addCoef.col = 'black', # Color of the correlation coefficients
+  tl.col = 'black', # Color of text labels
+  tl.srt = 45, # Rotation of text labels
+  diag = FALSE # Remove the diagonal
+)
 
-# Visualize filtered correlation matrix
-corrplot(cor_matrix_filtered, method = 'circle',
-         tl.col = "black", tl.srt = 45, tl.cex = 0.6, addrect = 2,
-         col = colorRampPalette(c("#6D9EC1", "white", "#E46726"))(200))
+dev.off() # Close the plotting device
 ```
 
--   Create summary tables with grouping variables. - Abhinav
+![](correlation_matrix.png)
+
+The correlation matrix shows that housing-related variables like 'CountHU', 'HH', and 'Workers' are highly interrelated, showing that as the number of housing units increases, so does the number of households and workers. There is a strong negative correlation between the number of households with multiple cars and walkability, suggesting that more walkable areas tend to have fewer cars per household. Transportation diversity appears to have little association with the selected demographic and housing variables, indicating other factors may be at play.
+
+\pagebreak
+
+## -   Check for correlation between your variables. - Dataset 2, 500 Cities: Diagnosed diabetes among adults aged >=18 years
+
+```{r}
+# Load necessary libraries
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+
+# Correct the file path to match the actual location of your CSV file
+file_path <- "../data/500_Cities__Diagnosed_diabetes_among_adults_aged___18_years_20240219.csv"
+
+# Check if the file exists before attempting to read it
+if (!file.exists(file_path)) {
+  stop("The file does not exist in the specified directory.")
+}
+
+# Read data
+health_data <- read_csv(file_path)
+
+# Select the columns of interest
+selected_columns <- health_data %>%
+  select(Data_Value, Low_Confidence_Limit, High_Confidence_Limit, PopulationCount)
+
+# Convert selected columns to a numeric matrix, if not already
+numeric_data <- data.matrix(selected_columns)
+
+# Ensure all selected data is numeric and finite
+numeric_data <- ifelse(!is.finite(numeric_data), NA, numeric_data)
+
+# Compute correlation matrix for selected numeric variables
+cor_matrix <- cor(numeric_data, use = "pairwise.complete.obs")
+
+# Visualize the correlation matrix
+corrplot(cor_matrix, method = 'color',
+         tl.col = "black", tl.srt = 45, tl.cex = 0.6, addrect = 2,
+         col = colorRampPalette(c("#6D9EC1", "white", "#E46726"))(200),
+         order = "hclust", addCoef.col = "black",
+         diag = FALSE)
+```
+
+The correlation matrix shows a very high correlation between 'Data_Value' and its confidence limits, which is expected since the confidence limits are derived from the 'Data_Value'. The lack of correlation between 'PopulationCount' and the other variables suggests that in this dataset, the size of the population in a census tract does not influence the reported diabetes prevalence rates. This could possibly mean that diabetes prevalence is relatively the same across different population sizes, or that other factors not included in this analysis have a more significant impact on diabetes rates.
