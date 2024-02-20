@@ -1,3 +1,5 @@
+
+```{r}
 library(GGally)
 library(ggplot2)
 library(corrplot)
@@ -14,3 +16,4 @@ print(pairs)
 
 #From this correlogram and using the ggpairs function, we can see that majority of variables do not have a strong correlation between each other. We will need to further do more
 exploratory analysis and see what to add as covariates for prediction.
+```
