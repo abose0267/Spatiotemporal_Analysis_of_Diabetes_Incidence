@@ -1,4 +1,61 @@
 
+
+
+
+```{r}
+data <- read.csv("data/data.csv")
+
+
+
+```
+
+```{r}
+colnames(data)
+```
+```{r}
+library(sf)
+spatial_data <- st_read("data/shapes/texas")
+
+data <- data %>%
+  group_by(BLKGRPCE) %>%
+  summarise_all(mean, na.rm = TRUE)
+
+
+
+merged_data <- merge(data, spatial_data, by = "BLKGRPCE")
+colnames(merged_data)
+```
+```{r}
+
+merged_data$geometry
+```
+```{r}
+merged_sf <- st_as_sf(merged_data)
+
+# Plot the spatial data with ggplot
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = NatWalkInd)) 
+```
+```{r}
+spatial_data <- st_read("data/shapes/ny")
+
+data <- data %>%
+  group_by(BLKGRPCE) %>%
+  summarise_all(mean, na.rm = TRUE)
+
+
+
+merged_data <- merge(data, spatial_data, by = "BLKGRPCE")
+colnames(merged_data)
+
+merged_sf <- st_as_sf(merged_data)
+
+# Plot the spatial data with ggplot
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = NatWalkInd)) 
+```
+
+
 ```{r}
 data3 <- read.csv("data/500cities.csv")
 
