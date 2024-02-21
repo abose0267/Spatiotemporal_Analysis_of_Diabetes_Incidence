@@ -1,0 +1,35 @@
+
+$if(has-frontmatter)$
+\frontmatter
+$endif$
+% Custom
+\fancyhead[C]{}
+\hrule \medskip % Upper rule
+\begin{minipage}{0.295\textwidth} 
+\raggedright
+\footnotesize
+$if(author)$
+$author$ \hfill\\
+$endif$
+$if(institute)$
+$institute$ \hfill\\
+$endif$
+$if(email)$
+$email$
+$endif$
+\end{minipage}
+\begin{minipage}{0.4\textwidth} 
+\centering 
+\large 
+$title$\\ 
+\normalsize 
+$if(subtitle)$
+$subtitle$\\ 
+$endif$
+\end{minipage}
+\begin{minipage}{0.295\textwidth} 
+\raggedleft
+$date$\hfill\\
+\end{minipage}
+\medskip\hrule 
+\bigskip
