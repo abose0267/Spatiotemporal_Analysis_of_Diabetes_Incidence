@@ -18,7 +18,7 @@ file_path <- "../Data/data.csv"
 
 # Check if the file exists before attempting to read it
 if (!file.exists(file_path)) {
-  stop("The file does not exist in the specified directory.")
+  stop("The file does not exist in the specifieddirectory.")
 }
 
 # Read data
