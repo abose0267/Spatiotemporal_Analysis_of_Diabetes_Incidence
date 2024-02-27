@@ -1,0 +1,10 @@
+---
+title: Spatial Analysis
+subtitle: Sebastian Oberg, Arka Bose, Abhinav Cheruvu
+format:
+  homework-pdf: default
+institute: Texas A\&M University
+date: 2/27/2024
+---
+
+## Start Here
