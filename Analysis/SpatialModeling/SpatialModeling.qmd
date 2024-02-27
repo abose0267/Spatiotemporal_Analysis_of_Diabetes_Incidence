@@ -54,3 +54,38 @@ corrplot(cor_matrix, method = "circle", type = "upper", order = "hclust",
 ```
 
 The correlation matrix above indicates strong positive correlations between obesity, physical activity, smoking, diabetes, and high blood pressure prevalence, with less correlation to the national walking index. Given these relationships, my team decided that a spatial autoregressive model (SAR) or a geographically weighted regression (GWR) could be appropriate to account for spatial dependencies and variations in the data.
+
+## GWR Model
+```{r}
+install.packages("spgwr")
+install.packages("spdep")
+library(spgwr)
+library(spdep)
+library(sf)
+
+spatial_data <- st_as_sf(merged_data, coords = c("longitude", "latitude"), crs = 4326) # placeholder
+
+# Assuming 'DIABETES_CrudePrev' is dependent variable and rest are independent
+formula_gwr <- DIABETES_CrudePrev ~ OBESITY_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + BPHIGH_CrudePrev
+
+# Fit GWR model
+gwr_model <- gwr(formula_gwr, data = merged_data, coords = cbind(spatial_data$lon, spatial_data$lat), bandwidth = 70, hatmatrix = TRUE)
+
+# Print GWR model summary
+print(summary(gwr_model))
+```
+
+## CAR Model
+```{r}
+# CAR models require a neighbors list
+neighbors_list <- poly2nb(spatial_data) # placeholder
+
+# Define formula for CAR model
+formula_car <- DIABETES_CrudePrev ~ OBESITY_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + BPHIGH_CrudePrev
+
+# Fit CAR model
+car_model <- lagsarlm(formula_car, data = merged_data, listw = nb2listw(neighbors_list))
+
+# Print CAR model summary
+print(summary(car_model))
+```
