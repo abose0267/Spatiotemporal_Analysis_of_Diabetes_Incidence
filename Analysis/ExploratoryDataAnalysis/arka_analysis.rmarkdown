@@ -1,0 +1,115 @@
+---
+title: "Exploring Data Analysis"
+author: "Arka Bose"
+format: pdf
+---
+
+```{r}
+data <- read.csv("../../Data/data.csv")
+data2 <- read.csv("../../Data/500cities.csv")
+
+
+
+
+
+```
+
+```{r}
+url <- "https://data.cdc.gov/resource/mb5y-ytti.csv"
+destination_file <- "../Data/test.csv"
+
+# Download the file
+download.file(url, destination_file, method = "auto")
+```
+
+```{r}
+library(dplyr)
+# Assuming your data frame is named 'data'
+
+# Step 1: Convert columns to strings and pad with leading zeros
+data$STATEFP <- sprintf("%02d", as.numeric(data$STATEFP))
+data$COUNTYFP <- sprintf("%03d", as.numeric(data$COUNTYFP))
+data$TRACTCE <- sprintf("%06d", as.numeric(data$TRACTCE))
+
+# Step 2: Concatenate the padded columns
+data$TractFIPS <- paste0(data$STATEFP, data$COUNTYFP, data$TRACTCE)
+
+# Step 3: Convert the concatenated string to integer
+data$TractFIPS <- as.numeric(data$TractFIPS)
+
+```
+
+```{r}
+colnames(data)
+```
+
+```{r}
+# Assuming your data frames are named 'data1' and 'data2'
+averaged_data <- data %>%
+  group_by(TractFIPS) %>%
+  summarise(NatWalkInd = mean(NatWalkInd, na.rm = TRUE)) %>%
+  ungroup()
+
+```
+
+```{r}
+merged_data <- merge(averaged_data, data2, by = "TractFIPS", all.x = TRUE, all.y = TRUE)
+merged_data <- merged_data %>%
+  filter(StateAbbr == "CA")
+```
+
+```{r}
+library(sf)
+library(dplyr)
+library(ggplot2)
+spatial_data <- st_read("../../Data/shapes/ca_tract")
+
+spatial_data$TractFIPS <- as.numeric(spatial_data$GEOID)
+merged_data <- merge(merged_data, spatial_data, by = "TractFIPS", all.x = TRUE, all.y = TRUE)
+
+merged_data <- na.omit(merged_data)
+
+```
+
+```{r}
+merged_sf <- st_as_sf(merged_data)
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = NatWalkInd)) +
+scale_fill_gradientn(colours = terrain.colors(8),
+                       limits = c(0, 20),
+                       breaks = c(0, 10, 20))
+
+```
+
+```{r}
+colnames(merged_data)
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = DIABETES_CrudePrev)) +
+  scale_fill_gradientn(colours = terrain.colors(8),
+                       limits = c(0, 28),
+                       breaks = c(0, 12.5, 25)) 
+```
+
+```{r}
+library(GWmodel)
+library(sf)
+
+merged_spatialdf <- as(merged_sf, "Spatial")
+
+merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+                        data = merged_spatialdf,
+                        kernel = "exponential",
+                        parallel.method = "omp")
+
+merged_gwr <- gwr.basic(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+                        data = merged_spatialdf,
+                        bw = merged_gwr_bw,
+                        kernel = "exponential",
+                        parallel.method = "omp")
+
+gwr_results_sf <- merged_gwr$SDF %>% as("sf")
+```
+

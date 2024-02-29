@@ -6,8 +6,8 @@ format: pdf
 ---
 
 ```{r}
-data <- read.csv("../Data/data.csv")
-data2 <- read.csv("../Data/500cities.csv")
+data <- read.csv("../../Data/data.csv")
+data2 <- read.csv("../../Data/500cities.csv")
 
 
 
@@ -101,7 +101,7 @@ merged_data <- merged_data %>%
 library(sf)
 library(dplyr)
 library(ggplot2)
-spatial_data <- st_read("../Data/shapes/ca_tract")
+spatial_data <- st_read("../../Data/shapes/ca_tract")
 
 spatial_data$TractFIPS <- as.numeric(spatial_data$GEOID)
 merged_data <- merge(merged_data, spatial_data, by = "TractFIPS", all.x = TRUE, all.y = TRUE)
@@ -132,64 +132,24 @@ ggplot() +
                        breaks = c(0, 12.5, 25)) 
 ```
 
-
-
 ```{r}
-
-merged_data$geometry
-```
-```{r}
-merged_sf <- st_as_sf(merged_data)
-
-# Plot the spatial data with ggplot
-ggplot() +
-  geom_sf(data = merged_sf, aes(fill = NatWalkInd)) 
-```
-```{r}
-spatial_data <- st_read("../Data/shapes/ny")
-
-data <- data %>%
-  group_by(BLKGRPCE) %>%
-  summarise_all(mean, na.rm = TRUE)
-
-
-
-merged_data <- merge(data, spatial_data, by = "BLKGRPCE")
-
-
-merged_sf <- st_as_sf(merged_data)
-
-# Plot the spatial data with ggplot
-ggplot() +
-  geom_sf(data = merged_sf, aes(fill = NatWalkInd)) 
-```
-
-
-```{r}
-data3 <- read.csv("../Data/500cities.csv")
-
-
-library(stringr)
-library(dplyr)
+library(GWmodel)
 library(sf)
-library(ggplot2)
-regex_pattern <- "\\((-?\\d+\\.\\d+),\\s*(-?\\d+\\.\\d+)\\)"
-data3$latitude =  as.numeric(str_match(data3$GeoLocation, regex_pattern)[, 2])
-data3$longitude =  as.numeric(str_match(data3$GeoLocation, regex_pattern)[, 3])
-options(digits = 10)
-data3$latitude
 
+merged_spatialdf <- as(merged_sf, "Spatial")
 
-filtered_df_subset <- subset(data3, DataValueTypeID == "CrdPrv")
-ggplot(filtered_df_subset, aes(x = longitude, y = latitude,color=Data_Value)) +
-  geom_point() +
-  ggtitle("Spatial Plot with Latitude and Longitude") +
-  xlab("Longitude") +
-  ylab("Latitude") +
-  theme_minimal()
+merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+                        data = merged_spatialdf,
+                        kernel = "exponential",
+                        parallel.method = "omp")
 
+merged_gwr <- gwr.basic(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+                        data = merged_spatialdf,
+                        bw = merged_gwr_bw,
+                        kernel = "exponential",
+                        parallel.method = "omp")
 
-data3$Short_Question_Text
-
+gwr_results_sf <- merged_gwr$SDF %>% as("sf")
 ```
-Based on this data set, we can see that the the crude prevalence of type II diabetes seems to be consistently low along the west coast (California and Washington area). This may be because those areas promote healthy lifestyles and have areas to go exercise or hike
+
+
