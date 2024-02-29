@@ -55,42 +55,7 @@ corrplot(cor_matrix, method = "circle", type = "upper", order = "hclust",
 
 The correlation matrix above indicates strong positive correlations between obesity, physical activity, smoking, diabetes, and high blood pressure prevalence, with less correlation to the national walking index. Given these relationships, my team decided that a spatial autoregressive model (SAR) or a geographically weighted regression (GWR) could be appropriate to account for spatial dependencies and variations in the data.
 
-<<<<<<< HEAD
-## GWR Model
-```{r}
-install.packages("spgwr")
-install.packages("spdep")
-library(spgwr)
-library(spdep)
-library(sf)
 
-spatial_data <- st_as_sf(merged_data, coords = c("longitude", "latitude"), crs = 4326) # placeholder
-
-# Assuming 'DIABETES_CrudePrev' is dependent variable and rest are independent
-formula_gwr <- DIABETES_CrudePrev ~ OBESITY_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + BPHIGH_CrudePrev
-
-# Fit GWR model
-gwr_model <- gwr(formula_gwr, data = merged_data, coords = cbind(spatial_data$lon, spatial_data$lat), bandwidth = 70, hatmatrix = TRUE)
-
-# Print GWR model summary
-print(summary(gwr_model))
-```
-
-## CAR Model
-```{r}
-# CAR models require a neighbors list
-neighbors_list <- poly2nb(spatial_data) # placeholder
-
-# Define formula for CAR model
-formula_car <- DIABETES_CrudePrev ~ OBESITY_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + BPHIGH_CrudePrev
-
-# Fit CAR model
-car_model <- lagsarlm(formula_car, data = merged_data, listw = nb2listw(neighbors_list))
-
-# Print CAR model summary
-print(summary(car_model))
-```
-=======
 
 
 
@@ -98,22 +63,62 @@ print(summary(car_model))
 library(GWmodel)
 library(sf)
 
+
+spatial_data <- st_read("../../Data/shapes/ca_tract")
+
+spatial_data$TractFIPS <- as.numeric(spatial_data$GEOID)
+merged_data <- merge(merged_data, spatial_data, by = "TractFIPS", all.x = TRUE, all.y = TRUE)
+
+merged_data <- na.omit(merged_data)
+merged_sf <- st_as_sf(merged_data)
 merged_spatialdf <- as(merged_sf, "Spatial")
 
 merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
                         data = merged_spatialdf,
                         kernel = "exponential",
-                        parallel.method = "omp")
+                        )
 
 merged_gwr <- gwr.basic(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
                         data = merged_spatialdf,
                         bw = merged_gwr_bw,
                         kernel = "exponential",
-                        parallel.method = "omp")
+                        )
 
 gwr_results_sf <- merged_gwr$SDF %>% as("sf")
 
 
+
+
+
+```
+```{r}
+
+summary(gwr_results_sf)
 ```
 
->>>>>>> 85aa983 (Added GWR Model)
+
+
+
+
+```{r}
+library(ggplot2)
+
+# Plot the spatial distribution of DIABETES_CrudePrev
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = DIABETES_CrudePrev), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+
+# Plot the spatial distribution of GWR results
+ggplot() +
+  geom_sf(data = gwr_results_sf, aes(fill = yhat), color = "black", size = 0.2) +
+  scale_fill_gradient(name = "Predicted Diabetes Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,25)) +
+  labs(title = "GWR Predicted Diabetes Crude Prevalence")
+```
+
+```{r}
+plot(gwr_results_sf$residual)
+```
+
+
+
