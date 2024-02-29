@@ -135,7 +135,7 @@ ggplot() +
 ```{r}
 library(GWmodel)
 library(sf)
-
+#Abhinav Cheruvu code
 merged_spatialdf <- as(merged_sf, "Spatial")
 
 merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
