@@ -8,6 +8,7 @@ date: 2/27/2024
 ---
 
 ## Correlation Matrix
+
 ```{r}
 # Load necessary libraries
 library(dplyr)
@@ -55,8 +56,6 @@ corrplot(cor_matrix, method = "circle", type = "upper", order = "hclust",
 
 The correlation matrix above indicates strong positive correlations between obesity, physical activity, smoking, diabetes, and high blood pressure prevalence, with less correlation to the national walking index. Given these relationships, my team decided that a spatial autoregressive model (SAR) or a geographically weighted regression (GWR) could be appropriate to account for spatial dependencies and variations in the data.
 
-
-
 # Geographically Weighted Regression Model
 
 ```{r}
@@ -91,14 +90,11 @@ gwr_results_sf <- merged_gwr$SDF %>% as("sf")
 
 
 ```
+
 ```{r}
 
 summary(gwr_results_sf)
 ```
-
-
-
-
 
 ```{r}
 library(ggplot2)
@@ -115,8 +111,8 @@ ggplot() +
   scale_fill_gradient(name = "Predicted Diabetes Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,25)) +
   labs(title = "GWR Predicted Diabetes Crude Prevalence using GWR")
 ```
-The first plot shows the actual geographical distribution of diabetes crude prevalence throughout California, with the intensity of the blue shade meaning the prevalence rates and the darker areas signaling higher diabetes prevalence. This is shown mostly in the central and southern regions, which highlights the spatial variability in diabetes prevalence and suggests that lifestyle factors, healthcare access, and demographics might be influential here. The second plot presents predictions from our Geographically Weighted Regression (GWR) model, showing a spatial gradient of diabetes prevalence. The model shows higher rates in similar central areas as observed in the actual data. This consistency between the observed and predicted patterns emphasizes the potential impact of local factors on diabetes prevalence. These maps give a complete view of both the current state and modeled predictions of diabetes distribution, which could be very insightful when considering health strategies and specific geographic needs.
 
+The first plot shows the actual geographical distribution of diabetes crude prevalence throughout California, with the intensity of the blue shade meaning the prevalence rates and the darker areas signaling higher diabetes prevalence. This is shown mostly in the central and southern regions, which highlights the spatial variability in diabetes prevalence and suggests that lifestyle factors, healthcare access, and demographics might be influential here. The second plot presents predictions from our Geographically Weighted Regression (GWR) model, showing a spatial gradient of diabetes prevalence. The model shows higher rates in similar central areas as observed in the actual data. This consistency between the observed and predicted patterns emphasizes the potential impact of local factors on diabetes prevalence. These maps give a complete view of both the current state and modeled predictions of diabetes distribution, which could be very insightful when considering health strategies and specific geographic needs.
 
 ```{r}
 plot(gwr_results_sf$residual)
@@ -124,10 +120,7 @@ plot(gwr_results_sf$residual)
 
 The plot above is a residual plot from the Geographically Weighted Regression (GWR) analysis. The distribution of points along the horizontal line at zero suggests that the model has no systematic error across the range of the data. However, there are several outliers, which can be seen by points above or below the horizontal line, which probably represents areas where the model's predictions are less accurate. In general, the residuals are relatively evenly scattered, which implies it is a good fit for most of the data points, although the outliers suggest areas that might need further examination or could be due to unique local factors not captured by the model.
 
-
-
 # Random Forest Model
-
 
 ```{r}
 library(randomForest)
@@ -140,7 +133,6 @@ print(rf_model)
 
 
 ```
-
 
 ```{r}
 plot(rf_model)
@@ -155,7 +147,6 @@ modelPrediction <- predict(rf_model)
 merged_sf$rfModelValues <- modelPrediction
 merged_sf$rf_residuals <- merged_sf$DIABETES_CrudePrev - merged_sf$rfModelVal
 ```
-
 
 ```{r}
 ggplot() +
@@ -174,10 +165,7 @@ ggplot() +
   labs(title = "Residuals of Random Forest Model")
 ```
 
-
-
-
-
+# Gradient Boosted Model
 
 ```{r}
 library(gbm)
@@ -201,6 +189,9 @@ plot(gbm_model$cv.fitted)
 
 
 ```
+
+# Plots for RFM and GBM
+
 ```{r}
 merged_sf$gbmModelValue <- gbm_model$cv.fitted
 merged_sf$gbmResiduals <- merged_sf$DIABETES_CrudePrev-merged_sf$gbmModelValue
@@ -220,3 +211,16 @@ ggplot() +
   labs(title = "Residuals of GBM Model")
 ```
 
+## Summary of Plots
+
+### Random Forest Model:
+The Random Forest model's spatial plot suggest the highest rates are concentrated in the south. The variation in prevalence across counties may imply that local factors, potentially including lifestyle, access to healthcare, or socio-economic conditions, significantly influence diabetes rates. The coastal regions show a lower prevalence, hinting at possible variations in health behaviors or environmental factors. The model seems to effectively capture these regional differences, which offers detailed insights.
+
+### Residuals of Random Forest Model:
+The residuals from the Random Forest model indicate a generally well-fitting model since most residuals are clustered around zero. However, the presence of outliers with large residuals suggests that there are areas where the model doesn't align perfectly with the observed data. This could potentially be due to factors not accounted for in the model. These outliers highlight specific regions where additional variables or model adjustments may be necessary to improve predictive accuracy.
+
+### Gradient Boosted Model:
+The Gradient Boosted Model shows a tendency to smooth out the spatial variability seen in the Random Forest outputs. While this may imply a less nuanced capture of local occurrence, it could also indicate a more generalized understanding of the data, which might be useful for broader public health planning. The GBM's residuals also display a good fit overall but, but like the Random Forest model, shows room for refinement in capturing local variance.
+
+### Comparative Analysis:
+When comparing the two models, the Random Forest appears to describe finer spatial details of diabetes prevalence, while the Gradient Boosted Model provides a more generalized prediction across the state. The choice between these models may depend on the specific needs of the analysis—if the goal is to understand detailed local patterns, then the Random Forest might probably be preferable. Contrarily, for more general trends, the GBM could satisfy demands. Both models, however, point to the multifactorial nature of diabetes prevalence and underscore areas where public health efforts might be targeted to reduce it.
