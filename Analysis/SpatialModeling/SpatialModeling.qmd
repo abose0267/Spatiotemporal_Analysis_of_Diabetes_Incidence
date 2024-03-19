@@ -136,6 +136,9 @@ data_df <- as.data.frame(merged_spatialdf)
 
 rf_model <- randomForest(DIABETES_CrudePrev ~ NatWalkInd+OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,data = data_df)
 print(rf_model)
+
+
+
 ```
 
 
@@ -146,6 +149,34 @@ partialPlot(rf_model, data_df, NatWalkInd)
 plot(data_df$DIABETES_CrudePrev, predict(rf_model), xlab = "Actual", ylab = "Predicted")
 abline(0,1)
 ```
+
+```{r}
+modelPrediction <- predict(rf_model)
+merged_sf$rfModelValues <- modelPrediction
+merged_sf$rf_residuals <- merged_sf$DIABETES_CrudePrev - merged_sf$rfModelVal
+```
+
+
+```{r}
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = DIABETES_CrudePrev), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = rfModelValues), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence us Random Forest Model")
+
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = rf_residuals), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Residuals of Random Forest Model")
+```
+
+
+
+
 
 
 ```{r}
