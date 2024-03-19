@@ -57,7 +57,7 @@ The correlation matrix above indicates strong positive correlations between obes
 
 
 
-
+# Geographically Weighted Regression Model
 
 ```{r}
 library(GWmodel)
@@ -113,7 +113,7 @@ ggplot() +
 ggplot() +
   geom_sf(data = gwr_results_sf, aes(fill = yhat), color = "black", size = 0.2) +
   scale_fill_gradient(name = "Predicted Diabetes Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,25)) +
-  labs(title = "GWR Predicted Diabetes Crude Prevalence")
+  labs(title = "GWR Predicted Diabetes Crude Prevalence using GWR")
 ```
 The first plot shows the actual geographical distribution of diabetes crude prevalence throughout California, with the intensity of the blue shade meaning the prevalence rates and the darker areas signaling higher diabetes prevalence. This is shown mostly in the central and southern regions, which highlights the spatial variability in diabetes prevalence and suggests that lifestyle factors, healthcare access, and demographics might be influential here. The second plot presents predictions from our Geographically Weighted Regression (GWR) model, showing a spatial gradient of diabetes prevalence. The model shows higher rates in similar central areas as observed in the actual data. This consistency between the observed and predicted patterns emphasizes the potential impact of local factors on diabetes prevalence. These maps give a complete view of both the current state and modeled predictions of diabetes distribution, which could be very insightful when considering health strategies and specific geographic needs.
 
@@ -123,3 +123,69 @@ plot(gwr_results_sf$residual)
 ```
 
 The plot above is a residual plot from the Geographically Weighted Regression (GWR) analysis. The distribution of points along the horizontal line at zero suggests that the model has no systematic error across the range of the data. However, there are several outliers, which can be seen by points above or below the horizontal line, which probably represents areas where the model's predictions are less accurate. In general, the residuals are relatively evenly scattered, which implies it is a good fit for most of the data points, although the outliers suggest areas that might need further examination or could be due to unique local factors not captured by the model.
+
+
+
+# Random Forest Model
+
+
+```{r}
+library(randomForest)
+
+data_df <- as.data.frame(merged_spatialdf)
+
+rf_model <- randomForest(DIABETES_CrudePrev ~ NatWalkInd+OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,data = data_df)
+print(rf_model)
+```
+
+
+```{r}
+plot(rf_model)
+varImpPlot(rf_model)
+partialPlot(rf_model, data_df, NatWalkInd)
+plot(data_df$DIABETES_CrudePrev, predict(rf_model), xlab = "Actual", ylab = "Predicted")
+abline(0,1)
+```
+
+
+```{r}
+library(gbm)
+
+merged_spatialdf <- as(merged_sf, "Spatial")
+data_df <- as.data.frame(merged_spatialdf)
+
+gbm_model <- gbm(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+                 data = data_df,
+                 distribution = "gaussian",  
+                 n.trees = 500,  
+                 interaction.depth = 3,  
+                 shrinkage = 0.1,  
+                 bag.fraction = 0.5,  
+                 cv.folds = 5,  
+                 verbose = TRUE)  
+
+summary(gbm_model)
+
+plot(gbm_model$cv.fitted)
+
+
+```
+```{r}
+merged_sf$gbmModelValue <- gbm_model$cv.fitted
+merged_sf$gbmResiduals <- merged_sf$DIABETES_CrudePrev-merged_sf$gbmModelValue
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = DIABETES_CrudePrev), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = gbmModelValue), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence us Gradient Boosted Model")
+
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = gbmResiduals), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Residuals of GBM Model")
+```
+
