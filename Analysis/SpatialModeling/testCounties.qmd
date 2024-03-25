@@ -1,0 +1,268 @@
+---
+title: Spatial Analysis
+subtitle: Sebastian Oberg, Arka Bose, Abhinav Cheruvu
+format:
+  homework-pdf: default
+institute: Texas A\&M University
+date: 2/27/2024
+---
+
+
+
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(corrplot) # correlation matrix visualization
+library(ggcorrplot) # ggplot2 style visualization of correlation matrix
+
+# Read datasets
+data <- read.csv("../../Data/data.csv")
+data2 <- read.csv("../../Data/500cities.csv")
+```
+
+## Correlation Matrix
+
+```{r}
+
+
+# Prepare 'data' by padding and merging columns to create a unique identifier
+data$STATEFP <- sprintf("%02d", as.numeric(data$STATEFP))
+data$COUNTYFP <- sprintf("%03d", as.numeric(data$COUNTYFP))
+data$CountyFIPS <- sprintf("%05d",as.numeric(paste0(data$STATEFP, data$COUNTYFP)))
+
+# Summarize 'data' to get mean of 'NatWalkInd' by 'TractFIPS'
+averaged_data <- data %>%
+  group_by(CountyFIPS) %>%
+  summarise(NatWalkInd = mean(NatWalkInd, na.rm = TRUE)) %>%
+  ungroup()
+
+data2$CountyFIPS <- sprintf("%05s", paste0(data2$CountyFIPS))
+
+
+averaged_data2 <- data2 %>%
+  group_by(CountyFIPS) %>%
+  summarise(DIABETES_CrudePrev = mean(DIABETES_CrudePrev, na.rm = TRUE),BPHIGH_CrudePrev= mean(BPHIGH_CrudePrev, na.rm = TRUE),OBESITY_CrudePrev=mean(OBESITY_CrudePrev, na.rm = TRUE),LPA_CrudePrev=mean(LPA_CrudePrev, na.rm = TRUE),CSMOKING_CrudePrev=mean(CSMOKING_CrudePrev, na.rm = TRUE),StateAbbr=StateAbbr) %>%
+  ungroup() %>%
+  unique()
+
+
+# Select relevant columns from 'data2'
+data2_relevant <- averaged_data2 %>% 
+  select(CountyFIPS, StateAbbr, DIABETES_CrudePrev, BPHIGH_CrudePrev, OBESITY_CrudePrev, LPA_CrudePrev, CSMOKING_CrudePrev)
+
+# Merge 'averaged_data' with 'data2_relevant' on 'TractFIPS'
+merged_data <- merge(averaged_data, data2_relevant, by = "CountyFIPS", all.x = TRUE, all.y = TRUE)
+
+merged_data <- subset(merged_data, !(StateAbbr %in% c("AK", "HI")))
+
+# Calculate correlation matrix
+cor_matrix <- cor(merged_data %>% select(-CountyFIPS, -StateAbbr), use = "complete.obs")  # Handling missing values by using complete observations
+
+# Output variable names (column names) used for correlation matrix
+cat("Variables used for correlation matrix:\n")
+print(names(merged_data %>% select(-CountyFIPS, -StateAbbr)))
+
+# Make correlation matrix
+corrplot(cor_matrix, method = "circle", type = "upper", order = "hclust",
+         tl.col = "black", tl.srt = 45,  # Text label color and rotation
+         addCoef.col = "orange")  # Add correlation coefficients to plot
+```
+
+The correlation matrix above indicates strong positive correlations between obesity, physical activity, smoking, diabetes, and high blood pressure prevalence, with less correlation to the national walking index. Given these relationships, my team decided that a spatial autoregressive model (SAR) or a geographically weighted regression (GWR) could be appropriate to account for spatial dependencies and variations in the data.
+
+# Geographically Weighted Regression Model
+
+```{r}
+library(GWmodel)
+library(sf)
+
+
+spatial_data <- st_read("../../Data/shapes/us_counties")
+
+
+spatial_data$CountyFIPS <- sprintf("%05s", paste0(spatial_data$GEOID))
+
+cleaned_spatial = data.frame()
+
+
+selected_columns <- spatial_data[, c("CountyFIPS", "geometry","INTPTLAT","INTPTLON")]
+cleaned_spatial <- data.frame(selected_columns) %>% na.omit()
+```
+```{r}
+merged_data <- merge(merged_data, cleaned_spatial, by = "CountyFIPS", all.x = TRUE, all.y = TRUE)
+```
+
+```{r}
+
+
+
+
+merged_data <- na.omit(merged_data)
+merged_sf <- st_as_sf(merged_data)
+merged_spatialdf <- as(merged_sf, "Spatial")
+
+merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+                        data = merged_spatialdf,
+                        kernel = "exponential",
+                        )
+
+merged_gwr <- gwr.basic(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+                        data = merged_spatialdf,
+                        bw = merged_gwr_bw,
+                        kernel = "exponential",
+                        )
+
+gwr_results_sf <- merged_gwr$SDF %>% as("sf")
+
+```
+
+```{r}
+
+summary(gwr_results_sf)
+```
+
+```{r}
+library(ggplot2)
+
+# Plot the spatial distribution of DIABETES_CrudePrev
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = DIABETES_CrudePrev), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,25)) +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+
+# Plot the spatial distribution of GWR results
+ggplot() +
+  geom_sf(data = gwr_results_sf, aes(fill = yhat), color = "black", size = 0.2) +
+  scale_fill_gradient(name = "Predicted Diabetes Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,25)) +
+  labs(title = "GWR Predicted Diabetes Crude Prevalence using GWR")
+```
+```{r}
+# Plot the spatial distribution of DIABETES_CrudePrev
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = LPA_CrudePrev), color="black",size=0.2) +
+  scale_fill_gradient(name = "LPA Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,20)) +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+
+# Plot the spatial distribution of GWR results
+ggplot() +
+  geom_sf(data = gwr_results_sf, aes(fill = LPA_CrudePrev), color = "black", size = 0.2) +
+  scale_fill_gradient(name = "Predicted Diabetes Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,20)) +
+  labs(title = "GWR Predicted Diabetes Crude Prevalence using GWR")
+```
+
+
+The first plot shows the actual geographical distribution of diabetes crude prevalence throughout California, with the intensity of the blue shade meaning the prevalence rates and the darker areas signaling higher diabetes prevalence. This is shown mostly in the central and southern regions, which highlights the spatial variability in diabetes prevalence and suggests that lifestyle factors, healthcare access, and demographics might be influential here. The second plot presents predictions from our Geographically Weighted Regression (GWR) model, showing a spatial gradient of diabetes prevalence. The model shows higher rates in similar central areas as observed in the actual data. This consistency between the observed and predicted patterns emphasizes the potential impact of local factors on diabetes prevalence. These maps give a complete view of both the current state and modeled predictions of diabetes distribution, which could be very insightful when considering health strategies and specific geographic needs.
+
+```{r}
+plot(gwr_results_sf$residual)
+mse = mean((gwr_results_sf$residual)*(gwr_results_sf$residual)) %>% sqrt()
+print(mse)
+```
+
+The plot above is a residual plot from the Geographically Weighted Regression (GWR) analysis. The distribution of points along the horizontal line at zero suggests that the model has no systematic error across the range of the data. However, there are several outliers, which can be seen by points above or below the horizontal line, which probably represents areas where the model's predictions are less accurate. In general, the residuals are relatively evenly scattered, which implies it is a good fit for most of the data points, although the outliers suggest areas that might need further examination or could be due to unique local factors not captured by the model.
+
+# Random Forest Model
+
+```{r}
+library(randomForest)
+
+data_df <- as.data.frame(merged_spatialdf)
+
+rf_model <- randomForest(DIABETES_CrudePrev ~ NatWalkInd+OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,data = data_df)
+print(rf_model)
+
+
+
+```
+
+```{r}
+plot(rf_model)
+varImpPlot(rf_model)
+partialPlot(rf_model, data_df, NatWalkInd)
+plot(data_df$DIABETES_CrudePrev, predict(rf_model), xlab = "Actual", ylab = "Predicted")
+abline(0,1)
+```
+
+```{r}
+modelPrediction <- predict(rf_model)
+merged_sf$rfModelValues <- modelPrediction
+merged_sf$rf_residuals <- merged_sf$DIABETES_CrudePrev - merged_sf$rfModelVal
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = DIABETES_CrudePrev), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = rfModelValues), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence us Random Forest Model")
+
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = rf_residuals), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Residuals of Random Forest Model")
+```
+
+# Gradient Boosted Model
+
+```{r}
+library(gbm)
+
+merged_spatialdf <- as(merged_sf, "Spatial")
+data_df <- as.data.frame(merged_spatialdf)
+
+gbm_model <- gbm(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+                 data = data_df,
+                 distribution = "gaussian",  
+                 n.trees = 500,  
+                 interaction.depth = 3,  
+                 shrinkage = 0.1,  
+                 bag.fraction = 0.5,  
+                 cv.folds = 5,  
+                 verbose = TRUE)  
+
+summary(gbm_model)
+
+plot(gbm_model$cv.fitted)
+
+
+```
+
+# Plots for RFM and GBM
+
+```{r}
+merged_sf$gbmModelValue <- gbm_model$cv.fitted
+merged_sf$gbmResiduals <- merged_sf$DIABETES_CrudePrev-merged_sf$gbmModelValue
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = DIABETES_CrudePrev), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = gbmModelValue), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence us Gradient Boosted Model")
+
+ggplot() +
+  geom_sf(data = merged_sf, aes(fill = gbmResiduals), color="black",size=0.2) +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue") +
+  labs(title = "Residuals of GBM Model")
+```
+
+## Summary of Plots
+
+### Random Forest Model:
+The Random Forest model's spatial plot suggest the highest rates are concentrated in the south. The variation in prevalence across counties may imply that local factors, potentially including lifestyle, access to healthcare, or socio-economic conditions, significantly influence diabetes rates. The coastal regions show a lower prevalence, hinting at possible variations in health behaviors or environmental factors. The model seems to effectively capture these regional differences, which offers detailed insights.
+
+### Residuals of Random Forest Model:
+The residuals from the Random Forest model indicate a generally well-fitting model since most residuals are clustered around zero. However, the presence of outliers with large residuals suggests that there are areas where the model doesn't align perfectly with the observed data. This could potentially be due to factors not accounted for in the model. These outliers highlight specific regions where additional variables or model adjustments may be necessary to improve predictive accuracy.
+
+### Gradient Boosted Model:
+The Gradient Boosted Model shows a tendency to smooth out the spatial variability seen in the Random Forest outputs. While this may imply a less nuanced capture of local occurrence, it could also indicate a more generalized understanding of the data, which might be useful for broader public health planning. The GBM's residuals also display a good fit overall but, but like the Random Forest model, shows room for refinement in capturing local variance.
+
+### Comparative Analysis:
+The Geographically Weighted Regression (GWR) model effectively captures local variations in diabetes prevalence, highlighting the impact of regional factors. In comparison, the Gradient Boosted Model (GBM) provides a more generalized overview, potentially smoothing over local nuances. GWR's strength lies in its spatially detailed predictions, while GBM's smoothed predictions may be beneficial for broader trend analysis. For public health strategies, GWR's detailed spatial insights could be more preferred. On the other hand, the GBM's general predictions across larger areas could be more appropriate for overarching health policies.
