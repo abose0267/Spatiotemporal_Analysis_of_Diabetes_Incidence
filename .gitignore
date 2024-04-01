@@ -1,6 +1,13 @@
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
+git rm --cached -r .Rproj.user
+git rm --cached -r .Rhistory
+git rm --cached -r .RData
+git rm --cached -r .Ruserdata
+git rm --cached -r ./.quarto/
+git rm --cached -r '*.DS_Store'
+git rm --cached -r '*.pdf'
 
-/.quarto/
+git add .gitignore
+git commit -m "Update .gitignore and untrack unnecessary files"
+
+git push
+
