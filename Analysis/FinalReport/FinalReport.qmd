@@ -1,0 +1,151 @@
+
+
+```{r}
+source("../code/DataProcessing.R")
+library(GWmodel)
+library(dplyr)
+library(ggplot2)
+library(sf)
+library(corrplot)
+```
+
+
+
+
+```{r}
+
+loadedData <- loadData()
+```
+```{r}
+  spatial_data <- st_read("../Data/shapes/us_counties")
+```
+
+
+```{r}
+
+
+
+cleaned_walkability = loadedData$original_walkability %>% clean_walkability()
+cleaned_diabetes = loadedData$original_diabetes %>% clean_diabetes()
+spatial_data = loadedData$spatial_data %>% clean_spatial()
+
+new_dataset = merge(cleaned_walkability, cleaned_diabetes, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% subset( !(StateAbbr %in% c("AK", "HI"))) 
+
+
+new_spatial_dataset = merge(new_dataset,spatial_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE)
+
+
+```
+```{r}
+plot_correlation_matrix(new_dataset)
+```
+
+
+```{r}
+new_spatial_dataset <- na.omit(new_spatial_dataset)
+sf_spatial_data<- st_as_sf(new_spatial_dataset)
+sf_spatial_data <- as(sf_spatial_data, "Spatial")
+```
+
+```{r}
+
+ggplot() +
+  geom_sf(data = new_spatial_dataset, aes(geometry = geometry,fill =DIABETES_CrudePrev), color="black",size=0.2) +
+  scale_fill_viridis_c(name = "Diabetes Crude Prev") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+
+
+```
+
+```{r}
+
+
+gwr_model_results = fit_gwr(sf_spatial_data)
+
+model_df <- gwr_model_results$SDF %>% as("sf")
+
+
+```
+```{r}
+
+```
+
+```{r}
+  ggplot() +
+    geom_sf(data = model_df, aes(geometry = geometry,fill = yhat), color="black",size=0.2) +
+    scale_fill_viridis_c(name = "Diabetes Crude Prev") +
+    labs(title = "Fitted Spatial Distribution of Diabetes Crude Prevalence")
+  
+  ggplot() +
+    geom_sf(data = model_df, aes(geometry = geometry,fill = y), color="black",size=0.2) +
+    scale_fill_viridis_c(name = "Diabetes Crude Prev") +
+    labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+```
+
+```{r}
+model_df %>% 
+ mutate("Predicted %Diabetes Prevalence" = yhat) %>%
+  ggplot() +
+  geom_sf(aes(fill = `Predicted %Diabetes Prevalence`),
+          color = scales::alpha("black",
+                                alpha = 0.1)) +
+  scale_fill_gradientn(colours = terrain.colors(8),
+                       limits = c(0, 25),
+                       breaks = c(0, 10, 20)) +
+  theme(text = element_text(size = 20), 
+        legend.position = "bottom") +
+  labs(title = "Predicted Values for %Diabetes Prevalence by GWR w/ exponential kernel")
+```
+
+```{r}
+model_df %>% 
+  mutate("%Diabetes Abs Err" = abs(yhat - y)) %>%
+  ggplot() +
+  geom_sf(aes(fill = `%Diabetes Abs Err`),
+          color = scales::alpha("black",
+                                alpha = 0.1)) +
+  scale_fill_viridis_c(limits = c(0, 1),
+                       breaks = c(0, 0.5, 1)) +
+  theme(text = element_text(size = 20), 
+        legend.position = "bottom") +
+  labs(title = "Absolute Prediction Error of %Diabetes by GWR w/ \nexponential kernel")
+```
+
+```{r}
+model_df %>% 
+  mutate("%LPA Prevalence Coeff" = LPA_CrudePrev) %>%
+  ggplot() +
+  geom_sf(aes(fill = `%LPA Prevalence Coeff`),color="black",size=0.2) +
+  scale_fill_viridis_c(breaks = c(-1, 0, 1)) +
+  labs(title = 
+"Estimated Coefficient Surface of LPA")
+
+```
+```{r}
+model_df %>% 
+  mutate("%HBP Prevalence Coeff" = BPHIGH_CrudePrev) %>%
+  ggplot() +
+  geom_sf(aes(fill = `%HBP Prevalence Coeff`),color="black",size=0.2) +
+  scale_fill_viridis_c(breaks = c(-1, 0, 1)) +
+  labs(title = 
+"Estimated Coefficient Surface of HBP")
+```
+```{r}
+model_df %>% 
+  mutate("%Obesity Prevalence Coeff" = OBESITY_CrudePrev) %>%
+  ggplot() +
+  geom_sf(aes(fill = `%Obesity Prevalence Coeff`),color="black",size=0.2) +
+  scale_fill_viridis_c(breaks = c(-1, 0, 1)) +
+  labs(title = 
+"Estimated Coefficient Surface of Obesity")
+```
+```{r}
+model_df %>% 
+  mutate("%Smoker Prevalence Coeff" = CSMOKING_CrudePrev) %>%
+  ggplot() +
+  geom_sf(aes(fill = `%Smoker Prevalence Coeff`),color="black",size=0.2) +
+  scale_fill_viridis_c(breaks = c(-1, 0, 1)) +
+  labs(title = 
+"Estimated Coefficient Surface of Obesity")
+```
+

@@ -1,8 +1,8 @@
 
 loadData <- function() {
-  data <- read.csv("../Data/data.csv")
-  data2 <- read.csv("../Data/500cities.csv")
-  spatial_data <- st_read("../Data/shapes/us_counties")
+  data <- read.csv("../../Data/data.csv")
+  data2 <- read.csv("../../Data/500cities.csv")
+  spatial_data <- st_read("../../Data/shapes/us_counties")
   return(list( original_walkability= data, original_diabetes = data2, spatial_data=spatial_data))
 }
 

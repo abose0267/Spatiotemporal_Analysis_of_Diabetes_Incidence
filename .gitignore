@@ -6,8 +6,17 @@ git rm --cached -r ./.quarto/
 git rm --cached -r '*.DS_Store'
 git rm --cached -r '*.pdf'
 
-git add .gitignore
-git commit -m "Update .gitignore and untrack unnecessary files"
 
-git push
+*.pdf
+*.DS_Store
+*.txt
+*.Rhistory
+*.Rproj.user
+*.RData
+*.html
+*.rmarkdown
 
+*.aux
+*.log
+*.png
+*.tex
