@@ -1,0 +1,45 @@
+```{r}
+source("../code/DataProcessing.R")
+```
+
+```{r}
+
+loadedData <- loadData()
+```
+
+```{r}
+
+
+
+cleaned_walkability = loadedData$original_walkability %>% clean_walkability()
+cleaned_diabetes = loadedData$original_diabetes %>% clean_diabetes()
+spatial_data = loadedData$spatial_data %>% clean_spatial()
+
+new_dataset = merge(cleaned_walkability, cleaned_diabetes, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% subset( !(StateAbbr %in% c("AK", "HI"))) 
+
+
+new_spatial_dataset = merge(new_dataset,spatial_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE)
+
+
+```
+
+```{r}
+plot_correlation_matrix(new_dataset)
+```
+
+```{r}
+new_spatial_dataset <- na.omit(new_spatial_dataset)
+sf_spatial_data<- st_as_sf(new_spatial_dataset)
+sf_spatial_data <- as(sf_spatial_data, "Spatial")
+```
+
+```{r}
+test_train_split <- test_train_split(sf_spatial_data,0.9)
+train_data = test_train_split$train_data
+test_data = test_train_split$test_data
+gwr_model = train_gwr(train_data)
+
+predicted_values <- predict(gwr_model,test_data)
+
+```
+

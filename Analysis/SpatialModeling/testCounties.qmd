@@ -8,13 +8,14 @@ date: 2/27/2024
 ---
 
 
-
+source(")
 
 ```{r}
 # Load necessary libraries
 library(dplyr)
 library(corrplot) # correlation matrix visualization
 library(ggcorrplot) # ggplot2 style visualization of correlation matrix
+
 
 # Read datasets
 data <- read.csv("../../Data/data.csv")
@@ -95,9 +96,6 @@ merged_data <- merge(merged_data, cleaned_spatial, by = "CountyFIPS", all.x = TR
 
 ```{r}
 
-
-
-
 merged_data <- na.omit(merged_data)
 merged_sf <- st_as_sf(merged_data)
 merged_spatialdf <- as(merged_sf, "Spatial")
@@ -128,14 +126,15 @@ library(ggplot2)
 # Plot the spatial distribution of DIABETES_CrudePrev
 ggplot() +
   geom_sf(data = merged_sf, aes(fill = DIABETES_CrudePrev), color="black",size=0.2) +
-  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,25)) +
+  scale_fill_viridis_c(name = "Diabetes Crude Prev") +
   labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
 
 # Plot the spatial distribution of GWR results
 ggplot() +
   geom_sf(data = gwr_results_sf, aes(fill = yhat), color = "black", size = 0.2) +
-  scale_fill_gradient(name = "Predicted Diabetes Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,25)) +
-  labs(title = "GWR Predicted Diabetes Crude Prevalence using GWR")
+  scale_fill_viridis_c(name = "Predicted Diabetes Crude Prev") +
+  labs(title = "GWR Predicted Diabetes Crude Prevalence using GWR") +
+  theme_bw()
 ```
 ```{r}
 # Plot the spatial distribution of DIABETES_CrudePrev
