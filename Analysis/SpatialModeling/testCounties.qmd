@@ -8,14 +8,13 @@ date: 2/27/2024
 ---
 
 
-source(")
+
 
 ```{r}
 # Load necessary libraries
 library(dplyr)
 library(corrplot) # correlation matrix visualization
 library(ggcorrplot) # ggplot2 style visualization of correlation matrix
-
 
 # Read datasets
 data <- read.csv("../../Data/data.csv")
@@ -96,6 +95,9 @@ merged_data <- merge(merged_data, cleaned_spatial, by = "CountyFIPS", all.x = TR
 
 ```{r}
 
+
+
+
 merged_data <- na.omit(merged_data)
 merged_sf <- st_as_sf(merged_data)
 merged_spatialdf <- as(merged_sf, "Spatial")
@@ -126,15 +128,14 @@ library(ggplot2)
 # Plot the spatial distribution of DIABETES_CrudePrev
 ggplot() +
   geom_sf(data = merged_sf, aes(fill = DIABETES_CrudePrev), color="black",size=0.2) +
-  scale_fill_viridis_c(name = "Diabetes Crude Prev") +
+  scale_fill_gradient(name = "Diabetes Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,25)) +
   labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
 
 # Plot the spatial distribution of GWR results
 ggplot() +
   geom_sf(data = gwr_results_sf, aes(fill = yhat), color = "black", size = 0.2) +
-  scale_fill_viridis_c(name = "Predicted Diabetes Crude Prev") +
-  labs(title = "GWR Predicted Diabetes Crude Prevalence using GWR") +
-  theme_bw()
+  scale_fill_gradient(name = "Predicted Diabetes Crude Prev", low = "lightblue", high = "darkblue",limits=c(0,25)) +
+  labs(title = "GWR Predicted Diabetes Crude Prevalence using GWR")
 ```
 ```{r}
 # Plot the spatial distribution of DIABETES_CrudePrev
@@ -165,11 +166,28 @@ The plot above is a residual plot from the Geographically Weighted Regression (G
 
 ```{r}
 library(randomForest)
+library(caret)
+library(sp)
 
-data_df <- as.data.frame(merged_spatialdf)
+set.seed(123) # for reproducibility
 
-rf_model <- randomForest(DIABETES_CrudePrev ~ NatWalkInd+OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,data = data_df)
-print(rf_model)
+merged_df <- as.data.frame(merged_spatialdf)
+
+index <- createDataPartition(merged_df$DIABETES_CrudePrev, p = 0.8, list = FALSE)
+train_df <- merged_df[index, ]
+test_df <- merged_df[-index, ]
+
+rf_train <- train(
+  x = train_df[, c("NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", "LPA_CrudePrev", "CSMOKING_CrudePrev")],
+  y = train_df$DIABETES_CrudePrev,
+  method = "rf"
+)
+
+rf_pred <- predict(rf_train, newdata = test_df[, c("NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", "LPA_CrudePrev", "CSMOKING_CrudePrev")])
+
+
+rmse <- sqrt(mean((rf_pred - test_df$DIABETES_CrudePrev)^2))
+cat("RMSE:", rmse, "\n")
 
 
 
@@ -211,7 +229,7 @@ ggplot() +
 ```{r}
 library(gbm)
 
-merged_spatialdf <- as(merged_sf, "Spatial")
+merged_spatialdf <- as(merged_sf, "Spatial")  
 data_df <- as.data.frame(merged_spatialdf)
 
 gbm_model <- gbm(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
