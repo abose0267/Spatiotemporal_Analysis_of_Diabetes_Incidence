@@ -9,6 +9,7 @@ git rm --cached -r '*.pdf'
 
 *.pdf
 .DS_Store
+.RDataTmp
 *.txt
 *.Rhistory
 *.Rproj.user

@@ -1,7 +1,7 @@
 
 
 ```{r}
-source("../code/DataProcessing.R")
+source("../../functions/DataProcessing.R")
 library(GWmodel)
 library(dplyr)
 library(ggplot2)
@@ -16,25 +16,14 @@ library(corrplot)
 
 loadedData <- loadData()
 ```
-```{r}
-  spatial_data <- st_read("../Data/shapes/us_counties")
-```
 
 
 ```{r}
-
-
-
 cleaned_walkability = loadedData$original_walkability %>% clean_walkability()
 cleaned_diabetes = loadedData$original_diabetes %>% clean_diabetes()
 spatial_data = loadedData$spatial_data %>% clean_spatial()
-
 new_dataset = merge(cleaned_walkability, cleaned_diabetes, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% subset( !(StateAbbr %in% c("AK", "HI"))) 
-
-
 new_spatial_dataset = merge(new_dataset,spatial_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE)
-
-
 ```
 ```{r}
 plot_correlation_matrix(new_dataset)
@@ -45,6 +34,11 @@ plot_correlation_matrix(new_dataset)
 new_spatial_dataset <- na.omit(new_spatial_dataset)
 sf_spatial_data<- st_as_sf(new_spatial_dataset)
 sf_spatial_data <- as(sf_spatial_data, "Spatial")
+```
+
+
+```{r}
+rf_pred <- runRandomForest(sf_spatial_data)
 ```
 
 ```{r}
@@ -113,12 +107,18 @@ model_df %>%
 
 ```{r}
 model_df %>% 
-  mutate("%LPA Prevalence Coeff" = LPA_CrudePrev) %>%
+  mutate("NatWalkInd Coeff" = NatWalkInd) %>%
   ggplot() +
-  geom_sf(aes(fill = `%LPA Prevalence Coeff`),color="black",size=0.2) +
-  scale_fill_viridis_c(breaks = c(-1, 0, 1)) +
+  geom_sf(aes(fill = `NatWalkInd Coeff`),color="black",size=0.2) +
+  scale_fill_continuous_diverging(breaks = c(-1, 0, 1)) +
   labs(title = 
-"Estimated Coefficient Surface of LPA")
+"Estimated Coefficient Surface of NatWalkInd")
+```
+
+
+
+```{r}
+
 
 ```
 ```{r}

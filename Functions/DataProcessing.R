@@ -1,4 +1,9 @@
 
+library(randomForest)
+library(caret)
+library(sp)
+
+
 loadData <- function() {
   data <- read.csv("../../Data/data.csv")
   data2 <- read.csv("../../Data/500cities.csv")
@@ -74,12 +79,12 @@ test_train_split <- function(data,train) {
 
 fit_gwr <- function(data) {
   
-  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
                           data = data,
                           kernel = "exponential",
   )
   
-  merged_gwr <- gwr.basic(DIABETES_CrudePrev ~ OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+  merged_gwr <- gwr.basic(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
                           data = data,
                           bw = merged_gwr_bw,
                           kernel = "exponential",
@@ -117,6 +122,30 @@ plotDiabetes <- function(model_results,new_dataset) {
     labs(title = "GWR Predicted Diabetes Crude Prevalence using GWR") +
     theme_bw()
 }
+
+
+runRandomForest <- function(data) {
+  set.seed(123) # for reproducibility
+  
+  merged_df <- as.data.frame(data)
+  
+  index <- createDataPartition(merged_df$DIABETES_CrudePrev, p = 0.8, list = FALSE)
+  train_df <- merged_df[index, ]
+  test_df <- merged_df[-index, ]
+  
+  rf_train <- train(
+    x = train_df[, c("NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", "LPA_CrudePrev", "CSMOKING_CrudePrev")],
+    y = train_df$DIABETES_CrudePrev,
+    method = "rf"
+  )
+  
+  rf_pred <- predict(rf_train, newdata = test_df[, c("NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", "LPA_CrudePrev", "CSMOKING_CrudePrev")])
+  
+  return(rf_pred)
+}
+
+
+
 
 plotGWR <- function(model, value) {
   
