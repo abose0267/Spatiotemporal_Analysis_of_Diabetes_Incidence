@@ -1,0 +1,388 @@
+---
+title: "Week 1: Intro to Statistical Research \\& Simulation Studies"
+author: 
+  name: "Isaac Ray"
+  institution: "Texas A\\&M University"
+format: 
+  beamer:
+    include-in-header: 
+      - text: "\\definecolor{TAMUMaroon}{HTML}{500000}"
+      - text: "\\setbeamercolor{palette primary}{bg=TAMUMaroon,fg=white}"
+    theme: metropolis
+    keep-tex: true
+    linkcolor: blue
+editor: visual
+date: today
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+set.seed(12345)
+```
+
+## Admin
+
+-   Be sure to check Canvas / Howdy for the Syllabus
+-   Office hours for myself and TA posted in Canvas
+-   Key points:
+    -   You should already know STAT 211-212, Lin Alg., and programming
+        with R
+    -   No required textbooks but some good resources are listed
+    -   Standard letter grading
+    -   No exams, final project is main purpose of the course
+
+## What I want you to get out of this class
+
+-   An understanding of the research process
+
+-   How to communicate research
+
+-   Applications of software in research
+
+-   Performing effective literature review
+
+-   A resume/CV item you can be proud of
+
+## Statistical Research
+
+Statistical research comes in multiple flavors:
+
+1)  **Theoretical Statistics**
+
+-   Given a specific model, we show an asymptotic bound on the error...
+
+2)  **Methodological Statistics**
+
+-   Existing models do not answer a research question satisfactorily, so
+    we propose a new method for estimating...
+
+3)  **Applied Statistics**
+
+-   We use an existing model on a new dataset to reach the conclusion
+    that...
+
+*Most research projects involve all three!*
+
+## Statistical Research
+
+Examples from my own research; what do you think they are?
+
+-   Clustering aerial imagery based on land use without specifying a
+    number of clusters and using no training data
+-   Showing that a Gibbs sampler will result in a consistent posterior
+    distribution for basketball shots
+-   Classifying papers in a citation network using a new graph-based
+    boosting model
+
+## Statistical Research
+
+-   If you pursue an MS in statistics, you will most likely focus on
+    **applied** statistical research and potentially some methodological
+    research
+-   If you pursue a PhD in statistics, you will most likely focus on
+    **methodological** research but will also be involved in some
+    theoretical and applied research
+-   As an undergrad you have opportunities for research outside of this
+    class!
+    -   [Statistics Summer Undergraduate Research
+        Experience](https://stat.tamu.edu/academics/undergraduate-research/)
+    -   [Aggie Research Program](https://aggieresearch.tamu.edu/)
+    -   Department Faculty
+    -   National Laboratories
+        ([LANL](https://lanl.jobs/creative/students),
+        [ORNL](https://education.ornl.gov/undergraduate/),
+        [LLNL](https://www.llnl.gov/join-our-team/careers/students),
+        etc.)
+
+## Applied Research
+
+This course will focus on *applied* and *methodological* research.
+
+-   Applied statistical research generally starts with a *domain
+    question*
+
+    -   Can we (classify/predict/cluster/infer/quantify) $y$?
+
+    -   Sometimes, you will already have data; other times you need to
+        figure out what data is necessary to answer the domain question
+
+-   Once you have your question and your data, you need a *method* of
+    using your data to answer the question
+
+    -   Sometimes, an existing common method is sufficient. Linear
+        model, GLM, RF, SVM, GMM, etc.
+
+    -   You need to do *literature review* to see what methods are out
+        there!
+
+## Literature Review
+
+-   Are there existing methods $g$ that you can use?
+
+    -   Does the model's assumptions match your data?
+
+    -   Does there exist an implementation of the model?
+
+    -   Does the implementation suck (too slow, crashes, can't handle
+        large data, etc.)?
+
+    -   Are the results reasonable? Are there theoretical guarantees
+        that they should be?
+
+-   If not, you might need a *new method*
+
+## Methodological Research
+
+-   Often, methodological developments are made by discovering that
+    existing methods are lacking in some way
+
+    -   Sometimes existing methods are lacking in many ways; focus on
+        one at a time
+
+-   It is very hard to pluck a brilliant method out of thin air;
+    improvement over existing approaches is the norm
+
+-   The key to methodological research is you have to be able to show
+    *why your new method is better*
+
+    -   Gives you a goalpost to work towards; essential for justifying
+        your method's existence to reviewers
+
+    -   But outside of theoretical developments, how can you
+        *definitively show* your method is better?
+
+## Methodological Research
+
+-   You have your question about $y$ and gathered some data $x$
+
+-   You processed $x$ into the format you need to apply your amazing new
+    method $f$
+
+-   You apply your amazing new method $\hat{y} = f(x)$
+
+-   You interpret $\hat{y}$ in the context of $f$
+
+But does $f$ do what it should? Is it reasonable to answer your question
+using it?
+
+## Simulation Studies
+
+-   To convince ourselves that $f$ does what it should, we need to *know
+    the truth about* $y$*.*
+
+-   This is impossible for real data; instead we **simulate** some
+    artificial data $Y$ which we can control
+
+-   Now, we can compare $\hat{Y}$ and $Y$ to say something about the
+    effectiveness/correctness of $f$
+
+-   We can control aspects of $Y$ to see how $f$ (and $g, h,$ etc.)
+    perform under many different situations
+
+    -   Common examples include sample size, signal to noise ratio,
+        distribution shift, etc.
+
+## Simulation Studies
+
+-   The way in which we generate $Y$ is important for answering $y$
+
+    -   If our assumption is that $y \sim \textrm{Multinomial}$; we
+        should simulate $Y \sim \textrm{Multinomial}$
+
+    -   The performance of $f$ on $Y$ is only relevant insofar as it
+        relates to the performance of $f$ for our real question about
+        $y$
+
+-   Example: suppose $y$ is a box of 10 *exchangeable* coins, and our
+    question is if *all* 10 of them are fair
+
+    -   What might be a method $f$ we could use to test that?
+
+    -   What are some $Y$ we could generate to examine the performance
+        of $f$?
+
+    -   How *many* $Y$ should we generate (replications)
+
+## Coin Example
+
+\footnotesize
+
+```{r fair-coins, include=TRUE, echo=TRUE}
+replications = 1000
+n_coins = 10
+rigging_amount = 0.1
+
+Y_fair = sample(c(0, 1), 
+                size = n_coins * replications, 
+                replace = TRUE) %>%
+  matrix(ncol = n_coins)
+
+Y_all_rigged = sample(c(0, 1), 
+                      size = n_coins * replications, 
+                      replace = TRUE, 
+                      prob = c(0.5 + rigging_amount, 
+                               0.5 - rigging_amount))%>%
+  matrix(ncol = n_coins)
+# Note: should shuffle across columns to test exchangability! 
+Y_one_rigged = cbind(Y_fair[,1:(n_coins-1)], 
+                     Y_all_rigged[,n_coins])
+```
+
+## Coin Example
+
+\normalsize
+
+```{r hists}
+histogram_df = data.frame(
+  "flip_value" = c(as.vector(Y_fair), 
+                   as.vector(Y_all_rigged),
+                   as.vector(Y_one_rigged)),
+  "simulation_setup" = c(rep("Fair", replications*n_coins),
+                         rep("AllRigged", replications*n_coins),
+                         rep("OneRigged", replications*n_coins)))
+histogram_df %>% ggplot(aes(x = flip_value)) +
+  geom_histogram(aes(fill = simulation_setup),
+                 position = "dodge",
+                 bins = 5) +
+  scale_fill_viridis_d(name = "Simulation") +
+  theme(text = element_text(size = 20)) +
+  xlab("Flip Result") +
+  ylab("Count")
+
+# Sum of 10 iid Bernoulli fair flips follows Binomial(10, 1/2)
+# Can we test this across replications? Sure, so long as still independent
+# Binomial(n_coins * replications, 0.5); how many coins could we reasonably
+# expect (0.05 significance) to come up heads if the coins are all fair?
+sig_level = 0.05
+max_heads_05 = qbinom(1 - sig_level, n_coins*replications, 0.5)
+# More formal test
+significance_fair = pbinom(sum(rowSums(Y_fair)), 
+                               n_coins*replications, 
+                               0.5)
+significance_all_unfair = pbinom(sum(rowSums(Y_all_rigged)), 
+                                 n_coins*replications, 
+                                 0.5)
+significance_one_unfair = pbinom(sum(rowSums(Y_one_rigged)), 
+                                 n_coins*replications, 
+                                 0.5)
+# Further reading: this is an example of a 'Poisson binomial distribution';
+# sum of independent Bernoulli trials which are *not* identically distributed
+```
+
+## Simulation Studies
+
+-   Replications cost computational power but can give us arbitrarily
+    large sample sizes for us to verify with
+
+-   In the coins example, we generated *artificial* simulation data
+    according to a pre-specified statistical model (multivariate
+    Bernoulli)
+
+-   We can also do simulations using *real* data; for example using
+    cross-validation to measure predictive performance on hold-out test
+    sets
+
+## Why do we want to simulate?
+
+-   **Applied Research**: justify model selection, verify data
+    assumptions, get uncertainty quantification
+
+-   **Methodological Research**: demonstrate better modeling
+    performance, show speed or implementation uplift, find cracks in
+    competing methods
+
+-   **Theoretical Research**: verify results that should be true in
+    theory work in practice
+
+## Reproducible Research
+
+-   Simulations in statistical research are so important that they often
+    have their own section in research articles
+
+    -   Intro, Related Works, Methodology, Simulations, Data Analysis,
+        Conclusion
+
+-   It is **essential** that everything needed to perfectly reproduce
+    the simulations (and data analysis) be included in a supplement
+
+    -   Generally, this will include all simulation scripts and code
+        used to generate results including PRNG settings
+
+    -   This is not only important for journal submission reasons, but
+        *philosophically* important for research validity
+
+## Research with Simulation Studies
+
+-   Method comparisons using simulations is so essential that it is
+    oftentimes published independently of any new developments:
+
+    -   These are often published as 'review' or 'survey' papers,
+        essentially an in-depth literature review with independent
+        testing of different methods
+
+    -   Examples: [Survey on unsupervised methods for high-dimension UQ
+        in black-box
+        problems](https://linkinghub.elsevier.com/retrieve/pii/S0021999122003758),
+        [Survey on Dimension Reduction
+        tools](https://arxiv.org/abs/2012.04456), [A Comprehensive
+        Survey on Transfer Learning](https://arxiv.org/abs/1911.02685),
+        [Examination of Procedures for determining the number of
+        clusters in a data set](https://doi.org/10.1007/BF02294245)
+
+-   *A **well designed** and **well reported** simulation study is the
+    key to effective statistical research*
+
+## How to design a simulation study?
+
+\small
+
+It is difficult to design a simulation study without experience.
+
+-   Choosing the methods to compare against requires understanding of
+    the statistical question being asked, the assumptions on the data,
+    and reviewing literature/software on similar problems
+
+-   Generating artificial data requires understanding modeling
+    assumptions behind different methods, limitations of those
+    assumptions, and the relationships with the real data
+
+-   Choosing metrics to evaluate a model requires understanding the goal
+    of the analysis and where existing methods need to be improved on
+
+-   Drawing conclusions about how the settings in a simulation study
+    affect its results is an exercise in critical thinking and requires
+    interpreting abstract concepts in the context of the research
+    question
+
+## How to report a simulation study?
+
+It is also difficult to report a simulation study without experience.
+
+-   Presenting results in tables/figures requires some programming
+    experience to coerce data into outputs, as well as design skills
+
+-   Summarizing and reporting results requires technical writing and
+    careful record keeping
+
+-   Ensuring results are reproducible and experiments can be modified
+    and re-run requires good program organization and documentation
+
+## Next Week
+
+-   Next week we will discuss the final project and break out into teams
+-   This project is the main focus of the course and will last the
+    entire semester
+-   High level overview:
+    -   Literature Review / Selecting Research Question (with my help)
+
+    -   Identify and understand existing methods
+
+    -   Design appropriate simulation studies (metrics, data generation,
+        etc)
+
+    -   Organize experiments using RStudio, Git, etc. for
+        reproducibility
+
+    -   Present your results orally and in a journal-style report
+-   If you need to complete an honors contract for the course please see
+    me after class

@@ -1,0 +1,366 @@
+---
+title: "Demo arXiv template"
+format:
+  arxiv-pdf:
+    keep-tex: true  
+    linenumbers: false
+    doublespacing: false
+    runninghead: "A Preprint"
+  arxiv-html: default
+author:
+  - name: Michael J Mahoney
+    affiliations:
+      - name: State University of New York College of Environmental Science and Forestry
+        department: Graduate Program in Environmental Science
+        address: 1 Forestry Drive
+        city: Syracuse, NY
+        country: USA
+        postal-code: 13210
+    orcid: 0000-0003-2402-304X
+    email: fake_email@fakeyfake.com
+    url: https://mm218.dev
+  - name: Someone Else
+    affiliations:
+      - name: State University of New York College of Environmental Science and Forestry
+        department: Department of Sustainable Resources Management
+        address: 1 Forestry Drive
+        city: Syracuse, NY
+        country: USA
+        postal-code: 13210
+abstract: |
+  This document is only a demo explaining how to use the template.
+keywords: 
+  - template
+  - demo
+bibliography: bibliography.bib  
+---
+
+# Introduction {#sec-intro}
+
+This is an example of how to use this template to render journal articles. This template is inspired by the arXiv rticles template for rmarkdown, repurposed for the Quarto publishing system.
+
+This quarto extension format supports PDF and HTML outputs. This template is primarily focused on generating acceptable {{< latex >}} outputs from Quarto, but renders an acceptable HTML output using the standard Quarto options.
+
+# Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+# Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+source("../../Functions/DataProcessing.R")
+
+library(GWmodel)
+library(dplyr)
+library(ggplot2)
+library(sf)
+library(corrplot)
+```
+
+```{r}
+loadedData <- loadData()
+```
+
+```{r}
+cleaned_walkability = loadedData$original_walkability %>% clean_walkability()
+cleaned_diabetes = loadedData$original_diabetes %>% clean_diabetes()
+spatial_data = loadedData$spatial_data %>% clean_spatial()
+new_dataset = merge(cleaned_walkability, cleaned_diabetes, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% subset( !(StateAbbr %in% c("AK", "HI"))) 
+new_spatial_dataset = merge(new_dataset,spatial_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE)
+```
+```{r}
+plot_correlation_matrix(new_dataset)
+```
+
+```{r}
+new_spatial_dataset <- na.omit(new_spatial_dataset)
+sf_spatial_data<- st_as_sf(new_spatial_dataset)
+sf_spatial_data <- as(sf_spatial_data, "Spatial")
+```
+
+```{r}
+rf_pred <- runRandomForest(sf_spatial_data)
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = new_spatial_dataset, aes(geometry = geometry,fill =DIABETES_CrudePrev), color="black",size=0.2) +
+  scale_fill_viridis_c(name = "Diabetes Crude Prev") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+```
+
+```{r}
+gwr_model_results = fit_gwr(sf_spatial_data)
+model_df <- gwr_model_results$SDF %>% as("sf")
+=
+```
+
+```{r}
+  ggplot() +
+    geom_sf(data = model_df, aes(geometry = geometry,fill = yhat), color="black",size=0.2) +
+    scale_fill_viridis_c(name = "Diabetes Crude Prev") +
+    labs(title = "Fitted Spatial Distribution of Diabetes Crude Prevalence")
+  
+  ggplot() +
+    geom_sf(data = model_df, aes(geometry = geometry,fill = y), color="black",size=0.2) +
+    scale_fill_viridis_c(name = "Diabetes Crude Prev") +
+    labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+```
+
+```{r}
+model_df %>% 
+ mutate("Predicted %Diabetes Prevalence" = yhat) %>%
+  ggplot() +
+  geom_sf(aes(fill = `Predicted %Diabetes Prevalence`),
+          color = scales::alpha("black",
+                                alpha = 0.1)) +
+  scale_fill_gradientn(colours = terrain.colors(8),
+                       limits = c(0, 25),
+                       breaks = c(0, 10, 20)) +
+  theme(text = element_text(size = 20), 
+        legend.position = "bottom") +
+  labs(title = "Predicted Values for %Diabetes Prevalence by GWR w/ exponential kernel")
+```
+
+```{r}
+model_df %>% 
+  mutate("%Diabetes Abs Err" = abs(yhat - y)) %>%
+  ggplot() +
+  geom_sf(aes(fill = `%Diabetes Abs Err`),
+          color = scales::alpha("black",
+                                alpha = 0.1)) +
+  scale_fill_viridis_c(limits = c(0, 1),
+                       breaks = c(0, 0.5, 1)) +
+  theme(text = element_text(size = 20), 
+        legend.position = "bottom") +
+  labs(title = "Absolute Prediction Error of %Diabetes by GWR w/ \nexponential kernel")
+```
+
+```{r}
+model_df %>% 
+  mutate("NatWalkInd Coeff" = NatWalkInd) %>%
+  ggplot() +
+  geom_sf(aes(fill = `NatWalkInd Coeff`),color="black",size=0.2) +
+  scale_fill_continuous_diverging(breaks = c(-1, 0, 1)) +
+  labs(title = 
+"Estimated Coefficient Surface of NatWalkInd")
+```
+
+```{r}
+model_df %>% 
+  mutate("%HBP Prevalence Coeff" = BPHIGH_CrudePrev) %>%
+  ggplot() +
+  geom_sf(aes(fill = `%HBP Prevalence Coeff`),color="black",size=0.2) +
+  scale_fill_viridis_c(breaks = c(-1, 0, 1)) +
+  labs(title = 
+"Estimated Coefficient Surface of HBP")
+```
+
+```{r}
+model_df %>% 
+  mutate("%Obesity Prevalence Coeff" = OBESITY_CrudePrev) %>%
+  ggplot() +
+  geom_sf(aes(fill = `%Obesity Prevalence Coeff`),color="black",size=0.2) +
+  scale_fill_viridis_c(breaks = c(-1, 0, 1)) +
+  labs(title = 
+"Estimated Coefficient Surface of Obesity")
+```
+
+```{r}
+model_df %>% 
+  mutate("%Smoker Prevalence Coeff" = CSMOKING_CrudePrev) %>%
+  ggplot() +
+  geom_sf(aes(fill = `%Smoker Prevalence Coeff`),color="black",size=0.2) +
+  scale_fill_viridis_c(breaks = c(-1, 0, 1)) +
+  labs(title = 
+"Estimated Coefficient Surface of Obesity")
+```
+
+# Markdown Basics
+
+This section of the template is adapted from [Quarto's documentation on Markdown basics](https://quarto.org/docs/authoring/markdown-basics.html).
+
+## Text Formatting
+
++-----------------------------------+-------------------------------+
+| Markdown Syntax                   | Output                        |
++===================================+===============================+
+| ```                               | *italics* and **bold**        |
+| *italics* and **bold**            |                               |
+| ```                               |                               |
++-----------------------------------+-------------------------------+
+| ```                               | superscript^2^ / subscript~2~ |
+| superscript^2^ / subscript~2~     |                               |
+| ```                               |                               |
++-----------------------------------+-------------------------------+
+| ```                               | ~~strikethrough~~             |
+| ~~strikethrough~~                 |                               |
+| ```                               |                               |
++-----------------------------------+-------------------------------+
+| ```                               | `verbatim code`               |
+| `verbatim code`                   |                               |
+| ```                               |                               |
++-----------------------------------+-------------------------------+
+
+## Headings {#headings}
+
++--------------------+-----------------------------------+
+| Markdown Syntax    | Output                            |
++====================+===================================+
+| ```                | # Header 1 {.heading-output}      |
+| # Header 1         |                                   |
+| ```                |                                   |
++--------------------+-----------------------------------+
+| ```                | ## Header 2 {.heading-output}     |
+| ## Header 2        |                                   |
+| ```                |                                   |
++--------------------+-----------------------------------+
+| ```                | ### Header 3 {.heading-output}    |
+| ### Header 3       |                                   |
+| ```                |                                   |
++--------------------+-----------------------------------+
+
+## Equations
+
+Use `$` delimiters for inline math and `$$` delimiters for display math. For example:
+
++------------------------------+-------------------------+
+| Markdown Syntax              | Output                  |
++==============================+=========================+
+| ```                          | inline math: $E=mc^{2}$ |
+| inline math: $E = mc^{2}$    |                         |
+| ```                          |                         |
++------------------------------+-------------------------+
+| ```                          | display math:\          |
+| display math:                | $$E = mc^{2}$$          |
+|                              |                         |
+| $$E = mc^{2}$$               |                         |
+| ```                          |                         |
++------------------------------+-------------------------+
+
+If assigned an ID, display math equations will be automatically numbered:
+
+$$
+\frac{\partial \mathrm C}{ \partial \mathrm t } + \frac{1}{2}\sigma^{2} \mathrm S^{2}
+\frac{\partial^{2} \mathrm C}{\partial \mathrm C^2}
+  + \mathrm r \mathrm S \frac{\partial \mathrm C}{\partial \mathrm S}\ =
+  \mathrm r \mathrm C 
+$$ {#eq-black-scholes}
+
+## Other Blocks
+
++----------------------------+--------------------------+
+| Markdown Syntax            | Output                   |
++============================+==========================+
+| ```                        | > Blockquote             |
+| > Blockquote               |                          |
+| ```                        |                          |
++----------------------------+--------------------------+
+| ```                        | | Line Block             |
+| | Line Block               | |    Spaces and newlines |
+| |   Spaces and newlines    | |    are preserved       |
+| |   are preserved          |                          |
+| ```                        |                          |
++----------------------------+--------------------------+
+
+## Cross-references {#sec-crf}
+
+![A sunflower](sunflower.png){#fig-sunflower}
+
++-------------------------------------+---------------------------------+
+| Markdown Format                     | Output                          |
++=====================================+=================================+
+| ```                                 | @fig-sunflower is pretty.       |
+| @fig-sunflower is pretty.           |                                 |
+| ```                                 |                                 |
++-------------------------------------+---------------------------------+
+| ```                                 | @tbl-glm was created from code. |
+| @tbl-glm was created from code.     |                                 |
+| ```                                 |                                 |
++-------------------------------------+---------------------------------+
+| ```                                 | @sec-crf is this section.       |
+| @sec-crf is this section.           |                                 |
+| ```                                 |                                 |
++-------------------------------------+---------------------------------+
+| ```                                 | @eq-black-scholes is above.     |
+| @eq-black-scholes is above.         |                                 |
+| ```                                 |                                 |
++-------------------------------------+---------------------------------+
+
+See the [Quarto documentation on cross-references for more](https://quarto.org/docs/authoring/cross-references.html).
+
+# Citations
+
+This section of the template is adapted from the [Quarto citation documentation](https://quarto.org/docs/authoring/footnotes-and-citations.html).
+
+Quarto supports bibliography files in a wide variety of formats including BibTeX and CSL. Add a bibliography to your document using the `bibliography` YAML metadata field. For example:
+
+``` yaml
+---
+title: "My Document"
+bibliography: references.bib
+---
+```
+
+See the [Pandoc Citations](https://pandoc.org/MANUAL.html#citations) documentation for additional information on bibliography formats.
+
+## Citation Syntax {#sec-citations}
+
+Quarto uses the standard Pandoc markdown representation for citations. Here are some examples:
+
++---------------------------------------+-------------------------------------------------------------------+
+| Markdown Format                       | Output                                                            |
++=======================================+===================================================================+
+| ```                                   | Blah Blah [see @knuth1984, pp. 33-35; also @wickham2015, chap. 1] |
+| Blah Blah [see @knuth1984, pp. 33-35; |                                                                   |
+| also @wickham2015, chap. 1]           |                                                                   |
+| ```                                   |                                                                   |
++---------------------------------------+-------------------------------------------------------------------+
+| ```                                   | Blah Blah [@knuth1984, pp. 33-35, 38-39 and passim]               |
+| Blah Blah [@knuth1984, pp. 33-35,     |                                                                   |
+| 38-39 and passim]                     |                                                                   |
+| ```                                   |                                                                   |
++---------------------------------------+-------------------------------------------------------------------+
+| ```                                   | Blah Blah [@wickham2015; @knuth1984].                             |
+| Blah Blah [@wickham2015; @knuth1984]. |                                                                   |
+| ```                                   |                                                                   |
++---------------------------------------+-------------------------------------------------------------------+
+| ```                                   | Wickham says blah [-@wickham2015]                                 |
+| Wickham says blah [-@wickham2015]     |                                                                   |
+| ```                                   |                                                                   |
++---------------------------------------+-------------------------------------------------------------------+
+
+You can also write in-text citations, as follows:
+
++-----------------------------------+-------------------------------+
+| Markdown Format                   | Output                        |
++===================================+===============================+
+| ```                               | @knuth1984 says blah.         |
+| @knuth1984 says blah.             |                               |
+| ```                               |                               |
++-----------------------------------+-------------------------------+
+| ```                               | @knuth1984 [p. 33] says blah. |
+| @knuth1984 [p. 33] says blah.     |                               |
+| ```                               |                               |
++-----------------------------------+-------------------------------+
+
+See the [Pandoc Citations](https://pandoc.org/MANUAL.html#citations) documentation for additional information on citation syntax.
+
+To provide a custom citation stylesheet, provide a path to a CSL file using the `csl` metadata field in your document, for example:
+
+``` yaml
+---
+title: "My Document"
+bibliography: references.bib
+csl: nature.csl
+---
+```
+
+{{< pagebreak >}}
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
