@@ -1,0 +1,24 @@
+git rm --cached -r .Rproj.user
+git rm --cached -r .Rhistory
+git rm --cached -r .RData
+git rm --cached -r .Ruserdata
+git rm --cached -r ./.quarto/
+git rm --cached -r '*.DS_Store'
+git rm --cached -r '*.pdf'
+
+
+.pdf
+.DS_Store
+.RDataTmp
+.txt
+.Rhistory
+.Rproj.user
+.RData
+.html
+.rmarkdown
+
+.aux
+.log
+.png
+.tex
+.Rproj.user
