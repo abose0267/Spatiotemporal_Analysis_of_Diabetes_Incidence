@@ -36,7 +36,7 @@ author:
         country: USA
         postal-code: 77843
 abstract: |
-  This document is only a demo explaining how to use the template.
+  The diabetes epidemic is one that is very important in the United States. It is believed that lifestyle factors      such as walkability can affect the prevalence. Although the general relationship between walkability index and       diabetes prevalence is one that is inverse, in southern regions, a higher walkability index contributes to diabetes   prevalence . In some regions, walkability and diabetes prevalence has a positive correlation. It is               important to understand in which regions, walkability index can be used as a true indicator of diabetes prevalence,   so that moving forward, changes can be made in those regions accord
 keywords: 
   - template
   - demo
@@ -44,9 +44,7 @@ keywords:
 
 # Introduction {#sec-intro}
 
-This is an example of how to use this template to render journal articles. This template is inspired by the arXiv rticles template for rmarkdown, repurposed for the Quarto publishing system.
-
-This quarto extension format supports PDF and HTML outputs. This template is primarily focused on generating acceptable {{< latex >}} outputs from Quarto, but renders an acceptable HTML output using the standard Quarto options.
+## 
 
 # Related Works
 
