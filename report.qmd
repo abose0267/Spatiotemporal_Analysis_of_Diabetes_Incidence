@@ -37,22 +37,53 @@ author:
         postal-code: 77843
 abstract: |
   The diabetes epidemic is one that is very important in the United States. It is believed that lifestyle factors      such as walkability can affect the prevalence. Although the general relationship between walkability index and       diabetes prevalence is one that is inverse, in southern regions, a higher walkability index contributes to diabetes   prevalence . In some regions, walkability and diabetes prevalence has a positive correlation. It is               important to understand in which regions, walkability index can be used as a true indicator of diabetes prevalence,   so that moving forward, changes can be made in those regions accord
-keywords: 
-  - template
-  - demo
 ---
 
 # Introduction {#sec-intro}
 
-## 
+## Central Thesis Support
+  
+
+  
+  What is so important about diabetes?
+  
+  Does a high walkability index always lead to a lower diabetes prevalence?
+  
+  In southern regions, a higher walkability index contributes to diabetes prevalence
+  
+  This is significant because it will show where diabetes needs more preventative measures
+  
+<!-- ## Paragraphs -->
+
+  <!-- P1: This paragraph discusses the importance of diabetes, specifically the impact of it on a population and how common it is -->
+
+  <!-- P2: Talk about how there are recent claims that lifestyle factors like living is a highly walkable diets, diets etc  can decrease diabetes cases. -->
+
+  <!-- P3: State Thesis and Explain that it is important because it shows that the southern regions are not doing as well to prevent diabetes than other regions -->
+
+<!-- ## Sentences -->
+
+
+
 
 # Related Works
 
 
 # Methods
 
+## Central Thesis Support
 
-# Results 
+
+In order to analyze diabetes as a response of walkability, we need good, clean data
+
+In order to make sure that walkability is consistent as a coefficient, we choose multiple covariates that might be significant
+
+We used GWR to create coefficient surfaces to analyze which parts of the country had the most impact on diabetes
+
+We compared GWR with Random Forest to show that GWR is not overfitting, to prevent error
+
+
+# Results
 
 ```{r echo={FALSE}}
 source("./Functions/DataProcessing.R")
@@ -72,7 +103,7 @@ loadedData <- loadData()
 cleaned_walkability = loadedData$original_walkability %>% clean_walkability()
 cleaned_diabetes = loadedData$original_diabetes %>% clean_diabetes()
 spatial_data = loadedData$spatial_data %>% clean_spatial()
-new_dataset = merge(cleaned_walkability, cleaned_diabetes, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% subset( !(StateAbbr %in% c("AK", "HI"))) 
+new_dataset = merge(cleaned_walkability, cleaned_diabetes, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% subset( !(StateAbbr %in% c("AK", "HI")))
 new_spatial_dataset = merge(new_dataset,spatial_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE)
 ```
 ```{r echo={FALSE}}
@@ -167,7 +198,7 @@ plots %>%
 # example_long = model_df %>%
 #   select(!c(Intercept), !contains("_TV"), !contains("_SE")) %>%
 #   rename_with(~paste0(.x, "_coef")) %>%
-#   bind_cols(new_spatial_dataset) 
+#   bind_cols(new_spatial_dataset)
 #   pivot_longer(data = NatWalkInd:CSMOKING_CrudePrev,
 #                names_to = "Covariate",
 #                values_to = "Coefficient")
