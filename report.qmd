@@ -100,6 +100,15 @@ We compared GWR with Random Forest to show that GWR is not overfitting, to preve
 
 # Results
 
+
+## Central Thesis Level Outline
+
+From the plots, it shows that the southern region of the United States, walkability had a postive relationship with diabetes prevalence.
+
+From the GWR model's spatial plot which shows the estimated impact of the National Walkability Index it is clear that there is a negative relationship between Walkability and Diabetes.
+
+In the Western Region, though, there is a more positive relationship between the impact of Walkability and Diabetes in the Southern and Eastern Region further supporting our central thesis.
+
 ```{r echo={FALSE}}
 source("./Functions/DataProcessing.R")
 
