@@ -36,7 +36,7 @@ author:
         country: USA
         postal-code: 77843
 abstract: |
-  The diabetes epidemic is one that is very important in the United States. It is believed that lifestyle factors      such as walkability can affect the prevalence. Although the general relationship between walkability index and       diabetes prevalence is one that is inverse, in southern regions, a higher walkability index contributes to diabetes   prevalence . In some regions, walkability and diabetes prevalence has a positive correlation. It is               important to understand in which regions, walkability index can be used as a true indicator of diabetes prevalence,   so that moving forward, changes can be made in those regions accord
+  The diabetes epidemic in the United States, influenced by lifestyle elements such as walkability, presents a nuanced public health challenge. Our research shows that in southern regions, higher walkability indexes unexpectedly correlate with increased diabetes prevalence, which is contrary to the anticipated inverse relationship. This anomaly persists even when controlling for high blood pressure and low physical activity, which indicates significant regional variance. These findings present the necessity for tailored public health strategies and urban planning to effectively combat diabetes.
 ---
 
 # Introduction {#sec-intro}
@@ -68,6 +68,21 @@ abstract: |
 
 # Related Works
 
+## Central Thesis Support
+
+
+
+Exploring how location affects diabetes risk, focusing on two studies
+
+One study shows that in Northeastern Germany, local factors like socio-economic status impact diabetes risk
+
+Another study links diabetes with obesity and inactivity, stressing location-specific health solutions
+
+These insights guide our analysis of walkability’s influence on diabetes in the Southern United States
+
+<!-- Will reference these two from our journal entries: -->
+<!--   - Do the risk factors for type 2 diabetes mellitus vary by location? A spatial analysis of health insurance claims in Northeastern Germany using kernel density estimation and geographically weighted regression -->
+<!--   - Spatial Analysis of Incidence of Diagnosed Type 2 Diabetes Mellitus and Its Association With Obesity and Physical Inactivity -->
 
 # Methods
 
@@ -237,7 +252,17 @@ model_df %>%
 ```
 # Discussion
 
+## Central Thesis Support
 
+
+
+Analyzing the relationship between walkability and diabetes prevalence in our study’s context
+
+Comparing our findings with existing research to understand regional differences
+
+Discussing the implications of our study for local health strategies
+
+Highlighting the need for tailored interventions based on regional characteristics to combat diabetes
 
 {{< pagebreak >}}
 
