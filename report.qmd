@@ -6,6 +6,7 @@ format:
     linenumbers: false
     doublespacing: false
     runninghead: "A Preprint"
+    fig-format: jpeg
   arxiv-html: default
 author:
   - name: Arkaprabho Bose
@@ -127,11 +128,16 @@ loadedData <- loadData()
 cleaned_walkability = loadedData$original_walkability %>% clean_walkability()
 cleaned_diabetes = loadedData$original_diabetes %>% clean_diabetes()
 spatial_data = loadedData$spatial_data %>% clean_spatial()
+temp_data = loadedData$temp_data
+income_data = loadedData$income_data %>% clean_income()
 new_dataset = merge(cleaned_walkability, cleaned_diabetes, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% subset( !(StateAbbr %in% c("AK", "HI")))
-new_spatial_dataset = merge(new_dataset,spatial_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE)
+merged_income = merge(new_dataset,income_data,by = "CountyFIPS", all.x = TRUE, all.y = TRUE ) %>% na.omit()
+new_spatial_dataset = merge(merged_income,spatial_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% na.omit()
+
+summary(new_spatial_dataset)
 ```
 ```{r echo={FALSE}}
-plot_correlation_matrix(new_dataset)
+plot_correlation_matrix(merged_income)
 ```
 
 ```{r echo={FALSE}}
@@ -146,7 +152,7 @@ sf_spatial_data <- as(sf_spatial_data, "Spatial")
 
 ```{r echo={FALSE}}
 ggplot() +
-  geom_sf(data = new_spatial_dataset, aes(geometry = geometry,fill =DIABETES_CrudePrev), color="black",size=0.2) +
+  geom_sf(data = new_spatial_dataset, aes(geometry = geometry,fill = DIABETES_CrudePrev), color="black",size=0.2) +
   scale_fill_viridis_c(name = "Diabetes Crude Prev") +
   labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
 ```
@@ -209,23 +215,31 @@ model_df %>%
 
 
 ```{r echo={FALSE}}
-plots = data.frame(CountyFIPS = new_spatial_dataset$CountyFIPS,Walkability_Obs = new_spatial_dataset$NatWalkInd,HBP_Obs = new_spatial_dataset$BPHIGH_CrudePrev,walkability_coef= model_df$NatWalkInd, walk_impact = new_spatial_dataset$NatWalkInd * model_df$NatWalkInd, INTPTLAT=new_spatial_dataset$INTPTLAT, INTPTLON = new_spatial_dataset$INTPTLON, geometry =  new_spatial_dataset$geometry  ) %>%
+plots = data.frame(CountyFIPS = new_spatial_dataset$CountyFIPS,Walkability_Obs = new_spatial_dataset$NatWalkInd,HBP_Obs = new_spatial_dataset$BPHIGH_CrudePrev,walkability_coef= model_df$NatWalkInd, income_impact = new_spatial_dataset$Median.Household.Income * model_df$Median.Household.Income, walk_impact = new_spatial_dataset$NatWalkInd * model_df$NatWalkInd, bp_impact = new_spatial_dataset$BPHIGH_CrudePrev * model_df$BPHIGH_CrudePrev, lpa_impact = new_spatial_dataset$LPA_CrudePrev*model_df$LPA_CrudePrev, smoking_impact = new_spatial_dataset$CSMOKING_CrudePrev * model_df$CSMOKING_CrudePrev, INTPTLAT=new_spatial_dataset$INTPTLAT, INTPTLON = new_spatial_dataset$INTPTLON, geometry =  new_spatial_dataset$geometry  ) %>%   pivot_longer(cols = c(walk_impact, income_impact,bp_impact, lpa_impact, smoking_impact),
+               names_to = "Impact_Type",
+               values_to = "Impact_Value") %>%
   st_sf()
+
 
 plots %>%
   ggplot() +
-  geom_sf(aes(fill = walk_impact),color="black",size=0.2) +
+  geom_sf(aes(fill = Impact_Value),color="black",) +
  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
   labs(title =
-"Estimated Impact of NatWalkInd")
+"Estimated Impact of NatWalkInd") +
+facet_wrap(~Impact_Type)
+# 
+# plots %>%
+#   ggplot() +
+#   geom_sf(aes(fill = income_impact),color="black",size=0.2) +
+#  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+#   labs(title =
+# "Estimated Impact of Median Household Income")
 
-# example_long = model_df %>%
-#   select(!c(Intercept), !contains("_TV"), !contains("_SE")) %>%
-#   rename_with(~paste0(.x, "_coef")) %>%
-#   bind_cols(new_spatial_dataset)
-#   pivot_longer(data = NatWalkInd:CSMOKING_CrudePrev,
-#                names_to = "Covariate",
-#                values_to = "Coefficient")
+
+
+
+
 ```
 
 

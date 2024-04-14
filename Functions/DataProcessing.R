@@ -8,7 +8,9 @@ loadData <- function() {
   data <- read.csv("./Data/data.csv")
   data2 <- read.csv("./Data/500cities.csv")
   spatial_data <- st_read("./Data/shapes/us_counties")
-  return(list( original_walkability= data, original_diabetes = data2, spatial_data=spatial_data))
+  temp_data <-read.csv("./Data/tempData.csv")
+  income_data <-read.csv("./Data/incomeData.csv")
+  return(list( original_walkability= data, original_diabetes = data2, spatial_data=spatial_data, temp_data=temp_data,income_data=income_data))
 }
 
 
@@ -24,6 +26,14 @@ clean_walkability <- function(data) {
     ungroup()
   
   return(cleaned_walk_data)
+}
+
+clean_income <- function(data) {
+  data$CountyFIPS <- sprintf("%02d%03d", data$State.FIPS.Code, data$County.FIPS.Code)
+  data$Median.Household.Income <- gsub(",", "", data$Median.Household.Income)
+  data$Median.Household.Income <- as.numeric(data$Median.Household.Income)
+  cleaned_income <- subset(data, select = c(CountyFIPS ,Median.Household.Income))
+  return(cleaned_income)
 }
 
 clean_diabetes <- function(data) {
@@ -79,16 +89,16 @@ test_train_split <- function(data,train) {
 
 fit_gwr <- function(data) {
   
-  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income,
                           data = data,
                           kernel = "exponential",
   )
   
-  merged_gwr <- gwr.basic(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev,
+  merged_gwr <- gwr.basic(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev+ Median.Household.Income,
                           data = data,
                           bw = merged_gwr_bw,
                           kernel = "exponential",
-  )
+  ) 
   
   
   return(merged_gwr)
