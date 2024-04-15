@@ -198,10 +198,3 @@ plotGWR <- function(model, value) {
 plotValue <- function(data, value) {
   
 }
-
-
-
-
-
-
-

@@ -81,6 +81,21 @@ These insights guide our analysis of walkability’s influence on diabetes in th
 
 # Methods
 
+```{r}
+source("data/artificialData.R")
+source("analysis/gwrAnalysis.R")
+
+# Generate data
+data <- create_data()
+
+# Convert data to spatial format and fit GWR
+gwr_results <- fit_gwr(data)
+
+# Output results (handle as needed)
+print(gwr_results)
+```
+
+
 ## Central Thesis Support
 
 In order to analyze diabetes as a response of walkability, we need good, clean data
@@ -139,23 +154,23 @@ sf_spatial_data<- st_as_sf(new_spatial_dataset)
 sf_spatial_data <- as(sf_spatial_data, "Spatial")
 ```
 
-```{r}
-rf_pred <- runRandomForest(sf_spatial_data)
-```
-
-```{r echo={FALSE}}
-rf_pred %>%
-  mutate("%Diabetes Abs Err from Random Forest" = abs(predictedValues - testValues.DIABETES_CrudePrev)) %>%
-  ggplot() +
-  geom_sf(aes(fill = `%Diabetes Abs Err from Random Forest`),
-          color = scales::alpha("black",
-                                alpha = 0.1)) +
-  scale_fill_viridis_c(limits = c(0, 1),
-                       breaks = c(0, 0.5, 1)) +
-  theme(text = element_text(size = 20),
-        legend.position = "bottom") +
-  labs(title = "Absolute Prediction Error of %Diabetes by GWR w/ \nexponential kernel")
-```
+# ```{r}
+# rf_pred <- runRandomForest(sf_spatial_data)
+# ```
+# 
+# ```{r echo={FALSE}}
+# rf_pred %>%
+#   mutate("%Diabetes Abs Err from Random Forest" = abs(predictedValues - testValues.DIABETES_CrudePrev)) %>%
+#   ggplot() +
+#   geom_sf(aes(fill = `%Diabetes Abs Err from Random Forest`),
+#           color = scales::alpha("black",
+#                                 alpha = 0.1)) +
+#   scale_fill_viridis_c(limits = c(0, 1),
+#                        breaks = c(0, 0.5, 1)) +
+#   theme(text = element_text(size = 20),
+#         legend.position = "bottom") +
+#   labs(title = "Absolute Prediction Error of %Diabetes by GWR w/ \nexponential kernel")
+# ```
 
 ```{r echo={FALSE}}
 plot<- ggplot() +
@@ -166,9 +181,32 @@ plot<- ggplot() +
 ggsave("original_diabetes_plot.png", plot, width = 8, height = 6, units = "in", dpi = 300)
 ```
 
-```{r echo={FALSE}}
+
+```{r}
 gwr_model_results = fit_gwr(sf_spatial_data)
+```
+
+```{r echo={FALSE}}
+adjusted_tvalues <- gwr.t.adjust(gwr_model_results)$SDF %>% as("sf") 
+selected_columns <- c(grep("_p$", colnames(adjusted_tvalues), value = TRUE),"geometry")
+subset_df <- adjusted_tvalues[, selected_columns]
 model_df <- gwr_model_results$SDF %>% as("sf")
+
+for (i in seq_len(nrow(model_df))) {
+  # Check values in subset_df
+  for (col_name in names(model_df)) {
+    # Construct the corresponding column name in subset_df
+    col_name_subset <- paste0(col_name, "_p")
+    
+    # Check if the column exists in subset_df
+    if (col_name_subset %in% names(subset_df)) {
+      if (subset_df[[col_name_subset]][i] < 0.05) {
+        # Set corresponding value in model_df to 0
+        model_df[i, col_name] <- 0
+      }
+    }
+  }
+}
 ```
 
 <!-- ```{r echo={FALSE}} -->
@@ -279,12 +317,12 @@ plot1 <- plots %>%
 
 ggsave("facet_plot.png", plot1, width = 8, height = 6, units = "in", dpi = 300)
 
-print(plot1)
+
 plot2 <- plots %>%
   ggplot() +
   geom_sf(aes(fill = walk_impact), color = "black") +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
-  labs(title = "Estimated Impact of Covariates") 
+  labs(title = "Estimated Impact of Covariates")
 ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 
