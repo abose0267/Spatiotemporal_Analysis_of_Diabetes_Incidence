@@ -119,6 +119,23 @@ fit_gwr <- function(data) {
   return(merged_gwr)
 }
 
+fit_gwr2<-function(data) {
+  
+  merged_gwr_bw2 <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
+                          data = data,
+                          kernel = "gaussian",
+  )
+  
+  merged_gwr2 <- gwr.basic(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev+ Median.Household.Income + avg_temp,
+                          data = data,
+                          bw = merged_gwr_bw2,
+                          kernel = "gaussian",
+  ) 
+  
+  return(merged_gwr2)
+}
+
+
 
 test_model <- function(model,data) {
   
