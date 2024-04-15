@@ -6,7 +6,6 @@ format:
     linenumbers: false
     doublespacing: false
     runninghead: "A Preprint"
-    fig-format: jpeg
   arxiv-html: default
 author:
   - name: Arkaprabho Bose
@@ -43,35 +42,28 @@ abstract: |
 # Introduction {#sec-intro}
 
 ## Central Thesis Support
-  
 
-  
-  What is so important about diabetes?
-  
-  Does a high walkability index always lead to a lower diabetes prevalence?
-  
-  In southern regions, a higher walkability index contributes to diabetes prevalence
-  
-  This is significant because it will show where diabetes needs more preventative measures
-  
+What is so important about diabetes?
+
+Does a high walkability index always lead to a lower diabetes prevalence?
+
+In southern regions, a higher walkability index contributes to diabetes prevalence
+
+This is significant because it will show where diabetes needs more preventative measures
+
 <!-- ## Paragraphs -->
 
-  <!-- P1: This paragraph discusses the importance of diabetes, specifically the impact of it on a population and how common it is -->
+<!-- P1: This paragraph discusses the importance of diabetes, specifically the impact of it on a population and how common it is -->
 
-  <!-- P2: Talk about how there are recent claims that lifestyle factors like living is a highly walkable diets, diets etc  can decrease diabetes cases. -->
+<!-- P2: Talk about how there are recent claims that lifestyle factors like living is a highly walkable diets, diets etc  can decrease diabetes cases. -->
 
-  <!-- P3: State Thesis and Explain that it is important because it shows that the southern regions are not doing as well to prevent diabetes than other regions -->
+<!-- P3: State Thesis and Explain that it is important because it shows that the southern regions are not doing as well to prevent diabetes than other regions -->
 
 <!-- ## Sentences -->
-
-
-
 
 # Related Works
 
 ## Central Thesis Support
-
-
 
 Exploring how location affects diabetes risk, focusing on two studies
 
@@ -82,13 +74,14 @@ Another study links diabetes with obesity and inactivity, stressing location-spe
 These insights guide our analysis of walkability’s influence on diabetes in the Southern United States
 
 <!-- Will reference these two from our journal entries: -->
+
 <!--   - Do the risk factors for type 2 diabetes mellitus vary by location? A spatial analysis of health insurance claims in Northeastern Germany using kernel density estimation and geographically weighted regression -->
+
 <!--   - Spatial Analysis of Incidence of Diagnosed Type 2 Diabetes Mellitus and Its Association With Obesity and Physical Inactivity -->
 
 # Methods
 
 ## Central Thesis Support
-
 
 In order to analyze diabetes as a response of walkability, we need good, clean data
 
@@ -98,9 +91,7 @@ We used GWR to create coefficient surfaces to analyze which parts of the country
 
 We compared GWR with Random Forest to show that GWR is not overfitting, to prevent error
 
-
 # Results
-
 
 ## Central Thesis Level Outline
 
@@ -117,6 +108,7 @@ library(GWmodel)
 library(dplyr)
 library(ggplot2)
 library(sf)
+library(tidyverse)
 library(corrplot)
 ```
 
@@ -128,14 +120,15 @@ loadedData <- loadData()
 cleaned_walkability = loadedData$original_walkability %>% clean_walkability()
 cleaned_diabetes = loadedData$original_diabetes %>% clean_diabetes()
 spatial_data = loadedData$spatial_data %>% clean_spatial()
-temp_data = loadedData$temp_data
+temp_data = loadedData$temp_data %>% cleaned_weather()
 income_data = loadedData$income_data %>% clean_income()
-new_dataset = merge(cleaned_walkability, cleaned_diabetes, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% subset( !(StateAbbr %in% c("AK", "HI")))
+new_dataset = merge(cleaned_walkability, cleaned_diabetes, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% subset( !(StateAbbr %in% c("AK", "HI"))) %>% merge(temp_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE)
 merged_income = merge(new_dataset,income_data,by = "CountyFIPS", all.x = TRUE, all.y = TRUE ) %>% na.omit()
 new_spatial_dataset = merge(merged_income,spatial_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% na.omit()
 
 summary(new_spatial_dataset)
 ```
+
 ```{r echo={FALSE}}
 plot_correlation_matrix(merged_income)
 ```
@@ -146,54 +139,15 @@ sf_spatial_data<- st_as_sf(new_spatial_dataset)
 sf_spatial_data <- as(sf_spatial_data, "Spatial")
 ```
 
-<!-- ```{r} -->
-<!-- rf_pred <- runRandomForest(sf_spatial_data) -->
-<!-- ``` -->
-
-```{r echo={FALSE}}
-ggplot() +
-  geom_sf(data = new_spatial_dataset, aes(geometry = geometry,fill = DIABETES_CrudePrev), color="black",size=0.2) +
-  scale_fill_viridis_c(name = "Diabetes Crude Prev") +
-  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+```{r}
+rf_pred <- runRandomForest(sf_spatial_data)
 ```
 
 ```{r echo={FALSE}}
-gwr_model_results = fit_gwr(sf_spatial_data)
-model_df <- gwr_model_results$SDF %>% as("sf")
-```
-
-```{r echo={FALSE}}
+rf_pred %>%
+  mutate("%Diabetes Abs Err from Random Forest" = abs(predictedValues - testValues.DIABETES_CrudePrev)) %>%
   ggplot() +
-    geom_sf(data = model_df, aes(geometry = geometry,fill = yhat), color="black",size=0.2) +
-    scale_fill_viridis_c(name = "Diabetes Crude Prev") +
-    labs(title = "Fitted Spatial Distribution of Diabetes Crude Prevalence")
-
-  ggplot() +
-    geom_sf(data = model_df, aes(geometry = geometry,fill = y), color="black",size=0.2) +
-    scale_fill_viridis_c(name = "Diabetes Crude Prev") +
-    labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
-```
-
-```{r echo={FALSE}}
-model_df %>%
- mutate("Predicted %Diabetes Prevalence" = yhat) %>%
-  ggplot() +
-  geom_sf(aes(fill = `Predicted %Diabetes Prevalence`),
-          color = scales::alpha("black",
-                                alpha = 0.1)) +
-  scale_fill_gradientn(colours = terrain.colors(8),
-                       limits = c(0, 25),
-                       breaks = c(0, 10, 20)) +
-  theme(text = element_text(size = 20),
-        legend.position = "bottom") +
-  labs(title = "Predicted Values for %Diabetes Prevalence by GWR w/ exponential kernel")
-```
-
-```{r echo={FALSE}}
-model_df %>%
-  mutate("%Diabetes Abs Err" = abs(yhat - y)) %>%
-  ggplot() +
-  geom_sf(aes(fill = `%Diabetes Abs Err`),
+  geom_sf(aes(fill = `%Diabetes Abs Err from Random Forest`),
           color = scales::alpha("black",
                                 alpha = 0.1)) +
   scale_fill_viridis_c(limits = c(0, 1),
@@ -204,80 +158,197 @@ model_df %>%
 ```
 
 ```{r echo={FALSE}}
-model_df %>%
-  mutate("NatWalkInd Coeff" = NatWalkInd) %>%
-  ggplot() +
-  geom_sf(aes(fill = `NatWalkInd Coeff`),color="black",size=0.2) +
- scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
-  labs(title =
-"Estimated Coefficient Surface of NatWalkInd")
+plot<- ggplot() +
+  geom_sf(data = new_spatial_dataset, aes(geometry = geometry,fill = DIABETES_CrudePrev), color="black",size=0.2) +
+  scale_fill_viridis_c(name = "Diabetes Crude Prev") +
+  labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
+
+ggsave("original_diabetes_plot.png", plot, width = 8, height = 6, units = "in", dpi = 300)
 ```
 
+```{r echo={FALSE}}
+gwr_model_results = fit_gwr(sf_spatial_data)
+model_df <- gwr_model_results$SDF %>% as("sf")
+```
+
+<!-- ```{r echo={FALSE}} -->
+
+<!--   ggplot() + -->
+
+<!--     geom_sf(data = model_df, aes(geometry = geometry,fill = yhat), color="black",size=0.2) + -->
+
+<!--     scale_fill_viridis_c(name = "Diabetes Crude Prev") + -->
+
+<!--     labs(title = "Fitted Spatial Distribution of Diabetes Crude Prevalence") -->
+
+<!--   ggplot() + -->
+
+<!--     geom_sf(data = model_df, aes(geometry = geometry,fill = y), color="black",size=0.2) + -->
+
+<!--     scale_fill_viridis_c(name = "Diabetes Crude Prev") + -->
+
+<!--     labs(title = "Spatial Distribution of Diabetes Crude Prevalence") -->
+
+<!-- ``` -->
+
+<!-- ```{r echo={FALSE}} -->
+
+<!-- model_df %>% -->
+
+<!--  mutate("Predicted %Diabetes Prevalence" = yhat) %>% -->
+
+<!--   ggplot() + -->
+
+<!--   geom_sf(aes(fill = `Predicted %Diabetes Prevalence`), -->
+
+<!--           color = scales::alpha("black", -->
+
+<!--                                 alpha = 0.1)) + -->
+
+<!--   scale_fill_gradientn(colours = terrain.colors(8), -->
+
+<!--                        limits = c(0, 25), -->
+
+<!--                        breaks = c(0, 10, 20)) + -->
+
+<!--   theme(text = element_text(size = 20), -->
+
+<!--         legend.position = "bottom") + -->
+
+<!--   labs(title = "Predicted Values for %Diabetes Prevalence by GWR w/ exponential kernel") -->
+
+<!-- ``` -->
+
+<!-- ```{r echo={FALSE}} -->
+
+<!-- model_df %>% -->
+
+<!--   mutate("%Diabetes Abs Err" = abs(yhat - y)) %>% -->
+
+<!--   ggplot() + -->
+
+<!--   geom_sf(aes(fill = `%Diabetes Abs Err`), -->
+
+<!--           color = scales::alpha("black", -->
+
+<!--                                 alpha = 0.1)) + -->
+
+<!--   scale_fill_viridis_c(limits = c(0, 1), -->
+
+<!--                        breaks = c(0, 0.5, 1)) + -->
+
+<!--   theme(text = element_text(size = 20), -->
+
+<!--         legend.position = "bottom") + -->
+
+<!--   labs(title = "Absolute Prediction Error of %Diabetes by GWR w/ \nexponential kernel") -->
+
+<!-- ``` -->
+
+<!-- ```{r echo={FALSE}} -->
+
+<!-- model_df %>% -->
+
+<!--   mutate("NatWalkInd Coeff" = NatWalkInd) %>% -->
+
+<!--   ggplot() + -->
+
+<!--   geom_sf(aes(fill = `NatWalkInd Coeff`),color="black",size=0.2) + -->
+
+<!--  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) + -->
+
+<!--   labs(title = -->
+
+<!-- "Estimated Coefficient Surface of NatWalkInd") -->
+
+<!-- ``` -->
 
 ```{r echo={FALSE}}
-plots = data.frame(CountyFIPS = new_spatial_dataset$CountyFIPS,Walkability_Obs = new_spatial_dataset$NatWalkInd,HBP_Obs = new_spatial_dataset$BPHIGH_CrudePrev,walkability_coef= model_df$NatWalkInd, income_impact = new_spatial_dataset$Median.Household.Income * model_df$Median.Household.Income, walk_impact = new_spatial_dataset$NatWalkInd * model_df$NatWalkInd, bp_impact = new_spatial_dataset$BPHIGH_CrudePrev * model_df$BPHIGH_CrudePrev, lpa_impact = new_spatial_dataset$LPA_CrudePrev*model_df$LPA_CrudePrev, smoking_impact = new_spatial_dataset$CSMOKING_CrudePrev * model_df$CSMOKING_CrudePrev, INTPTLAT=new_spatial_dataset$INTPTLAT, INTPTLON = new_spatial_dataset$INTPTLON, geometry =  new_spatial_dataset$geometry  ) %>%   pivot_longer(cols = c(walk_impact, income_impact,bp_impact, lpa_impact, smoking_impact),
+plots = data.frame(CountyFIPS = new_spatial_dataset$CountyFIPS,Walkability_Obs = new_spatial_dataset$NatWalkInd,HBP_Obs = new_spatial_dataset$BPHIGH_CrudePrev,walkability_coef= model_df$NatWalkInd, income_impact = new_spatial_dataset$Median.Household.Income * model_df$Median.Household.Income,temp_impact = new_spatial_dataset$avg_temp * model_df$avg_temp, walk_impact = new_spatial_dataset$NatWalkInd * model_df$NatWalkInd, bp_impact = new_spatial_dataset$BPHIGH_CrudePrev * model_df$BPHIGH_CrudePrev, lpa_impact = new_spatial_dataset$LPA_CrudePrev*model_df$LPA_CrudePrev,obesity_impact=new_spatial_dataset$OBESITY_CrudePrev * model_df$OBESITY_CrudePrev, smoking_impact = new_spatial_dataset$CSMOKING_CrudePrev * model_df$CSMOKING_CrudePrev, INTPTLAT=new_spatial_dataset$INTPTLAT, INTPTLON = new_spatial_dataset$INTPTLON, geometry =  new_spatial_dataset$geometry  ) %>%   pivot_longer(cols = c(bp_impact,lpa_impact,smoking_impact,obesity_impact, income_impact, temp_impact),
                names_to = "Impact_Type",
                values_to = "Impact_Value") %>%
   st_sf()
 
 
-plots %>%
+plot1 <- plots %>%
   ggplot() +
-  geom_sf(aes(fill = Impact_Value),color="black",) +
- scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
-  labs(title =
-"Estimated Impact of NatWalkInd") +
-facet_wrap(~Impact_Type)
-# 
-# plots %>%
-#   ggplot() +
-#   geom_sf(aes(fill = income_impact),color="black",size=0.2) +
-#  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
-#   labs(title =
-# "Estimated Impact of Median Household Income")
+  geom_sf(aes(fill = Impact_Value), color = scales::alpha("black", 0.1), ) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  labs(title = "Estimated Impact of Covariates") +
+  facet_wrap(~Impact_Type) 
 
+ggsave("facet_plot.png", plot1, width = 8, height = 6, units = "in", dpi = 300)
 
-
+print(plot1)
+plot2 <- plots %>%
+  ggplot() +
+  geom_sf(aes(fill = walk_impact), color = "black") +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+  labs(title = "Estimated Impact of Covariates") 
+ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 
 ```
 
+![](impact_plot.png){fig-align="center"}
 
+<!-- ```{r echo={FALSE}} -->
 
-```{r echo={FALSE}}
-model_df %>%
-  mutate("%HBP Prevalence Coeff" = BPHIGH_CrudePrev) %>%
-  ggplot() +
-  geom_sf(aes(fill = `%HBP Prevalence Coeff`),color="black",size=0.2) +
- scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
-  labs(title =
-"Estimated Coefficient Surface of HBP")
-```
+<!-- model_df %>% -->
 
-```{r echo={FALSE}}
-model_df %>%
-  mutate("%Obesity Prevalence Coeff" = OBESITY_CrudePrev) %>%
-  ggplot() +
-  geom_sf(aes(fill = `%Obesity Prevalence Coeff`),color="black",size=0.2) +
- scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(model_df$OBESITY_CrudePrev)) +
-  labs(title =
-"Estimated Coefficient Surface of Obesity")
-```
+<!--   mutate("%HBP Prevalence Coeff" = BPHIGH_CrudePrev) %>% -->
 
-```{r echo={FALSE}}
-model_df %>%
-  mutate("%Smoker Prevalence Coeff" = CSMOKING_CrudePrev) %>%
-  ggplot() +
-  geom_sf(aes(fill = `%Smoker Prevalence Coeff`),color="black",size=0.2) +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(model_df$CSMOKING_CrudePrev)) +
-  labs(title =
-"Estimated Coefficient Surface of Obesity")
-```
+<!--   ggplot() + -->
+
+<!--   geom_sf(aes(fill = `%HBP Prevalence Coeff`),color="black",size=0.2) + -->
+
+<!--  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) + -->
+
+<!--   labs(title = -->
+
+<!-- "Estimated Coefficient Surface of HBP") -->
+
+<!-- ``` -->
+
+<!-- ```{r echo={FALSE}} -->
+
+<!-- model_df %>% -->
+
+<!--   mutate("%Obesity Prevalence Coeff" = OBESITY_CrudePrev) %>% -->
+
+<!--   ggplot() + -->
+
+<!--   geom_sf(aes(fill = `%Obesity Prevalence Coeff`),color="black",size=0.2) + -->
+
+<!--  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(model_df$OBESITY_CrudePrev)) + -->
+
+<!--   labs(title = -->
+
+<!-- "Estimated Coefficient Surface of Obesity") -->
+
+<!-- ``` -->
+
+<!-- ```{r echo={FALSE}} -->
+
+<!-- model_df %>% -->
+
+<!--   mutate("%Smoker Prevalence Coeff" = CSMOKING_CrudePrev) %>% -->
+
+<!--   ggplot() + -->
+
+<!--   geom_sf(aes(fill = `%Smoker Prevalence Coeff`),color="black",size=0.2) + -->
+
+<!--   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(model_df$CSMOKING_CrudePrev)) + -->
+
+<!--   labs(title = -->
+
+<!-- "Estimated Coefficient Surface of Obesity") -->
+
+<!-- ``` -->
+
 # Discussion
 
 ## Central Thesis Support
-
-
 
 Analyzing the relationship between walkability and diabetes prevalence in our study’s context
 
@@ -290,4 +361,3 @@ Highlighting the need for tailored interventions based on regional characteristi
 {{< pagebreak >}}
 
 # References {.unnumbered}
-

@@ -38,11 +38,13 @@ clean_income <- function(data) {
 
 cleaned_weather <- function(temp_data) {
   temp_data$GEOID <- as.character(temp_data$GEOID)
-  
-  selected_columns <- temp_data[, c("GEOID", "Summer Avg Land Surface Temperature (F)")]
-  
-  cleaned_weather <- selected_columns[complete.cases(selected_columns), ]
-  
+  temp_data$GEOID <- sprintf("%011s", temp_data$GEOID)
+  temp_data$CountyFIPS <- substr(temp_data$GEOID, start = 1, stop = 5)
+  temp_data$avg_temp <- temp_data$Summer.Average.Land.Surface.Temperature..F.
+  selected_columns <- temp_data[, c("CountyFIPS", "avg_temp")]
+  cleaned_weather <- selected_columns[complete.cases(selected_columns), ] %>% group_by(CountyFIPS) %>%
+    summarise(avg_temp = mean(avg_temp, na.rm = TRUE)) %>%
+    ungroup()
   return(cleaned_weather)
 }
 
@@ -52,13 +54,13 @@ cleaned_weather <- function(temp_data) {
 clean_diabetes <- function(data) {
   data$CountyFIPS <- sprintf("%05s", paste0(data$CountyFIPS))
   
-    cleaned_diabetes <- data %>%
+  cleaned_diabetes <- data %>%
     group_by(CountyFIPS) %>%
     summarise(DIABETES_CrudePrev = mean(DIABETES_CrudePrev, na.rm = TRUE),BPHIGH_CrudePrev= mean(BPHIGH_CrudePrev, na.rm = TRUE),OBESITY_CrudePrev=mean(OBESITY_CrudePrev, na.rm = TRUE),LPA_CrudePrev=mean(LPA_CrudePrev, na.rm = TRUE),CSMOKING_CrudePrev=mean(CSMOKING_CrudePrev, na.rm = TRUE),StateAbbr=StateAbbr) %>%
     ungroup() %>%
     unique() 
   
-    cleaned_diabetes <- cleaned_diabetes %>% 
+  cleaned_diabetes <- cleaned_diabetes %>% 
     select(CountyFIPS, StateAbbr, DIABETES_CrudePrev, BPHIGH_CrudePrev, OBESITY_CrudePrev, LPA_CrudePrev, CSMOKING_CrudePrev)
   
   return(cleaned_diabetes)
@@ -84,8 +86,8 @@ plot_correlation_matrix <- function(data) {
   cor_matrix <- cor(data %>% select(-CountyFIPS, -StateAbbr), use = "complete.obs")  # Handling missing values by using complete observations
   # Make correlation matrix
   plot<- corrplot(cor_matrix, method = "circle", type = "upper", order = "hclust",
-           tl.col = "black", tl.srt = 45,  # Text label color and rotation
-           addCoef.col = "orange")  # Add correlation coefficients to plot
+                  tl.col = "black", tl.srt = 45,  # Text label color and rotation
+                  addCoef.col = "orange")  # Add correlation coefficients to plot
   return(plot)
 }
 
@@ -102,12 +104,12 @@ test_train_split <- function(data,train) {
 
 fit_gwr <- function(data) {
   
-  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income,
+  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
                           data = data,
                           kernel = "exponential",
   )
   
-  merged_gwr <- gwr.basic(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev+ Median.Household.Income,
+  merged_gwr <- gwr.basic(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev+ Median.Household.Income + avg_temp,
                           data = data,
                           bw = merged_gwr_bw,
                           kernel = "exponential",
@@ -157,14 +159,15 @@ runRandomForest <- function(data) {
   test_df <- merged_df[-index, ]
   
   rf_train <- train(
-    x = train_df[, c("NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", "LPA_CrudePrev", "CSMOKING_CrudePrev")],
+    x = train_df[, c("NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", "LPA_CrudePrev", "CSMOKING_CrudePrev", "avg_temp", "Median.Household.Income")],
     y = train_df$DIABETES_CrudePrev,
     method = "rf"
   )
   
-  rf_pred <- predict(rf_train, newdata = test_df[, c("NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", "LPA_CrudePrev", "CSMOKING_CrudePrev")])
+  rf_pred <- predict(rf_train, newdata = test_df[, c("NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", "LPA_CrudePrev", "CSMOKING_CrudePrev", "avg_temp", "Median.Household.Income")])
   
-  return(rf_pred)
+  return_frame = data.frame( test_df, predictedValues = rf_pred)
+  return(return_frame)
 }
 
 
@@ -172,13 +175,12 @@ runRandomForest <- function(data) {
 
 plotGWR <- function(model, value) {
   
-
+  
 }
 
 plotValue <- function(data, value) {
-
+  
 }
-
 
 
 
