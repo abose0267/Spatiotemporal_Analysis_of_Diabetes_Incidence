@@ -81,6 +81,21 @@ These insights guide our analysis of walkability’s influence on diabetes in th
 
 # Methods
 
+```{r}
+source("data/artificialData.R")
+source("analysis/gwrAnalysis.R")
+
+# Generate data
+data <- create_data()
+
+# Convert data to spatial format and fit GWR
+gwr_results <- fit_gwr(data)
+
+# Output results (handle as needed)
+print(gwr_results)
+```
+
+
 ## Central Thesis Support
 
 In order to analyze diabetes as a response of walkability, we need good, clean data
