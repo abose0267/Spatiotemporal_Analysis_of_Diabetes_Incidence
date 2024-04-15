@@ -36,6 +36,19 @@ clean_income <- function(data) {
   return(cleaned_income)
 }
 
+cleaned_weather <- function(temp_data) {
+  temp_data$GEOID <- as.character(temp_data$GEOID)
+  
+  selected_columns <- temp_data[, c("GEOID", "Summer Avg Land Surface Temperature (F)")]
+  
+  cleaned_weather <- selected_columns[complete.cases(selected_columns), ]
+  
+  return(cleaned_weather)
+}
+
+
+
+
 clean_diabetes <- function(data) {
   data$CountyFIPS <- sprintf("%05s", paste0(data$CountyFIPS))
   
