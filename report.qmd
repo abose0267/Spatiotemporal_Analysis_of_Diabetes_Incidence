@@ -121,6 +121,30 @@ We compared GWR with Random Forest to show that GWR is not overfitting, to preve
 # Results
 
 ## Central Thesis Level Outline
+Paragraph 1: Diabetes Prevalence in The South
+  
+  Topic: There is a clear positive relationship between walkability and diabetes in the Southern Region.
+  Support: From the plots,the estimated impact of walkability on diabetes is consistently higher in the southern to South East region. These areas tend to be red, which is associated with a higher impact of walkability on diabetes prevalence. 
+
+Paragraph 2: Certain reasons why walkability has a positive relationship with diabetes prevalence in the South.
+
+  Topic: Higher temperatures may be a potential reason why Walkability has a positive relationship with Diabetes in the South.
+  Support: As seen by the plot, in colder regions such as the west coast and in the Pacific Northwest, there is negative impact of Walkability on Diabetes. Thus, this shows that higher temperatures in the South may lead to people staying indoors, reducing walkability and in turn possibly leading to higher diabetes rates.
+
+Paragraph 3: Other factors that potentially lead to higher Diabetes prevalence
+
+  Topic: Additional Risk factors beside Walkability on Diabetes
+  Support: Overall,   certain risk factors such as smoking, obesity, etc. had a high impact on diabetes in every region. We expected this to be the case, further supporting our thesis.
+
+
+Paragraph 4: Validation metrics
+
+  Topic: Our model's performance overall
+  
+  Support: From the residual plot, we can see that the points are scattered fairly evenly around and the residual plot does not have a specific pattern, indicating a well-fit model. This further supports our central thesis indiciating that the model we fit is performing well. 
+  
+
+
 
 From the plots, it shows that the southern region of the United States, walkability had a postive relationship with diabetes prevalence.
 
