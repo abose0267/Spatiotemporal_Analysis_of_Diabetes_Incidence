@@ -65,13 +65,25 @@ This is significant because it will show where diabetes needs more preventative 
 
 ## Central Thesis Support
 
-Exploring how location affects diabetes risk, focusing on two studies
+Paragraph 1: Exploring how location affects diabetes risk, focusing on two studies
 
-One study shows that in Northeastern Germany, local factors like socio-economic status impact diabetes risk
+  Topic: Introduction to how geographical and environmental factors influence diabetes risk
+  Support: Discuss the relevance of location in epidemiological studies, which sets the stage for a deeper exploration of the key studies
 
-Another study links diabetes with obesity and inactivity, stressing location-specific health solutions
+Paragraph 2: One study shows that in Northeastern Germany, local factors like socio-economic status impact diabetes risk
 
-These insights guide our analysis of walkability’s influence on diabetes in the Southern United States
+  Topic: Detailed analysis of the study conducted in Northeastern Germany
+  Support: Describe how this research found that socio-economic status impacts diabetes risk within this specific location Reference the study to emphasize the importance of local factors in assessing diabetes risk
+
+Paragraph 3: Another study links diabetes with obesity and inactivity, stressing location-specific health solutions
+  
+  Topic: Examine another study that correlates diabetes prevalence with obesity and physical inactivity
+  Support: Highlight findings that stress the need for location-specific health solutions, highlighting the importance of understanding local health behaviors and lifestyle factors
+
+Paragraph 4: These insights guide our analysis of walkability’s influence on diabetes in the Southern United States
+
+  Topic: Integrate the insights gained from the mentioned studies and their application to the Southern U.S. context
+  Support: Explain how these studies guide and inform the analysis of walkability’s influence on diabetes in the Southern U.S., setting up the premise that walkability might play a similar or different role depending on regional characteristics
 
 <!-- Will reference these two from our journal entries: -->
 
@@ -230,13 +242,27 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 ## Central Thesis Support
 
-Analyzing the relationship between walkability and diabetes prevalence in our study’s context
+Paragraph 1: Analyzing the relationship between walkability and diabetes prevalence in our study’s context
+  
+  Topic: Compare and contrast the study’s findings on walkability and diabetes in the Southern U.S. with the existing literature
+  Support: Analyze how the results align or contrast from the findings in Northeastern Germany and other relevant studies, which shows the uniqueness of the Southern U.S. context
 
-Comparing our findings with existing research to understand regional differences
 
-Discussing the implications of our study for local health strategies
+Paragraph 2: Comparing our findings with existing research to understand regional differences
 
-Highlighting the need for tailored interventions based on regional characteristics to combat diabetes
+  Topic: Mention the regional variations in diabetes prevalence and walkability discovered during the study
+  Support: Explain how these variations might be influenced by socioeconomic and environmental factors specific to different parts of the Southern U.S.
+
+Paragraph 3: Discussing the implications of our study for local health strategies
+
+  Topic: Suggest tailored public health strategies based on our findings
+  Support: Propose specific interventions and urban planning strategies that could be effective in regions with varying walkability indices. Maybe draw parallels to successful approaches in other regions discussed in the literature
+
+Paragraph 4: Highlighting the need for tailored interventions based on regional characteristics to combat diabetes
+
+  Topic: Reinforce the necessity for region-specific approaches to combat diabetes effectively
+  Support: Note the broader consequences of the study’s findings for public health policy and urban planning, emphasizing that one-size-fits-all solutions are not effective in addressing the nuanced challenges presented by diabetes
+
 
 {{< pagebreak >}}
 
