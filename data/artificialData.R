@@ -15,6 +15,8 @@ create_data <- function(n_counties = 3244) {
     LPA_CrudePrev = runif(n_counties, 20, 45),
     CSMOKING_CrudePrev = runif(n_counties, 15, 30),
     INTPTLAT = runif(n_counties, 25, 49),
-    INTPTLON = runif(n_counties, -124, -66)
+    INTPTLON = runif(n_counties, -124, -66),
+    AvgSummerTemp = runif(n_counties, 70, 100),
+    MedianHHIncome = runif(n_counties, 30000, 100000) 
   )
 }
