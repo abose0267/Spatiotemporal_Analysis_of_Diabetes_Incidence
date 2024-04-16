@@ -1,5 +1,5 @@
 ---
-title: "The Impact of Walkability on Diabetes Prevelance in the Southern United States"
+title: "The Unexpected Direct Relationship of Walkability on Diabetes Prevalence in the Southern United States"
 format:
   arxiv-pdf:
     keep-tex: true  
@@ -36,7 +36,7 @@ author:
         country: USA
         postal-code: 77843
 abstract: |
-  The diabetes epidemic in the United States, influenced by lifestyle elements such as walkability, presents a nuanced public health challenge. Our research shows that in southern regions, higher walkability indexes unexpectedly correlate with increased diabetes prevalence, which is contrary to the anticipated inverse relationship. This anomaly persists even when controlling for high blood pressure and low physical activity, which indicates significant regional variance. These findings present the necessity for tailored public health strategies and urban planning to effectively combat diabetes.
+  The diabetes epidemic in the United States, influenced by factors such as socioeconomic status and climate, presents a nuanced public health challenge. While the impact of these factors is well-documented, the influence of walkability on diabetes prevalence has been less explored. This study investigates how both socioeconomic and climate variables, alongside walkability, affect diabetes prevalence in the Southern U.S. Contrary to expectations, our findings indicate that higher walkability indexes correlate with an increase in diabetes prevalence. This anomaly persists even when controlling for high blood pressure and low physical activity, which indicates significant regional variance. Our findings show that the relationship between walkability and diabetes prevalence varies significantly by region, driven by distinct socioeconomic and environmental contexts. This variability highlights the need for public health strategies and urban planning that are tailored to the specific regional characteristics to effectively address diabetes.
 ---
 
 # Introduction {#sec-intro}
