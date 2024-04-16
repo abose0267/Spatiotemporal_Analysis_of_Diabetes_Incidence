@@ -51,6 +51,17 @@ In southern regions, a higher walkability index contributes to diabetes prevalen
 
 This is significant because it will show where diabetes needs more preventative measures
 
+
+## Paragraph
+
+In this paragraph, we will discuss the importance of the diabetes epidemic. This could include using statistics from qualified sources to show how severe it is and how it needs to be addressed. This paragraph could also discuss the ways that diabetes is currently being combated, including walkability.
+
+In the second paragraph, we discuss the current believe that a higher walkability means that there is a lower chance of diabetes prevalence. we can discuss specific examples where this might not always be the case.
+
+In the third paragraph, we will discuss our thesis statement. We can discuss that this is not always the case and that in the eastern US, walkability actually tends to contribute to diabetes prevalence.
+
+In the 4th paragraph, we can discuss why this finding is important. Specifically, we will talk about the different ways that this information can be used to prevent the increase of diabetes prevalence in the United States.
+
 <!-- ## Paragraphs -->
 
 <!-- P1: This paragraph discusses the importance of diabetes, specifically the impact of it on a population and how common it is -->
@@ -93,7 +104,7 @@ Paragraph 4: These insights guide our analysis of walkability’s influence on d
 
 # Methods
 
-```{r}
+```{r message=FALSE}
 source("data/artificialData.R")
 source("analysis/gwrAnalysis.R")
 
@@ -117,6 +128,20 @@ In order to make sure that walkability is consistent as a coefficient, we choose
 We used GWR to create coefficient surfaces to analyze which parts of the country had the most impact on diabetes
 
 We compared GWR with Random Forest to show that GWR is not overfitting, to prevent error
+
+
+
+## Paragraphs
+
+In the first paragraph, we will talk about the importance of good, clean data. In addition to this, we will also talk about what data we will be analyzing, and where we got it
+
+In the second paragraph, we can discuss the reasoning behind choosing the covariates that we did. This can be a good segue into talking about the GWR, and how we went about cleaning the data.
+
+In the next paragraph, we can talk about how the model was used, and tuned to fit our data. Specifically how we chose a bandwidth and what package we used.
+
+In the last paragraph, we can discuss the plots. In the paragraph, we discuss the ways the different plots were created (facet plots etc.)
+
+
 
 # Results
 
@@ -152,10 +177,11 @@ From the GWR model's spatial plot which shows the estimated impact of the Nation
 
 In the Western Region, though, there is a more positive relationship between the impact of Walkability and Diabetes in the Southern and Eastern Region further supporting our central thesis.
 
-```{r echo={FALSE}}
+```{r,results='hide',message=FALSE}
 source("./Functions/DataProcessing.R")
 
 library(GWmodel)
+library(ggplot2)
 library(dplyr)
 library(ggplot2)
 library(sf)
@@ -190,24 +216,6 @@ sf_spatial_data<- st_as_sf(new_spatial_dataset)
 sf_spatial_data <- as(sf_spatial_data, "Spatial")
 ```
 
-# ```{r}
-# rf_pred <- runRandomForest(sf_spatial_data)
-# ```
-# 
-# ```{r echo={FALSE}}
-# rf_pred %>%
-#   mutate("%Diabetes Abs Err from Random Forest" = abs(predictedValues - testValues.DIABETES_CrudePrev)) %>%
-#   ggplot() +
-#   geom_sf(aes(fill = `%Diabetes Abs Err from Random Forest`),
-#           color = scales::alpha("black",
-#                                 alpha = 0.1)) +
-#   scale_fill_viridis_c(limits = c(0, 1),
-#                        breaks = c(0, 0.5, 1)) +
-#   theme(text = element_text(size = 20),
-#         legend.position = "bottom") +
-#   labs(title = "Absolute Prediction Error of %Diabetes by GWR w/ \nexponential kernel")
-# ```
-
 ```{r echo={FALSE}}
 plot<- ggplot() +
   geom_sf(data = new_spatial_dataset, aes(geometry = geometry,fill = DIABETES_CrudePrev), color="black",size=0.2) +
@@ -218,12 +226,35 @@ ggsave("original_diabetes_plot.png", plot, width = 8, height = 6, units = "in", 
 ```
 
 
-```{r}
+```{r echo={FALSE}}
 gwr_model_results = fit_gwr(sf_spatial_data)
 ```
 
-```{r}
-library(ggplot2)
+
+```{r echo={FALSE}}
+adjusted_tvalues <- gwr.t.adjust(gwr_model_results)$SDF %>% as("sf") 
+selected_columns <- c(grep("_p$", colnames(adjusted_tvalues), value = TRUE),"geometry")
+subset_df <- adjusted_tvalues[, selected_columns]
+model_df <- gwr_model_results$SDF %>% as("sf")
+for (i in seq_len(nrow(model_df))) {
+  # Check values in subset_df
+  for (col_name in names(model_df)) {
+    # Construct the corresponding column name in subset_df
+    col_name_subset <- paste0(col_name, "_p")
+    
+    # Check if the column exists in subset_df
+    if (col_name_subset %in% names(subset_df)) {
+      if (subset_df[[col_name_subset]][i] < 0.05) {
+        # Set corresponding value in model_df to 0
+        model_df[i, col_name] <- 0
+      }
+    }
+  }
+}
+```
+
+```{r echo=FALSE}
+
 
 plot(model_df$residual)
 
@@ -259,6 +290,8 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 ```
 
 ![](impact_plot.png){fig-align="center"}
+
+![](facet_plot.png){fig-align="center"}
 
 
 
