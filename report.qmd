@@ -1,5 +1,5 @@
 ---
-title: "The Unexpected Direct Relationship of Walkability on Diabetes Prevalence in the Southern United States"
+title: "The Positive Relationship of Walkability on Diabetes Prevalence in the Southern United States"
 format:
   arxiv-pdf:
     keep-tex: true  
@@ -16,7 +16,6 @@ author:
         city: College Station, TX
         country: USA
         postal-code: 77843
-    orcid: 0000-0003-2402-304X
     email: abose0267@tamu.edu
     url: https://mm218.dev
   - name: Sebastian Oberg
@@ -36,7 +35,7 @@ author:
         country: USA
         postal-code: 77843
 abstract: |
-  The diabetes epidemic in the United States, influenced by factors such as socioeconomic status and climate, presents a nuanced public health challenge. While the impact of these factors is well-documented, the influence of walkability on diabetes prevalence has been less explored. This study investigates how both socioeconomic and climate variables, alongside walkability, affect diabetes prevalence in the Southern U.S. Contrary to expectations, our findings indicate that higher walkability indexes correlate with an increase in diabetes prevalence. This anomaly persists even when controlling for high blood pressure and low physical activity, which indicates significant regional variance. Our findings show that the relationship between walkability and diabetes prevalence varies significantly by region, driven by distinct socioeconomic and environmental contexts. This variability highlights the need for public health strategies and urban planning that are tailored to the specific regional characteristics to effectively address diabetes.
+  The diabetes epidemic in the United States presents a nuanced public health challenge, influenced by factors such as socioeconomic status and climate. While the impact of these factors is well-documented, the influence of walkability on diabetes prevalence has been underexplored. This study investigates how both socioeconomic and climate variables, alongside walkability, affect diabetes prevalence in the Southern U.S. Contrary to expectations, our findings indicate that higher walkability indexes correlate with an increase in diabetes prevalence. This effect persists even when controlling for high blood pressure and low physical activity, which indicates significant regional variance. Our findings show that the relationship between walkability and diabetes prevalence varies significantly by region, driven by distinct socioeconomic and environmental contexts. This variability highlights the need for urban planning as a public health strategy that is tailored to the specific regional characteristics to effectively address diabetes.
 ---
 
 # Introduction {#sec-intro}
