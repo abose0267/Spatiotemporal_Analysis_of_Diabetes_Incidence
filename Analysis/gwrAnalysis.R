@@ -6,7 +6,7 @@ prepare_sf <- function(data) {
   st_as_sf(data, coords = c("INTPTLON", "INTPTLAT"), crs = 4326, remove = FALSE)
 }
 
-fit_gwr <- function(data) {
+fit_artificial_gwr <- function(data) {
   if (!inherits(data, "sf")) {
     data <- prepare_sf(data)
   }

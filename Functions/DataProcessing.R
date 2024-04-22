@@ -88,6 +88,7 @@ plot_correlation_matrix <- function(data) {
   plot<- corrplot(cor_matrix, method = "circle", type = "upper", order = "hclust",
                   tl.col = "black", tl.srt = 45,  # Text label color and rotation
                   addCoef.col = "orange")  # Add correlation coefficients to plot
+  
   return(plot)
 }
 
