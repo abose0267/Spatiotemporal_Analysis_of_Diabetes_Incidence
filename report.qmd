@@ -3,8 +3,8 @@ title: "The Positive Relationship of Walkability on Diabetes Prevalence in the S
 format:
   arxiv-pdf:
     keep-tex: true  
-    linenumbers: false
-    doublespacing: false
+    linenumbers: true
+    doublespacing: true
     runninghead: "A Preprint"
   arxiv-html: default
 author:
@@ -86,25 +86,23 @@ It is crucial to understand this relationship, so that the correct actions can b
 
 # Related Works
 
-## Central Thesis Support
 
-
-### Exploring how location affects diabetes risk, focusing on two studies
+## Exploring how location affects diabetes risk, focusing on two studies
 
 Geographical and environmental factors significantly influence the risk and prevalence of diabetes, emphasizing the importance of location in epidemiological studies. This observation sets the stage for a deeper exploration of key studies that analyze how local variables can affect health outcomes. Such studies help highlight the complex interaction between environment and disease, providing a significant context for our research on walkability and diabetes in the United States.
 
 
-### Study on socio-economic impact in Northeastern Germany
+## Study on socio-economic impact in Northeastern Germany
 
 A detailed analysis of a study conducted in Northeastern Germany reveals that socio-economic status significantly impacts diabetes risk within this specific locale (Smith et al., 2020). The research found a noticeable inconsistency in diabetes prevalence correlating with variations in income levels and education, suggesting that socio-economic factors are critical determinants of health. This study emphasizes the importance of considering local factors when assessing diabetes risk and forms a crucial reference point for understanding regional differences in disease prevalence.
 
 
-### Link between diabetes, obesity, and inactivity
+## Link between diabetes, obesity, and inactivity
 
-Another significant study examines the correlation between diabetes prevalence, obesity, and physical inactivity, highlighting the necessity for location-specific health solutions (Jones and Taylor, 2019). This research emphasizes the localized nature of diabetes risk factors, demonstrating that areas with higher rates of physical inactivity and obesity tend to have correspondingly higher rates of diabetes. Importantly, the study found that these correlations vary significantly from one community to another, influenced by urban versus rural settings and the availability of recreational facilities. The findings underscore the importance of understanding local health behaviors and lifestyle factors in crafting targeted interventions, suggesting that strategies effective in one region may not be as effective in another due to these variabilities.
+Another significant study examines the correlation between diabetes prevalence, obesity, and physical inactivity, highlighting the necessity for location-specific health solutions (Jones and Taylor, 2019). This research emphasizes the localized nature of diabetes risk factors, demonstrating that areas with higher rates of physical inactivity and obesity tend to have correspondingly higher rates of diabetes. Importantly, the study found that these correlations vary significantly from one community to another, influenced by urban versus rural settings and the availability of recreational facilities. The findings underscore the importance of understanding local health behaviors and lifestyle factors in crafting targeted interventions, suggesting that strategies effective in one region may not be as effective in another due to these vulnerabilities.
 
 
-### Application of insights to the Southern U.S.
+## Application of insights to the Southern U.S.
 
 The insights gained from the studies mentioned above inform our examination of how walkability affects diabetes prevalence in the Southern United States. By analyzing the influence of socio-economic and lifestyle factors on diabetes in different regions, we hypothesize that walkability may have a similarly multifaceted impact in the Southern U.S. This framework allows us to test if higher walkability indices typically lead to lower diabetes prevalence or if unique regional factors create different results.
 
@@ -115,6 +113,17 @@ The insights gained from the studies mentioned above inform our examination of h
 <!--   - Spatial Analysis of Incidence of Diagnosed Type 2 Diabetes Mellitus and Its Association With Obesity and Physical Inactivity -->
 
 # Methods
+
+## Data and Cleaning
+
+In order to get a better understanding of the topic at hand, a study was performed using data from a few different sources. The walkability index data was from the Environment Protection Agency, using data from 2023. The health factors data was provided by the Center for Disease Control and Prevention, which was last updated in 2023. Small area income and poverty estimates from the United States Census Bureau  was used to get median houshold income data. Temperature and climate data was found at *FIND WHERE WE GOT TEMP DATA*. All of these datasets were thorough and cleaned with very few missing values. The data was cleaned and the relevant values were put into a new common dataset.
+
+## Relevant Values
+
+Diabetes as a disease has been studied extensively in the past, and as a result there is evidence of numerous factors being correlated to the prevalence of diabetes in the United States. 
+
+
+
 
 ```{r message=FALSE, results='hide'}
 
@@ -193,7 +202,7 @@ In the Western Region, though, there is a more positive relationship between the
 
 
 ```{r echo={FALSE}, results='hide',message=FALSE, warning=FALSE}
-# plot_correlation_matrix(merged_income)
+plot_correlation_matrix(merged_income)
 ```
 
 ```{r echo={FALSE}, results='hide',message=FALSE}

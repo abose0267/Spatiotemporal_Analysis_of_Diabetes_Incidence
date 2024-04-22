@@ -9,7 +9,7 @@ loadData <- function() {
   data2 <- read.csv("./Data/500cities.csv")
   spatial_data <- st_read("./Data/shapes/us_counties")
   temp_data <-read.csv("./Data/tempData.csv")
-  income_data <-read.csv("./Data/incomeData.csv")
+  income_data <-read.csv("./Data/incomeData2.csv")
   return(list( original_walkability= data, original_diabetes = data2, spatial_data=spatial_data, temp_data=temp_data,income_data=income_data))
 }
 
@@ -114,10 +114,28 @@ fit_gwr <- function(data) {
                           data = data,
                           bw = merged_gwr_bw,
                           kernel = "exponential",
+                          
   ) 
   
   
   return(merged_gwr)
+}
+
+
+fit_gwr_monte <- function(data) {
+  
+  distMat <- gw.dist()
+  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
+                          data = data,
+                          kernel = "exponential",
+  )
+  
+  merged_gwr_monte <- gwr.montecarlo(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev+ Median.Household.Income + avg_temp,
+                                     data = data,
+                                     kernel = "exponential",
+                                     dis
+                                     )
+  
 }
 
 fit_gwr2<-function(data) {
