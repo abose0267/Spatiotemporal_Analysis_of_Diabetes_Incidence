@@ -22,3 +22,4 @@ git rm --cached -r '*.pdf'
 .png
 .tex
 .Rproj.user
+/report_files
