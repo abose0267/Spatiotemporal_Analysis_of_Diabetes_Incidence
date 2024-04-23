@@ -52,6 +52,7 @@ library(tidyverse)
 library(corrplot)
 source("data/artificialData.R")
 source("analysis/gwrAnalysis.R")
+set.seed(123)
 ```
 
 ```{r echo={FALSE}, results='hide',message=FALSE, warning=FALSE}
@@ -165,7 +166,7 @@ gwr_results <- fit_artificial_gwr(artificial_data)
 ```
 ```{r}
 # Output results (handle as needed)
-# gwr_results
+gwr_results
 ```
 
 
@@ -218,10 +219,7 @@ sf_spatial_data <- as(sf_spatial_data, "Spatial")
 
 
 
-```{r}
-library(GWmodel)
-gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
-```
+
 
 ```{r echo={FALSE}, results='hide'}
 plot<- ggplot() +
@@ -235,6 +233,12 @@ ggsave("original_diabetes_plot.png", plot, width = 8, height = 6, units = "in", 
 
 ```{r , results='hide',message=FALSE,echo={FALSE}}
 gwr_model_results = fit_gwr(sf_spatial_data)
+gwr_model_results
+```
+
+
+```{r echo={FALSE}, results='hide'}
+gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
 ```
 
 
@@ -262,8 +266,9 @@ for (i in seq_len(nrow(model_df))) {
 
 ```{r echo=FALSE, , results='hide'}
 
-
-# plot(model_df$residual)
+png("residual_plot.png")
+plot(model_df$residual)
+dev.off()
 
 ```
 
@@ -296,9 +301,9 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 ```
 
-<!-- ![](impact_plot.png){fig-align="center"} -->
+![](impact_plot.png "Figure 1: Impact of Walkability on Diabetes Prevalence"){fig-align="center"}
 
-<!-- ![](facet_plot.png){fig-align="center"} -->
+![](facet_plot.png "Figure 2: Impact of Covariates on Diabetes Prevalence"){fig-align="center"}
 
 
 
@@ -321,6 +326,11 @@ Given the nuanced relationship between walkability and diabetes prevalence disco
 ## Necessity for region-specific approaches
 
 Our findings emphasize the importance of developing region-specific approaches to public health policy and urban planning. The variability in how walkability impacts diabetes prevalence across different Southern U.S. regions suggests that a one-size-fits-all solution is insufficient. Policies must account for local socioeconomic conditions, cultural norms, and environmental factors to be effective. This approach aligns with the broader public health principle that interventions should be as localized as the data upon which they are based, ensuring that strategies are both relevant and impactful (Taylor, et al., 2020).
+
+{{< pagebreak >}}
+# Appendix
+![](residual_plot.png "Figure 1: Resdiual Plot of GWR Model"){fig-align="center", }
+
 
 {{< pagebreak >}}
 
