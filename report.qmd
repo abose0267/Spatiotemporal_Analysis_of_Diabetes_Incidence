@@ -106,11 +106,7 @@ Another significant study examines the correlation between diabetes prevalence, 
 
 The insights gained from the studies mentioned above inform our examination of how walkability affects diabetes prevalence in the Southern United States. By analyzing the influence of socio-economic and lifestyle factors on diabetes in different regions, we hypothesize that walkability may have a similarly multifaceted impact in the Southern U.S. This framework allows us to test if higher walkability indices typically lead to lower diabetes prevalence or if unique regional factors create different results.
 
-<!-- Will reference these two from our journal entries: -->
 
-<!--   - Do the risk factors for type 2 diabetes mellitus vary by location? A spatial analysis of health insurance claims in Northeastern Germany using kernel density estimation and geographically weighted regression -->
-
-<!--   - Spatial Analysis of Incidence of Diagnosed Type 2 Diabetes Mellitus and Its Association With Obesity and Physical Inactivity -->
 
 # Methods
 
@@ -120,7 +116,36 @@ In order to get a better understanding of the topic at hand, a study was perform
 
 ## Relevant Values
 
-Diabetes as a disease has been studied extensively in the past, and as a result there is evidence of numerous factors being correlated to the prevalence of diabetes in the United States. 
+Diabetes as a disease has been studied extensively in the past, and as a result there is evidence of numerous factors being correlated to the prevalence of diabetes in the United States. According to a study done by Lazar, obesity can cause inflammations which can be a direct cause for diabetes (Lazar). Other relevant covariates that were picked were low physical activity, high blood pressure, median household income and walkability index. By choosing health risk factors and socioeconomic factors as the covariates, we are removing health factors from causing anomalies in the data, and help our model take those values into account when fitting the data.
+*Need more sources*
+
+## Correlation Matrix
+
+In order to get a general understanding of the data at hand, a correlation matrix was generated to see the relationships between each of the variables. This was also used as a test for multicolinearity. In the case of our project, we used a threshold of 0.8 to find variables with concerning similarities, and depending on the values in the correlation matrix, conducted further analysis to ensure that the values that were similar were not impacting the results of the model heavily.
+
+## Variance Inflation Factor
+
+
+## Spatial Analysis
+Based on the type of the data that was available, it was clear that doing spatial analysis would provide the best results in terms of identifying diabetes patterns across the United States, and how that prevalence can be decreased with walkable areas. The model that was used in this study the a georaphically weighted regression model from the GWModel package in R. This model was chonen for a variety reasons. This model, originally created by Brunsdon, is based on the formula $$y_i = \alpha_{0} + \sum_{k=1}^{m} \alpha_{ik}x_{ik} + \varepsilon_{i}$$ (Brunsdon et. al). This model was chosen for this specific problem because it is able to improve on regular regression models like global regression, and account for spatial heterogeneity. In the case of our data, county level data exhibits spatial heterogeneity due to how small the counties are relative to the size of the United States.
+
+
+
+## Adjusting P Values for Significance
+Once the model was fit, it was important to adjust the P-values to deal with insignificant coefficients to make the visualization of the results more intuitive. By using the gwr.t.adjust() model in the GWModel package, the p-values were adjusted using the Fotheringham-Byrne procedures. This procedure has been thoruoghly investigated before, and therefore did not require any extra validation (Byrne et. al). Once this process was completed, p-values that were less than 0.05 were considered to be significant, and otherwise was set to 0 for plotting purposes.
+
+
+## Validation
+  A couple different methods were used to test the effectiveness of the geographically weighted regression model 
+  
+### Simulation Study
+  A simulation study was conducted by creating an artificial dataset and putting it through the geographically weighted regression model to see if we could achieve similar results. In order to create the artificial data, we used the covariance matrix of the response and all the covariates from the original data set to understand the underlying relationships, and then used "rmvnorm" from the "mvtnorm" package to generate a dataset with similar covariances centered at the mean value of the original data. The results of the GWR on this artifical data were then compared to the results of the GWR on the real dataset to do validation
+  
+### Diagnostics
+
+
+
+
 
 
 
@@ -140,30 +165,6 @@ gwr_results <- fit_artificial_gwr(artificial_data)
 # Output results (handle as needed)
 # gwr_results
 ```
-
-
-## Central Thesis Support
-
-In order to analyze diabetes as a response of walkability, we need good, clean data
-
-In order to make sure that walkability is consistent as a coefficient, we choose multiple covariates that might be significant
-
-We used GWR to create coefficient surfaces to analyze which parts of the country had the most impact on diabetes
-
-We compared GWR with Random Forest to show that GWR is not overfitting, to prevent error
-
-
-
-## Paragraphs
-
-In the first paragraph, we will talk about the importance of good, clean data. In addition to this, we will also talk about what data we will be analyzing, and where we got it
-
-In the second paragraph, we can discuss the reasoning behind choosing the covariates that we did. This can be a good segue into talking about the GWR, and how we went about cleaning the data.
-
-In the next paragraph, we can talk about how the model was used, and tuned to fit our data. Specifically how we chose a bandwidth and what package we used.
-
-In the last paragraph, we can discuss the plots. In the paragraph, we discuss the ways the different plots were created (facet plots etc.)
-
 
 
 # Results
@@ -291,22 +292,22 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 
 # Discussion
-### Analyzing the relationship between walkability and diabetes in the Southern U.S.
+## Analyzing the relationship between walkability and diabetes in the Southern U.S.
 
 Our study examined the relationship between walkability and diabetes prevalence in the Southern United States, finding an unexpected direct correlation where higher walkability indexes were associated with increased diabetes prevalence. This finding contrasts sharply with previous studies from regions like Northeastern Germany, where socioeconomic factors predominately influenced diabetes risk, often independent of walkability considerations (Schneider, et al., 2017). The unique socioeconomic and geographical attributes of the Southern U.S., including varying levels of urbanization and access to healthcare, likely contribute to these distinct outcomes, emphasizing the need for region-specific research in epidemiology.
 
 
-### Regional variations and implications
+## Regional variations and implications
 
 The regional variations observed in our study suggest that the influence of walkability on health outcomes such as diabetes may not be uniformly positive across different settings. For instance, in the Southern U.S., areas with high walkability scores often coincide with urban centers that have higher levels of pollution, stress, and potentially unhealthy lifestyle options, which could reduce or reverse the beneficial effects typically attributed to walkability (Jones and Brown, 2019). This diverges from findings in cooler climates where increased physical activity due to higher walkability uniformly correlates with better health outcomes. Such differences highlight the complex interaction between walkability, environmental factors, and health, necessitating a granular analysis by region.
 
 
-### Tailoring public health strategies
+## Tailoring public health strategies
 
 Given the nuanced relationship between walkability and diabetes prevalence discovered in our research, there is a need for tailored public health strategies that consider local conditions and characteristics. Urban planning initiatives could focus on not just increasing walkability but also improving the quality of walkable areas to promote healthy lifestyles more effectively. For instance, similar to successful efforts in other regions that integrated green spaces and recreational areas into urban designs (Smith, et al., 2018), cities in the Southern U.S. could adopt these strategies but tailor them to fit their unique socioeconomic contexts.
 
 
-### Necessity for region-specific approaches
+## Necessity for region-specific approaches
 
 Our findings emphasize the importance of developing region-specific approaches to public health policy and urban planning. The variability in how walkability impacts diabetes prevalence across different Southern U.S. regions suggests that a one-size-fits-all solution is insufficient. Policies must account for local socioeconomic conditions, cultural norms, and environmental factors to be effective. This approach aligns with the broader public health principle that interventions should be as localized as the data upon which they are based, ensuring that strategies are both relevant and impactful (Taylor, et al., 2020).
 
@@ -315,10 +316,12 @@ Our findings emphasize the importance of developing region-specific approaches t
 # References
 - Smith, J., et al. (2020). Do the risk factors for type 2 diabetes mellitus vary by location? A spatial analysis of health insurance claims in Northeastern Germany using kernel density estimation and geographically weighted regression. *Journal of Public Health Research*.
 - Jones, D., & Taylor, B. (2019). Spatial Analysis of Incidence of Diagnosed Type 2 Diabetes Mellitus and Its Association With Obesity and Physical Inactivity. *Journal of Clinical Epidemiology*.
-- P. A. Moore, J. C. Zgibor, and A. P. Dasanayake, “Diabetes: A growing epidemic of all ages,” The Journal of the American Dental Association, vol. 134, pp. 11S-15S, Oct. 2003, doi: 10.14219/jada.archive.2003.0369.
 -  G. Xu et al., “Prevalence of diagnosed type 1 and type 2 diabetes among US adults in 2016 and 2017: population based study,” 
 - M. I. Creatore et al., “Association of Neighborhood Walkability With Change in Overweight, Obesity, and Diabetes”
 -  R. H. Glazier et al., “Density, Destinations or Both? A Comparison of Measures of Walkability in Relation to Transportation Behaviors, Obesity and Diabetes in Toronto, Canada,” PLoS ONE, vol. 9, no. 1, p. e85295, Jan. 2014, doi: 10.1371/journal.pone.0085295.
+-  M. A. Lazar, “How Obesity Causes Diabetes: Not a Tall Tale,” Science, vol. 307, no. 5708, pp. 373–375, Jan. 2005, doi: 10.1126/science.1104342.
+- C. Brunsdon, A. S. Fotheringham, and M. E. Charlton, “Geographically Weighted Regression: A Method for Exploring Spatial Nonstationarity,” Geographical Analysis, vol. 28, no. 4, pp. 281–298, Oct. 1996, doi: 10.1111/j.1538-4632.1996.tb00936.x.
+- Byrne, Graeme & Charlton, Martin & Fotheringham, Alexander. (2009). Multiple Dependent Hypothesis Tests in Geographically Weighted Regression. 
 
 
 
