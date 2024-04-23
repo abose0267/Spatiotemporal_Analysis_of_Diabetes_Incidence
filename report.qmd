@@ -212,6 +212,15 @@ sf_spatial_data<- st_as_sf(new_spatial_dataset)
 sf_spatial_data <- as(sf_spatial_data, "Spatial")
 ```
 
+
+
+
+
+```{r}
+library(GWmodel)
+gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
+```
+
 ```{r echo={FALSE}, results='hide'}
 plot<- ggplot() +
   geom_sf(data = new_spatial_dataset, aes(geometry = geometry,fill = DIABETES_CrudePrev), color="black",size=0.2) +
