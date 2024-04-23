@@ -172,37 +172,21 @@ gwr_results
 
 # Results
 
-## Central Thesis Level Outline
-Paragraph 1: Diabetes Prevalence in The South
-  
-  Topic: There is a clear positive relationship between walkability and diabetes in the Southern Region.
-  Support: From the plots,the estimated impact of walkability on diabetes is consistently higher in the southern to South East region. These areas tend to be red, which is associated with a higher impact of walkability on diabetes prevalence. 
+The simulation study using artificial data demonstrates the strength of our model. Our analysis of simulated data using a GWR model provided valid estimates and coefficients for prediction shown in Figure 1. In addition, the model’s R-squared value was low with fairly evenly dispersed residuals, making it a reliable benchmark for comparison.
 
-Paragraph 2: Certain reasons why walkability has a positive relationship with diabetes prevalence in the South.
+Examining the GWR model with real-world data revealed a clear positive correlation between walkability and diabetes prevalence, which was particularly notable in the southern United States. Visual representations as seen in the impact plot  highlighted this relationship, with the southern to southeastern regions showing higher walkability's impact on diabetes prevalence, depicted in shades of red. Conversely, contrasting trends were observed in other parts of the country, indicating a negative association between walkability and diabetes.
 
-  Topic: Higher temperatures may be a potential reason why Walkability has a positive relationship with Diabetes in the South.
-  Support: As seen by the plot, in colder regions such as the west coast and in the Pacific Northwest, there is negative impact of Walkability on Diabetes. Thus, this shows that higher temperatures in the South may lead to people staying indoors, reducing walkability and in turn possibly leading to higher diabetes rates.
+The correlation between walkability and diabetes prevalence in the South can be attributed to various factors, with higher temperatures emerging as a key consideration. In warmer climates, such as those prevalent in the South, the positive relationship between walkability and diabetes may be influenced by people spending more time indoors to avoid the heat. This reduction in outdoor activity diminishes walkability and could potentially contribute to higher diabetes rates.
 
-Paragraph 3: Other factors that potentially lead to higher Diabetes prevalence
-
-  Topic: Additional Risk factors beside Walkability on Diabetes
-  Support: Overall,   certain risk factors such as smoking, obesity, etc. had a high impact on diabetes in every region. We expected this to be the case, further supporting our thesis.
+Conversely, in colder regions like the west coast and the Pacific Northwest, the impact of walkability on diabetes prevalence appears to be negative, as depicted in the plot. This suggests that regional differences, including climate variations, play a significant role in shaping the relationship between walkability and diabetes.
 
 
-Paragraph 4: Validation metrics
+Moreover, the analysis identified various additional risk factors, notably health-related ones, contributing to elevated diabetes prevalence nationwide. From the facet plot, factors like smoking and obesity showed clear associations with higher rates of diabetes, as expected given their impact on overall health and predisposition to chronic conditions like diabetes.
 
-  Topic: Our model's performance overall
-  
-  Support: From the residual plot, we can see that the points are scattered fairly evenly around and the residual plot does not have a specific pattern, indicating a well-fit model. This further supports our central thesis indiciating that the model we fit is performing well. 
-  
+In addition, the appendix below provides a comprehensive assessment supporting the accuracy of our model's metrics. The residual plot shows a fairly evenly scattered distribution of predicted values around zero, indicating a well-fitted model. Additionally, the examination for multicollinearity yielded reassuring results, with none of the covariates exhibiting significantly high variance inflation factors (VIF), confirming the absence of multicollinearity issues within our model.
 
+In summary, the insights from our model, both from simulated and real-world data, shed light on the complex interplay between walkability, various risk factors, and diabetes prevalence across different regions. The consistency between metrics obtained from our simulation study and real data, coupled with the absence of multicollinearity issues, underscores the reliability and validity of our findings, supporting the robustness of our approach.
 
-
-From the plots, it shows that the southern region of the United States, walkability had a postive relationship with diabetes prevalence.
-
-From the GWR model's spatial plot which shows the estimated impact of the National Walkability Index it is clear that there is a negative relationship between Walkability and Diabetes.
-
-In the Western Region, though, there is a more positive relationship between the impact of Walkability and Diabetes in the Southern and Eastern Region further supporting our central thesis.
 
 
 ```{r echo={FALSE}, results='hide',message=FALSE, warning=FALSE}
@@ -217,7 +201,7 @@ sf_spatial_data <- as(sf_spatial_data, "Spatial")
 
 
 
-
+5
 
 
 
@@ -237,9 +221,9 @@ gwr_model_results
 ```
 
 
-```{r echo={FALSE}, results='hide'}
-gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
-```
+# ```{r echo={FALSE}, results='hide'}
+# gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
+<!-- ``` -->
 
 
 ```{r echo={FALSE} , results='hide'}
