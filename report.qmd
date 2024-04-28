@@ -112,9 +112,45 @@ The insights gained from the studies mentioned above inform our examination of h
 
 # Methods
 
-## Data and Cleaning
+## Data
 
-In order to get a better understanding of the topic at hand, a study was performed using data from a few different sources. The walkability index data was from the Environment Protection Agency, using data from 2023. The health factors data was provided by the Center for Disease Control and Prevention, which was last updated in 2023. Small area income and poverty estimates from the United States Census Bureau  was used to get median household income data. Temperature and climate data was from GIS for Racial Equity. All of these datasets were thorough and cleaned with very few missing values. The data was cleaned and the relevant values were put into a new common dataset.
+In order to get a better understanding of the topic at hand, a study was performed using data from a few different sources. The walkability index data was from the Environment Protection Agency, using data from 2023 . The health factors data was provided by the Center for Disease Control and Prevention, which was last updated in 2023. Small area income and poverty estimates from the United States Census Bureau  was used to get median household income data. Temperature and climate data was from GIS for Racial Equity. All of these datasets were thorough and cleaned with very few missing values. The data was cleaned and the relevant values were put into a new common dataset.
+
+### Walkability Index
+
+Walkability Index is a measurement of relative walkability that is developed and calculated by the Environmental Protection Agency. The goal of this measurement is to analyze different parts of the United States on a common scale, and see trends related to walkability. The Environmental Protection Agency calculates this walkability on a scale 1-20 with 1 being the least walkable, and 20 being the most. The actual value on the walkability index scale is calculated using a few different metrics that the EPA collects. The formula used is 
+
+$$\text{Walkability Index} = \frac{w}{3} + \frac{x}{3} +\frac{y}{6} + \frac{z}{6} $$
+
+In this case...
+
+\begin{itemize}
+
+\item{ $w$ is a block group's intersection density, which is calculated by analyzing the number of different types of intersections. The five different types of intersections used were auto, multi-modal (3 leg \& 4 leg), and pedestrian oriented (3 leg \& 4 leg). These different intersections are classified based on what types of roads the intersections connects. The overall value of $w$ is calculated using a weighted sum of the different types of intersections, and penalizing specific intersections that inhibit pedestrians.}
+
+\item{$x$ is a measurement of the distance to the closest transit stop in meters. This value can directly impact walkability 
+since people who live in places with higher walkability tend to rely less on cars and more on public transport whether it's by bus or train.
+}
+
+\item{$y$ is a block group's employment density mix. This is a variable that calculates the entropy of a block group based on the different jobs that are available in a certain area. This is one of the chosen factors for calculating walkability index since it takes into account the diversity of the area. The idea is that it will be a highly walkable place if there is a lot of different types of stores and businesses.}
+
+\item{$z$} is a block group's employment and household mix. This is a measurement of the diversity in a given region, in terms of businesses and occupied housing. Similar to the employment density mix, this measurement uses the entropy of businesses and housing to calculate an overall entropy value. This can be used to calculate a walkability score since it implies that with businesses and homes being close together, it is not necessary for employees to take a car to get to work, but rather take a form of public transit.
+
+\end{itemize}
+
+*All formulas and variables were derived from the Environmental Protection Agency Smart Location Database*
+
+### Health Factors
+
+
+
+
+### Income Data
+
+
+### Temperature Data
+
+
 
 ## Relevant Values
 
@@ -124,8 +160,6 @@ Diabetes as a disease has been studied extensively in the past, and as a result 
 ## Correlation Matrix
 
 In order to get a general understanding of the data at hand, a correlation matrix was generated to see the relationships between each of the variables. This was also used as a test for multicolinearity. In the case of our project, we used a threshold of 0.8 to find variables with concerning similarities, and depending on the values in the correlation matrix, conducted further analysis to ensure that the values that were similar were not impacting the results of the model heavily.
-
-## Variance Inflation Factor
 
 
 ## Spatial Analysis
@@ -147,10 +181,7 @@ Once the model was fit, it was important to adjust the P-values to deal with ins
   
 ### Diagnostics
 
-
-
-
-
+In order to check to make sure our model results were accurate, we used the gwr.collin.diagno() function to test the variance inflation factor of the coefficient estimates. 
 
 
 
