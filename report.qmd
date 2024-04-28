@@ -40,6 +40,7 @@ abstract: |
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE)
 ```
+
 ```{r,results='hide',message=FALSE, warning=FALSE}
 source("./Functions/DataProcessing.R")
 
@@ -146,7 +147,7 @@ Once the model was fit, it was important to adjust the P-values to deal with ins
   
 ### Diagnostics
 
-In order to check to make sure our model results were accurate, we used the gwr.collin.diagno() function to test the variance inflation factor of the coefficient estimates. 
+
 
 
 
@@ -164,26 +165,17 @@ gwr_results <- fit_artificial_gwr(artificial_data)
 
 
 ```
-
-
-
-
-
+```{r}
+# Output results (handle as needed)
+gwr_results
+```
 
 
 # Results
 
-The simulation study using artificial data demonstrates the strength of our model. Our analysis of simulated data using a GWR model provided valid estimates and coefficients for prediction shown below. In addition, the model’s R-squared value was low with fairly evenly dispersed residuals, making it a reliable benchmark for comparison.
-
-```{r}
-# Output results (handle as needed)
-as.table(gwr_results$lm$coefficients)
-as.table(gwr_results$GW.diagnostic$gw.R2)
-```
+The simulation study using artificial data demonstrates the strength of our model. Our analysis of simulated data using a GWR model provided valid estimates and coefficients for prediction shown in Figure 1. In addition, the model’s R-squared value was low with fairly evenly dispersed residuals, making it a reliable benchmark for comparison.
 
 Examining the GWR model with real-world data revealed a clear positive correlation between walkability and diabetes prevalence, which was particularly notable in the southern United States. Visual representations as seen in the impact plot  highlighted this relationship, with the southern to southeastern regions showing higher walkability's impact on diabetes prevalence, depicted in shades of red. Conversely, contrasting trends were observed in other parts of the country, indicating a negative association between walkability and diabetes.
-
-![](impact_plot.png ""){fig-align="center"}
 
 The correlation between walkability and diabetes prevalence in the South can be attributed to various factors, with higher temperatures emerging as a key consideration. In warmer climates, such as those prevalent in the South, the positive relationship between walkability and diabetes may be influenced by people spending more time indoors to avoid the heat. This reduction in outdoor activity diminishes walkability and could potentially contribute to higher diabetes rates.
 
@@ -191,8 +183,6 @@ Conversely, in colder regions like the west coast and the Pacific Northwest, the
 
 
 Moreover, the analysis identified various additional risk factors, notably health-related ones, contributing to elevated diabetes prevalence nationwide. From the facet plot, factors like smoking and obesity showed clear associations with higher rates of diabetes, as expected given their impact on overall health and predisposition to chronic conditions like diabetes.
-
-![](facet_plot.png "Figure 2: Impact of Covariates on Diabetes Prevalence"){fig-align="center"}
 
 In addition, the appendix below provides a comprehensive assessment supporting the accuracy of our model's metrics. The residual plot shows a fairly evenly scattered distribution of predicted values around zero, indicating a well-fitted model. Additionally, the examination for multicollinearity yielded reassuring results, with none of the covariates exhibiting significantly high variance inflation factors (VIF), confirming the absence of multicollinearity issues within our model.
 
@@ -211,30 +201,54 @@ sf_spatial_data <- as(sf_spatial_data, "Spatial")
 ```
 
 
+
+
+
 ```{r echo={FALSE}, results='hide'}
 plot<- ggplot() +
   geom_sf(data = new_spatial_dataset, aes(geometry = geometry,fill = DIABETES_CrudePrev), color="black",size=0.2) +
   scale_fill_viridis_c(name = "Diabetes Crude Prev") +
   labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
 
-ggsave("original_diabetes_plot.png", plot, width = 4, height = 2, units = "in", dpi = 300)
+ggsave("original_diabetes_plot.png", plot, width = 8, height = 6, units = "in", dpi = 300)
 ```
 
 
 ```{r , results='hide',message=FALSE,echo={FALSE}}
 gwr_model_results = fit_gwr(sf_spatial_data)
-# gwr_model_results
-```
-
-```{r}
-as.table(gwr_model_results$lm$coefficients)
+gwr_model_results
 ```
 
 
-
-```{r echo={FALSE},results='hide'}
-val<-gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
+```{r , results='hide',message=FALSE,echo={FALSE}}
+library(GWmodel)
+library(sp)
+library(RColorBrewer)
+library(spgwr)
+gwr.montecarlo(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, nsims=99, kernel="exponential",adaptive=F, gwr_model_results$GW.arguments$bw) 
 ```
+```{r , results='hide',message=FALSE,echo={FALSE}}
+library(GWmodel)
+library(sp)
+library(RColorBrewer)
+library(spgwr)
+library(spdep)
+
+w <- poly2nb(sf_spatial_data, queen = TRUE)
+w <- nb2listw(w)
+
+# Perform Global Moran's I test on the residuals
+moran_result <- moran.test(model_df$residual, w)
+
+# Print the result
+print(moran_result)
+
+```
+
+
+# ```{r echo={FALSE}, results='hide'}
+# gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
+<!-- ``` -->
 
 
 ```{r echo={FALSE} , results='hide'}
@@ -296,9 +310,9 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 ```
 
+![](impact_plot.png "Figure 1: Impact of Walkability on Diabetes Prevalence"){fig-align="center"}
 
-
-
+![](facet_plot.png "Figure 2: Impact of Covariates on Diabetes Prevalence"){fig-align="center"}
 
 
 
@@ -338,7 +352,6 @@ Our findings emphasize the importance of developing region-specific approaches t
 -  M. A. Lazar, “How Obesity Causes Diabetes: Not a Tall Tale,” Science, vol. 307, no. 5708, pp. 373–375, Jan. 2005, doi: 10.1126/science.1104342.
 - C. Brunsdon, A. S. Fotheringham, and M. E. Charlton, “Geographically Weighted Regression: A Method for Exploring Spatial Nonstationarity,” Geographical Analysis, vol. 28, no. 4, pp. 281–298, Oct. 1996, doi: 10.1111/j.1538-4632.1996.tb00936.x.
 - Byrne, Graeme & Charlton, Martin & Fotheringham, Alexander. (2009). Multiple Dependent Hypothesis Tests in Geographically Weighted Regression. 
-
 
 
 
