@@ -19,7 +19,7 @@ The diabetes epidemic in the United States presents a nuanced public health chal
 
 # Introduction
 
-Diabetes, a chronic illness linked to high blood sugar levels, affects approximately 9.7% of U.S. adults, impacting both physical and mental well-being and straining healthcare resources. Recent studies suggest that the walkability of a region—a measure influenced by factors like intersection density and transit proximity—might significantly impact diabetes prevalence. While some findings indicate that higher walkability scores are associated with lower diabetes rates, our study explores this relationship in the Southern United States. Contrary to earlier research, we found that increased walkability correlates with higher diabetes prevalence in this region, suggesting that geographic and socioeconomic factors may influence health outcomes differently across locations. Understanding these dynamics is essential for devising effective public health strategies to manage and prevent diabetes.
+Diabetes, a chronic illness linked to high blood sugar levels, affects approximately 9.7% of U.S. adults, impacting both physical and mental well-being and straining healthcare resources. Recent studies suggest that the walkability of a region may impact diabetes prevalence. While some findings indicate that higher walkability index scores are associated with lower diabetes rates, our study explores this relationship, and investigates the process of formulating a walkability index score. Using walkability index score data from the Environmental Protection Agency, we found that the standardized formula for calculating a walkability index score does not taken enough factors into account for enough factors for there to be a statistically significant relationship. It is important to acknowledge, and improve this metric as it is essential for devising effective public health strategies to manage and prevent diabetes.
 
 # Methods
 
@@ -41,27 +41,25 @@ Our study applied a Geographically Weighted Regression (GWR) model to explore th
 
 Analysis of real-world data highlighted a notable positive correlation between walkability and diabetes prevalence in the Southern United States, where higher walkability is associated with increased diabetes rates, as depicted in **Figure 1**. This contrasts with other regions like the West Coast and Pacific Northwest, where higher walkability tends to decrease diabetes prevalence.
 
+![ Impact of Walkability Index on Diabetes Prevalence](images/figure3.png){ width=45% fig-align="center"}
+
+![Impact of Covariates on Diabetes Prevalence](images/figure2.png){ width=90% fig-align="center"}
+
 Ultimately, we believed that there would be a consistent trend showing that the Walkability Index Score did impact diabetes across the entire U.S. However, from our GWR model's results, that that is not the case. This leads us to believe that the Walkability Index Score calculated by the CDC may not be truly accurate and may fail to account for other additional factors that could contribute to increased diabetes prevalence in the U.S
+
+
 
 ## Validation
 
 This is further shown when conducting a Monte-Carlo test. As seen in **Figure 1**, the National Walkability Index Score is associated with a p-value of 0.18. This value indicates that the National Walkability Index Score is not a statistically significant metric as its p-value is greater than 0.05. Thus, the Walkability Index Score may not have a siginificant impact on predicting diabetes prevalence across the U.S.
 
+![Results of Monte Carlo Test on GWR Results](images/p-value.png){ width=40% fig-align="center"}
+
 In addition, from the Global Moran-Eye Test, our model's Moran 1 Statistic is 0.049, meaning there is slight positive autocorrelation in the covariates. However, we expect this as our covariates tend to resemble similar factors(eg.smoking,obesity,high blood pressure, etc.). However, this is not something to be too worried about as there is not significant autocorrelation or high spatial dependence.
+
 
 In addition, other validation metrics we looked at include the Variance Inflation Factor(VIF) of each of our covariates. None of our covariates had a VIF score that exceeded 13, indiciating there is not significant multicollinearity in our GWR model that poses an issue. We also looked at the residual plot and we can see that there are fairly evenly dispersed residuals which is a positive sign.
 
-
-
-
-
-![Figure 3](images/figure3.png){ width=50% fig-align="center"}
-
-Regional factors such as climate play a significant role; in warmer Southern climates, less outdoor activity may lead to higher diabetes rates, while cooler climates show the opposite effect. Additional analyses identified other influencing factors, including obesity and smoking, which significantly impact diabetes rates, as shown in **Figure 2**.
-
-![Impact of Covariates on Diabetes Prevalence](images/figure2.png){ width=50% fig-align="center"}
-
-These insights underscore the complex relationship between environmental factors and health outcomes, highlighting the necessity for region-specific public health strategies.
 
 # Discussion 
 
@@ -75,3 +73,6 @@ Given the nuanced relationship between walkability and diabetes prevalence disco
 
 ## Necessity for Region-Specific Approaches
 Our research highlights the necessity for developing public health policies and urban planning initiatives that respect regional specificities. The variability in how walkability affects diabetes prevalence across different regions highlights the inadequacy of a one-size-fits-all approach and advocates for interventions that are informed by local data to ensure that strategies are both relevant and impactful.
+
+
+# References

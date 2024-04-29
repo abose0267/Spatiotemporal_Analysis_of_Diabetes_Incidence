@@ -185,7 +185,7 @@ In order to check to make sure our model results were accurate, we used the gwr.
 
 
 
-```{r message=FALSE, results='hide'}
+```{r echo=FALSE, message=FALSE, results='hide'}
 
 
 # Generate data
@@ -284,7 +284,7 @@ gwr_mc <- gwr.montecarlo(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + B
 
 ```
 
-```{r}
+```{r, results='hide',message=FALSE,echo={FALSE}}
 library(knitr)
 library(webshot)
 library(dplyr)
@@ -318,9 +318,14 @@ out <- data.frame(gwr_mc2$Variable,gwr_mc2$p.value)
 out <- out %>%rename(Covariates = gwr_mc2.Variable) 
 out <- out %>% rename(P_Value = gwr_mc2.p.value)
 table <- knitr::kable(out)
-table 
+
 ```
 
+
+
+```{r, echo=FALSE}
+table 
+```
 
 ```{r , results='hide',message=FALSE,echo={FALSE}}
 library(GWmodel)
@@ -336,13 +341,24 @@ w <- nb2listw(w)
 moran_result <- moran.test(model_df$residual, w)
 
 # Print the result
-print(moran_result)
 
+
+```
+```{r  , results='hide',message=FALSE,echo={FALSE} }
+print(moran_result$estimate)
+
+out <- data.frame(moran_result$estimate) 
+out <- out %>%rename( "Value"  = 	moran_result.estimate) 
+val <- knitr::kable(out)
+```
+```{r echo=FALSE}
+val
 ```
 
 
+
 ```{r echo={FALSE}, results='hide'}
-gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
+# gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
 ```
 
 

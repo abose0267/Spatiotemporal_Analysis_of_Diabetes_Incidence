@@ -283,11 +283,11 @@ factors create different results.
 
 \section{Methods}\label{methods}
 
-\subsection{Data and Cleaning}\label{data-and-cleaning}
+\subsection{Data}\label{data}
 
 In order to get a better understanding of the topic at hand, a study was
 performed using data from a few different sources. The walkability index
-data was from the Environment Protection Agency, using data from 2023.
+data was from the Environment Protection Agency, using data from 2023 .
 The health factors data was provided by the Center for Disease Control
 and Prevention, which was last updated in 2023. Small area income and
 poverty estimates from the United States Census Bureau was used to get
@@ -295,6 +295,44 @@ median household income data. Temperature and climate data was from GIS
 for Racial Equity. All of these datasets were thorough and cleaned with
 very few missing values. The data was cleaned and the relevant values
 were put into a new common dataset.
+
+\subsubsection{Walkability Index}\label{walkability-index}
+
+Walkability Index is a measurement of relative walkability that is
+developed and calculated by the Environmental Protection Agency. The
+goal of this measurement is to analyze different parts of the United
+States on a common scale, and see trends related to walkability. The
+Environmental Protection Agency calculates this walkability on a scale
+1-20 with 1 being the least walkable, and 20 being the most. The actual
+value on the walkability index scale is calculated using a few different
+metrics that the EPA collects. The formula used is
+
+\[\text{Walkability Index} = \frac{w}{3} + \frac{x}{3} +\frac{y}{6} + \frac{z}{6} \]
+
+In this case\ldots{}
+
+\begin{itemize}
+
+\item{ $w$ is a block group's intersection density, which is calculated by analyzing the number of different types of intersections. The five different types of intersections used were auto, multi-modal (3 leg \& 4 leg), and pedestrian oriented (3 leg \& 4 leg). These different intersections are classified based on what types of roads the intersections connects. The overall value of $w$ is calculated using a weighted sum of the different types of intersections, and penalizing specific intersections that inhibit pedestrians.}
+
+\item{$x$ is a measurement of the distance to the closest transit stop in meters. This value can directly impact walkability 
+since people who live in places with higher walkability tend to rely less on cars and more on public transport whether it's by bus or train.
+}
+
+\item{$y$ is a block group's employment density mix. This is a variable that calculates the entropy of a block group based on the different jobs that are available in a certain area. This is one of the chosen factors for calculating walkability index since it takes into account the diversity of the area. The idea is that it will be a highly walkable place if there is a lot of different types of stores and businesses.}
+
+\item{$z$} is a block group's employment and household mix. This is a measurement of the diversity in a given region, in terms of businesses and occupied housing. Similar to the employment density mix, this measurement uses the entropy of businesses and housing to calculate an overall entropy value. This can be used to calculate a walkability score since it implies that with businesses and homes being close together, it is not necessary for employees to take a car to get to work, but rather take a form of public transit.
+
+\end{itemize}
+
+\emph{All formulas and variables were derived from the Environmental
+Protection Agency Smart Location Database}
+
+\subsubsection{Health Factors}\label{health-factors}
+
+\subsubsection{Income Data}\label{income-data}
+
+\subsubsection{Temperature Data}\label{temperature-data}
 
 \subsection{Relevant Values}\label{relevant-values}
 
@@ -318,8 +356,6 @@ the case of our project, we used a threshold of 0.8 to find variables
 with concerning similarities, and depending on the values in the
 correlation matrix, conducted further analysis to ensure that the values
 that were similar were not impacting the results of the model heavily.
-
-\subsection{Variance Inflation Factor}\label{variance-inflation-factor}
 
 \subsection{Spatial Analysis}\label{spatial-analysis}
 
@@ -373,25 +409,95 @@ In order to check to make sure our model results were accurate, we used
 the gwr.collin.diagno() function to test the variance inflation factor
 of the coefficient estimates.
 
+\begin{verbatim}
+   ***********************************************************************
+   *                       Package   GWmodel                             *
+   ***********************************************************************
+   Program starts at: 2024-04-28 20:17:24.082228 
+   Call:
+   gwr.basic(formula = DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + 
+    BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + AvgSummerTemp + 
+    MedianHHIncome, data = data_sp, bw = merged_gwr_bw, kernel = "exponential")
+
+   Dependent (y) variable:  DIABETES_CrudePrev
+   Independent variables:  NatWalkInd OBESITY_CrudePrev BPHIGH_CrudePrev LPA_CrudePrev CSMOKING_CrudePrev AvgSummerTemp MedianHHIncome
+   Number of data points: 3079
+   ***********************************************************************
+   *                    Results of Global Regression                     *
+   ***********************************************************************
+
+   Call:
+    lm(formula = formula, data = data)
+
+   Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.3260 -0.6844 -0.0065  0.6590  3.5886 
+
+   Coefficients:
+                        Estimate Std. Error t value Pr(>|t|)    
+   (Intercept)        -6.668e+00  3.987e-01 -16.724  < 2e-16 ***
+   NatWalkInd          5.885e-02  1.143e-02   5.148 2.79e-07 ***
+   OBESITY_CrudePrev   5.012e-02  7.359e-03   6.812 1.16e-11 ***
+   BPHIGH_CrudePrev    3.164e-01  6.055e-03  52.253  < 2e-16 ***
+   LPA_CrudePrev       6.769e-02  6.911e-03   9.796  < 2e-16 ***
+   CSMOKING_CrudePrev  3.685e-02  7.950e-03   4.636 3.71e-06 ***
+   AvgSummerTemp       3.459e-02  2.093e-03  16.524  < 2e-16 ***
+   MedianHHIncome     -1.420e-05  1.734e-06  -8.189 3.81e-16 ***
+
+   ---Significance stars
+   Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+   Residual standard error: 0.9929 on 3071 degrees of freedom
+   Multiple R-squared: 0.8577
+   Adjusted R-squared: 0.8573 
+   F-statistic:  2644 on 7 and 3071 DF,  p-value: < 2.2e-16 
+   ***Extra Diagnostic information
+   Residual sum of squares: 3027.727
+   Sigma(hat): 0.991961
+   AIC:  8704.119
+   AICc:  8704.177
+   BIC:  5751.701
+   ***********************************************************************
+   *          Results of Geographically Weighted Regression              *
+   ***********************************************************************
+
+   *********************Model calibration information*********************
+   Kernel function: exponential 
+   Fixed bandwidth: 3076 
+   Regression points: the same locations as observations are used.
+   Distance metric: Euclidean distance metric is used.
+
+   ****************Summary of GWR coefficient estimates:******************
+                             Min.     1st Qu.      Median     3rd Qu.    Max.
+   Intercept          -6.6690e+00 -6.6688e+00 -6.6687e+00 -6.6686e+00 -6.6673
+   NatWalkInd          5.8836e-02  5.8855e-02  5.8859e-02  5.8864e-02  0.0589
+   OBESITY_CrudePrev   5.0116e-02  5.0120e-02  5.0126e-02  5.0130e-02  0.0501
+   BPHIGH_CrudePrev    3.1637e-01  3.1638e-01  3.1638e-01  3.1640e-01  0.3164
+   LPA_CrudePrev       6.7685e-02  6.7692e-02  6.7695e-02  6.7699e-02  0.0677
+   CSMOKING_CrudePrev  3.6825e-02  3.6841e-02  3.6858e-02  3.6872e-02  0.0369
+   AvgSummerTemp       3.4585e-02  3.4593e-02  3.4595e-02  3.4596e-02  0.0346
+   MedianHHIncome     -1.4199e-05 -1.4197e-05 -1.4196e-05 -1.4195e-05  0.0000
+   ************************Diagnostic information*************************
+   Number of data points: 3079 
+   Effective number of parameters (2trace(S) - trace(S'S)): 8.076778 
+   Effective degrees of freedom (n-2trace(S) + trace(S'S)): 3070.923 
+   AICc (GWR book, Fotheringham, et al. 2002, p. 61, eq 2.33): 8704.198 
+   AIC (GWR book, Fotheringham, et al. 2002,GWR p. 96, eq. 4.22): 8694.1 
+   BIC (GWR book, Fotheringham, et al. 2002,GWR p. 61, eq. 2.34): 5671.629 
+   Residual sum of squares: 3027.671 
+   R-square value:  0.8576715 
+   Adjusted R-square value:  0.8572971 
+
+   ***********************************************************************
+   Program stops at: 2024-04-28 20:17:25.298382 
+\end{verbatim}
+
 \section{Results}\label{results}
 
 The simulation study using artificial data demonstrates the strength of
 our model. Our analysis of simulated data using a GWR model provided
-valid estimates and coefficients for prediction shown below. In
+valid estimates and coefficients for prediction shown in Figure 1. In
 addition, the model's R-squared value was low with fairly evenly
 dispersed residuals, making it a reliable benchmark for comparison.
-
-\begin{verbatim}
-       (Intercept)         NatWalkInd  OBESITY_CrudePrev   BPHIGH_CrudePrev 
-     -6.668054e+00       5.885385e-02       5.012305e-02       3.163938e-01 
-     LPA_CrudePrev CSMOKING_CrudePrev      AvgSummerTemp     MedianHHIncome 
-      6.769381e-02       3.685304e-02       3.459132e-02      -1.419791e-05 
-\end{verbatim}
-
-\begin{verbatim}
-        A 
-0.8576715 
-\end{verbatim}
 
 Examining the GWR model with real-world data revealed a clear positive
 correlation between walkability and diabetes prevalence, which was
@@ -402,10 +508,6 @@ walkability's impact on diabetes prevalence, depicted in shades of red.
 Conversely, contrasting trends were observed in other parts of the
 country, indicating a negative association between walkability and
 diabetes.
-
-\begin{center}
-\includegraphics{impact_plot.png}
-\end{center}
 
 The correlation between walkability and diabetes prevalence in the South
 can be attributed to various factors, with higher temperatures emerging
@@ -428,10 +530,6 @@ obesity showed clear associations with higher rates of diabetes, as
 expected given their impact on overall health and predisposition to
 chronic conditions like diabetes.
 
-\begin{center}
-\includegraphics{facet_plot.png}
-\end{center}
-
 In addition, the appendix below provides a comprehensive assessment
 supporting the accuracy of our model's metrics. The residual plot shows
 a fairly evenly scattered distribution of predicted values around zero,
@@ -451,14 +549,42 @@ our findings, supporting the robustness of our approach.
 
 \includegraphics{report_files/figure-pdf/unnamed-chunk-6-1.pdf}
 
-\begin{verbatim}
-            (Intercept)              NatWalkInd       OBESITY_CrudePrev 
-          -6.340782e+00            6.806356e-02            4.998862e-02 
-       BPHIGH_CrudePrev           LPA_CrudePrev      CSMOKING_CrudePrev 
-           3.089287e-01            7.665963e-02            2.418842e-02 
-Median.Household.Income                avg_temp 
-          -1.621888e-05            3.457785e-02 
-\end{verbatim}
+\begin{longtable}[]{@{}lr@{}}
+\toprule\noalign{}
+Covariates & P\_Value \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Intercept & 0.00 \\
+National Walkability Index & 0.45 \\
+Obesity Prevalence & 0.01 \\
+High Blood Pressure Prevalence & 0.00 \\
+Low Physical Activity Prevalence & 0.00 \\
+Current Smoking Prevalence & 0.00 \\
+Median Household Income & 0.90 \\
+Average Temperature & 0.00 \\
+\end{longtable}
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule\noalign{}
+& Value \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Moran I statistic & 0.0491018 \\
+Expectation & -0.0003249 \\
+Variance & 0.0001135 \\
+\end{longtable}
+
+\begin{center}
+\includegraphics{impact_plot.png}
+\end{center}
+
+\begin{center}
+\includegraphics{facet_plot.png}
+\end{center}
 
 \section{Discussion}\label{discussion}
 
