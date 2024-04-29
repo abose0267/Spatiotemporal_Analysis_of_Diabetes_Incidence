@@ -74,6 +74,7 @@ summary(new_spatial_dataset)
 ```
 
 
+
 # Introduction {#sec-intro}
 
 Diabetes is a common chronic illness that is caused due to consistently high blood sugar levels, and can be prevented through sugar intake management, exercise and dieting. In a study done on 2016 and 2017 National Center for Health Statistics data, it was shown that among adults in the United States, there was a prevalence of 9.7% (Xu, et. al). This high prevalence can impact humans on a daily basis by directly impacting the quality of life both physically and mentally. Diabetes can affect organs all around the body such as the eyes, pancreas and kidneys. In addition to having direct impact on people, high prevalence of diabetes puts stress on the existing healthcare systems by forcing hospitals and doctors to put resources into solving issues that are preventable.
@@ -185,6 +186,7 @@ In order to check to make sure our model results were accurate, we used the gwr.
 
 
 
+
 ```{r echo=FALSE, message=FALSE, results='hide'}
 
 
@@ -196,10 +198,12 @@ gwr_results <- fit_artificial_gwr(artificial_data)
 
 
 ```
+
 ```{r}
 # Output results (handle as needed)
 gwr_results
 ```
+
 
 
 # Results
@@ -221,6 +225,7 @@ In summary, the insights from our model, both from simulated and real-world data
 
 
 
+
 ```{r echo={FALSE}, results='hide',message=FALSE, warning=FALSE}
 plot_correlation_matrix(merged_income)
 ```
@@ -231,10 +236,6 @@ sf_spatial_data<- st_as_sf(new_spatial_dataset)
 sf_spatial_data <- as(sf_spatial_data, "Spatial")
 ```
 
-
-
-
-
 ```{r echo={FALSE}, results='hide'}
 plot<- ggplot() +
   geom_sf(data = new_spatial_dataset, aes(geometry = geometry,fill = DIABETES_CrudePrev), color="black",size=0.2) +
@@ -244,11 +245,11 @@ plot<- ggplot() +
 ggsave("original_diabetes_plot.png", plot, width = 8, height = 6, units = "in", dpi = 300)
 ```
 
-
 ```{r , results='hide',message=FALSE,echo={FALSE}}
 gwr_model_results = fit_gwr(sf_spatial_data)
 gwr_model_results
 ```
+
 ```{r echo={FALSE} , results='hide'}
 adjusted_tvalues <- gwr.t.adjust(gwr_model_results)$SDF %>% as("sf") 
 selected_columns <- c(grep("_p$", colnames(adjusted_tvalues), value = TRUE),"geometry")
@@ -270,9 +271,6 @@ for (i in seq_len(nrow(model_df))) {
   }
 }
 ```
-
-
-
 
 ```{r , results='hide',message=FALSE,echo={FALSE}}
 library(GWmodel)
@@ -321,8 +319,6 @@ table <- knitr::kable(out)
 
 ```
 
-
-
 ```{r, echo=FALSE}
 table 
 ```
@@ -344,6 +340,7 @@ moran_result <- moran.test(model_df$residual, w)
 
 
 ```
+
 ```{r  , results='hide',message=FALSE,echo={FALSE} }
 print(moran_result$estimate)
 
@@ -351,16 +348,14 @@ out <- data.frame(moran_result$estimate)
 out <- out %>%rename( "Value"  = 	moran_result.estimate) 
 val <- knitr::kable(out)
 ```
+
 ```{r echo=FALSE}
 val
 ```
 
-
-
 ```{r echo={FALSE}, results='hide'}
 # gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
 ```
-
 
 ```{r echo={FALSE} , results='hide'}
 adjusted_tvalues <- gwr.t.adjust(gwr_model_results)$SDF %>% as("sf") 
@@ -392,8 +387,6 @@ dev.off()
 
 ```
 
-
-
 ```{r echo={FALSE}, results='hide'}
 plots = data.frame(CountyFIPS = new_spatial_dataset$CountyFIPS,Walkability_Obs = new_spatial_dataset$NatWalkInd,HBP_Obs = new_spatial_dataset$BPHIGH_CrudePrev,walkability_coef= model_df$NatWalkInd, income_impact = new_spatial_dataset$Median.Household.Income * model_df$Median.Household.Income,temp_impact = new_spatial_dataset$avg_temp * model_df$avg_temp, walk_impact = new_spatial_dataset$NatWalkInd * model_df$NatWalkInd, bp_impact = new_spatial_dataset$BPHIGH_CrudePrev * model_df$BPHIGH_CrudePrev, lpa_impact = new_spatial_dataset$LPA_CrudePrev*model_df$LPA_CrudePrev,obesity_impact=new_spatial_dataset$OBESITY_CrudePrev * model_df$OBESITY_CrudePrev, smoking_impact = new_spatial_dataset$CSMOKING_CrudePrev * model_df$CSMOKING_CrudePrev, INTPTLAT=new_spatial_dataset$INTPTLAT, INTPTLON = new_spatial_dataset$INTPTLON, geometry =  new_spatial_dataset$geometry  ) %>%   pivot_longer(cols = c(bp_impact,lpa_impact,smoking_impact,obesity_impact, income_impact, temp_impact),
                names_to = "Impact_Type",
@@ -414,8 +407,7 @@ plot1 <- plots %>%
     "income_impact" = "Income Impact",
     "temp_impact" = "Temperature Impact",
     "bp_impact" = "High Blood Pressure Impact"
-  ))) +
-  theme(legend.position = "bottom")
+  )))
 
 ggsave("facet_plot.png", plot1, width = 8, height = 6, units = "in", dpi = 300)
 
@@ -424,12 +416,12 @@ plot2 <- plots %>%
   ggplot() +
   geom_sf(aes(fill = walk_impact), color = scales::alpha("black", 0.1)) +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, name = "Impact") +
-  labs(title = "Estimated Impact of Walkability Index Score") +
-  theme(legend.position = "bottom")
+  labs(title = "Estimated Impact of Walkability Index Score")
 ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 
 ```
+
 
 ![](impact_plot.png "Figure 1: Impact of Walkability on Diabetes Prevalence"){fig-align="center"}
 
@@ -457,12 +449,18 @@ Given the nuanced relationship between walkability and diabetes prevalence disco
 
 Our findings emphasize the importance of developing region-specific approaches to public health policy and urban planning. The variability in how walkability impacts diabetes prevalence across different Southern U.S. regions suggests that a one-size-fits-all solution is insufficient. Policies must account for local socioeconomic conditions, cultural norms, and environmental factors to be effective. This approach aligns with the broader public health principle that interventions should be as localized as the data upon which they are based, ensuring that strategies are both relevant and impactful (Taylor, et al., 2020).
 
+
 {{< pagebreak >}}
+
+
 # Appendix
 ![](residual_plot.png "Figure 1: Resdiual Plot of GWR Model"){fig-align="center", }
 
 
+
 {{< pagebreak >}}
+
+
 
 # References
 - Smith, J., et al. (2020). Do the risk factors for type 2 diabetes mellitus vary by location? A spatial analysis of health insurance claims in Northeastern Germany using kernel density estimation and geographically weighted regression. *Journal of Public Health Research*.
@@ -473,6 +471,7 @@ Our findings emphasize the importance of developing region-specific approaches t
 -  M. A. Lazar, “How Obesity Causes Diabetes: Not a Tall Tale,” Science, vol. 307, no. 5708, pp. 373–375, Jan. 2005, doi: 10.1126/science.1104342.
 - C. Brunsdon, A. S. Fotheringham, and M. E. Charlton, “Geographically Weighted Regression: A Method for Exploring Spatial Nonstationarity,” Geographical Analysis, vol. 28, no. 4, pp. 281–298, Oct. 1996, doi: 10.1111/j.1538-4632.1996.tb00936.x.
 - Byrne, Graeme & Charlton, Martin & Fotheringham, Alexander. (2009). Multiple Dependent Hypothesis Tests in Geographically Weighted Regression. 
+
 
 
 

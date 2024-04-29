@@ -44,9 +44,9 @@ Our study applied a Geographically Weighted Regression (GWR) model to explore th
 
 Analysis of real-world data highlighted a notable positive correlation between walkability and diabetes prevalence in the Southern United States, where higher walkability is associated with increased diabetes rates, as depicted in **Figure 2**. This contrasts with other regions like the West Coast and Pacific Northwest, where higher walkability tends to decrease diabetes prevalence.
 
-![ Impact of Walkability Index on Diabetes Prevalence](images/figure3.png){ width=45% fig-align="center"}
+![ Impact of Walkability Index on Diabetes Prevalence](images/impact_plot.png){ width=45% fig-align="center"}
 
-![Impact of Covariates on Diabetes Prevalence](images/figure2.png){ width=45% fig-align="center"}
+![Impact of Covariates on Diabetes Prevalence](images/facet_plot.png){ width=45% fig-align="center"}
 
 Ultimately, we believed that there would be a consistent trend showing that the Walkability Index Score did impact diabetes across the entire U.S. However, from our GWR model's results, that that is not the case. This leads us to believe that the Walkability Index Score calculated by the CDC may not be truly accurate and may fail to account for other additional factors that could contribute to increased diabetes prevalence in the U.S
 
@@ -56,7 +56,7 @@ Ultimately, we believed that there would be a consistent trend showing that the 
 
 This is further shown when conducting a Monte-Carlo test. As seen in **Figure 4**, the National Walkability Index Score is associated with a p-value of 0.18. This value indicates that the National Walkability Index Score is not a statistically significant metric as its p-value is greater than 0.05. Thus, the Walkability Index Score may not have a siginificant impact on predicting diabetes prevalence across the U.S.
 
-![Results of Monte Carlo Test on GWR Results](images/p-value.png){ width=40% fig-align="center"}
+![Results of Monte Carlo Test on GWR Results](images/p-value.png){ width=25% fig-align="center"}
 
 In addition, from the Global Moran-Eye Test, our model's Moran 1 Statistic is 0.049, meaning there is slight positive autocorrelation in the covariates. However, we expect this as our covariates tend to resemble similar factors(eg.smoking,obesity,high blood pressure, etc.). However, this is not something to be too worried about as there is not significant autocorrelation or high spatial dependence.
 
