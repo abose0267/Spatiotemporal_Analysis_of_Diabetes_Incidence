@@ -19,31 +19,34 @@ The diabetes epidemic in the United States presents a nuanced public health chal
 
 # Introduction
 
-Diabetes, a chronic illness linked to high blood sugar levels, affects approximately 9.7% of U.S. adults, impacting both physical and mental well-being and straining healthcare resources. Recent studies suggest that the walkability of a region may impact diabetes prevalence. While some findings indicate that higher walkability index scores are associated with lower diabetes rates, our study explores this relationship, and investigates the process of formulating a walkability index score. Using walkability index score data from the Environmental Protection Agency, we found that the standardized formula for calculating a walkability index score does not taken enough factors into account for enough factors for there to be a statistically significant relationship. It is important to acknowledge, and improve this metric as it is essential for devising effective public health strategies to manage and prevent diabetes.
+Diabetes, a chronic illness linked to high blood sugar levels, affects approximately 9.7% of U.S. adults, impacting both physical and mental well-being and straining healthcare resources (Xu, et. al). Recent studies suggest that the walkability of a region may impact diabetes prevalence. While some findings indicate that higher walkability index scores are associated with lower diabetes rates, our study explores this relationship, and investigates the process of formulating a walkability index score. Using walkability index score data from the Environmental Protection Agency, we found that the standardized formula for calculating a walkability index score does not taken enough factors into account for enough factors for there to be a statistically significant relationship. It is important to acknowledge, and improve this metric as it is essential for devising effective public health strategies to manage and prevent diabetes.
 
 # Methods
 
-## Data Sources
-Data for this study were gathered from multiple sources. The Walkability Index Data were obtained from the Environmental Protection Agency (EPA), utilizing the current formula provided by the agency. Diabetes prevalence data were sourced from the Centers for Disease Control and Prevention (CDC), while temperature data were acquired from Geographic Information Systems (GIS) for Racial Equity. Median household income information was retrieved from the Small Area Income and Poverty Estimates provided by the United States Census Bureau.
+## Walkability Index
+
+The walkability index score is a measurement of relative walkability within a given region. According the the Environmental Protection Agency, their official formula for calculating this number for a given group is listed below.
+
+![Formula for calculating walkability index score](images/walk_.png){ width=45% fig-align="center"}
+
+In this formula, $w$ represents a block group's block group's intersection density, $x$ represents the distance to the closest transit stop, $y$ represents the employment mix in the block group and $z$ represents the household-employment mix.
 
 ## Statistical Analysis
-To explore the spatial relationships between walkability index, diabetes prevalence, temperature, and median household income, we employed Geographic Weighted Regression (GWR). GWR allows for the examination of spatially varying relationships between variables. Additionally, to assess the robustness of our GWR results, Monte Carlo simulation was utilized.
+To explore the spatial relationships between walkability index score, obesity prevalence, high blood pressure prevalence, low-physical activity prevalence, smoking prevalence, temperature, and median household income, we employed Geographic Weighted Regression (GWR). GWR allows for the examination of spatially varying relationships between variables. Additionally, to assess the robustness of our GWR results, Monte Carlo simulation was utilized. For plotting purposes, gwr.t.adjust() was used to set insignificant coefficients equal to 0 using the Fotheringham-Byrne procedure (Byrne et. al).
+
 
 ## Spatial Diagnostics
-Global Moran's I test was conducted to examine spatial autocorrelation in the variables, providing insights into the spatial patterns present in the data. Furthermore, Variance Inflation Factor (VIF) analysis was employed to diagnose multicollinearity among the predictor variables.
-
-## Enhancing Walkability Measures
-In identifying alternate factors that could be used to calculate the walkability index, we considered the limitations of the current formula. Factors such as sidewalk conditions, access to public transportation, crime rates, and availability of green spaces were identified as potential contributors to walkability. Integrating these factors into the walkability index could enhance its accuracy and applicability, providing a more comprehensive understanding of the factors influencing walkability in the studied areas.
+Global Moran's I test was conducted to examine spatial autocorrelation in the variables, providing insights into the spatial patterns present in the data. Furthermore, Variance Inflation Factor (VIF) analysis was employed to diagnose multicollinearity among the predictor variables. 
 
 # Results 
 
 Our study applied a Geographically Weighted Regression (GWR) model to explore the connection between walkability index score and diabetes prevalence across the U.S. Simulations with artificial data validated the model's effectiveness, showing accurate, reliable predictions with evenly dispersed residuals.
 
-Analysis of real-world data highlighted a notable positive correlation between walkability and diabetes prevalence in the Southern United States, where higher walkability is associated with increased diabetes rates, as depicted in **Figure 1**. This contrasts with other regions like the West Coast and Pacific Northwest, where higher walkability tends to decrease diabetes prevalence.
+Analysis of real-world data highlighted a notable positive correlation between walkability and diabetes prevalence in the Southern United States, where higher walkability is associated with increased diabetes rates, as depicted in **Figure 2**. This contrasts with other regions like the West Coast and Pacific Northwest, where higher walkability tends to decrease diabetes prevalence.
 
 ![ Impact of Walkability Index on Diabetes Prevalence](images/figure3.png){ width=45% fig-align="center"}
 
-![Impact of Covariates on Diabetes Prevalence](images/figure2.png){ width=90% fig-align="center"}
+![Impact of Covariates on Diabetes Prevalence](images/figure2.png){ width=45% fig-align="center"}
 
 Ultimately, we believed that there would be a consistent trend showing that the Walkability Index Score did impact diabetes across the entire U.S. However, from our GWR model's results, that that is not the case. This leads us to believe that the Walkability Index Score calculated by the CDC may not be truly accurate and may fail to account for other additional factors that could contribute to increased diabetes prevalence in the U.S
 
@@ -51,7 +54,7 @@ Ultimately, we believed that there would be a consistent trend showing that the 
 
 ## Validation
 
-This is further shown when conducting a Monte-Carlo test. As seen in **Figure 1**, the National Walkability Index Score is associated with a p-value of 0.18. This value indicates that the National Walkability Index Score is not a statistically significant metric as its p-value is greater than 0.05. Thus, the Walkability Index Score may not have a siginificant impact on predicting diabetes prevalence across the U.S.
+This is further shown when conducting a Monte-Carlo test. As seen in **Figure 4**, the National Walkability Index Score is associated with a p-value of 0.18. This value indicates that the National Walkability Index Score is not a statistically significant metric as its p-value is greater than 0.05. Thus, the Walkability Index Score may not have a siginificant impact on predicting diabetes prevalence across the U.S.
 
 ![Results of Monte Carlo Test on GWR Results](images/p-value.png){ width=40% fig-align="center"}
 
@@ -76,3 +79,4 @@ Our research highlights the necessity for developing public health policies and 
 
 
 # References
+-  G. Xu et al., “Prevalence of diagnosed type 1 and type 2 diabetes among US adults in 2016 and 2017: population based study,” 
