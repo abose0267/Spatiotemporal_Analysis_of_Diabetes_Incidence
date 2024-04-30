@@ -1,5 +1,5 @@
 ---
-title: The Positive Relationship of Walkability on Diabetes Prevalence in the Southern United States
+title: "Understanding Walkability: Calculating the Index and Investigating Its Connection to Diabetes Prevalence"
 format:
   poster-typst: 
     size: "36x24"
@@ -54,7 +54,7 @@ Ultimately, we believed that there would be a consistent trend showing that the 
 
 ## Validation
 
-This is further shown when conducting a Monte-Carlo test. As seen in **Figure 4**, the National Walkability Index Score is associated with a p-value of 0.18. This value indicates that the National Walkability Index Score is not a statistically significant metric as its p-value is greater than 0.05. Thus, the Walkability Index Score may not have a siginificant impact on predicting diabetes prevalence across the U.S.
+This is further shown when conducting a Monte-Carlo test. As seen in **Figure 4**, the National Walkability Index Score is associated with a p-value of 0.45. This value indicates that the National Walkability Index Score is not a statistically significant metric as its p-value is greater than 0.05. Thus, the Walkability Index Score may not have a siginificant impact on predicting diabetes prevalence across the U.S.
 
 ![Results of Monte Carlo Test on GWR Results](images/p-value.png){ width=25% fig-align="center"}
 
@@ -66,17 +66,18 @@ In addition, other validation metrics we looked at include the Variance Inflatio
 
 # Discussion 
 
-Our investigation into the relationship between walkability and diabetes prevalence in the U.S. revealed that walkability, as currently indexed, does not significantly predict diabetes outcomes and varies notably across different regions. This challenges the dominant assumption that higher walkability universally lowers diabetes risk and aligns with our analytical results from Geographically Weighted Regression (GWR), Monte Carlo simulations, Global I Moran's Test, and Variance Inflation Ratio (VIR) assessments.
+Our investigation into the relationship between walkability and diabetes prevalence in the U.S. revealed that walkability, as currently indexed by the Environmental Protection Agency, does not significantly predict diabetes outcomes and varies notably across different regions. This challenges the dominant assumption that higher walkability universally lowers diabetes risk and aligns with our analytical results from Geographically Weighted Regression (GWR), Monte Carlo simulations, Global I Moran's Test, and Variance Inflation Ratio (VIR) assessments.
+Our findings question the efficacy of current walkability indices used by public health and urban planning bodies, suggesting that these indices fail to capture the multifaceted influences on health outcomes effectively. We propose a revised model for calculating walkability that incorporates a broader range of variables provided by the Environmental Protection Agency, which could more accurately reflect the true impact of walkability on health.
 
-## Critique of Current Walkability Indices
-Our findings question the efficacy of current walkability indices used by public health and urban planning bodies, suggesting that these indices fail to capture the multifaceted influences on health outcomes effectively. We propose a revised model for calculating walkability that incorporates a broader range of variables provided by the CDC, which could more accurately reflect the true impact of walkability on health.
+## Relevant Factors
 
-## Tailoring Public Health Strategies
-Given the nuanced relationship between walkability and diabetes prevalence discovered in our research, there is a need for public health strategies that are tailored to local conditions. Urban planning should not only promote walkability but also ensure that the quality of walkable areas is good for to promoting health, integrating elements such as green spaces to enhance lifestyle quality.
+After conducting our analysis, it was important for us to investigate which factors could be added to the formula provided by the EPA in order to allow for walkability to be a significant predictor of diabetes prevalence. Although there are many factors that could play into this, there are a couple that stood out in our reserach. In an article by Creatore et. al, walkability was calculated using population density as one of the factors. In this article, the results found there to be a statistically significant relationship between diabetes and walkability index score. The EPA already has this value as part of their Smart Location Database for each Census Block Group. Another factor that should be considered when coming up with a walkability index score is crime rate. In an article by Nafakh, he found success in generating a specific walkability index using crime rate density as a factor. 
 
-## Necessity for Region-Specific Approaches
-Our research highlights the necessity for developing public health policies and urban planning initiatives that respect regional specificities. The variability in how walkability affects diabetes prevalence across different regions highlights the inadequacy of a one-size-fits-all approach and advocates for interventions that are informed by local data to ensure that strategies are both relevant and impactful.
 
 
 # References
 -  G. Xu et al., “Prevalence of diagnosed type 1 and type 2 diabetes among US adults in 2016 and 2017: population based study,” 
+- [1] M. I. Creatore et al., “Association of Neighborhood Walkability With Change in Overweight, Obesity, and Diabetes,” JAMA, vol. 315, no. 20, p. 2211, May 2016, doi: 10.1001/jama.2016.5898.
+- [1] A. J. Nafakh, “Spatial Assessment of Walkability Index - A Case Study in Chicago,” Oct. 2018, [Online]. Available: https://indigo.uic.edu/articles/thesis/Spatial_Assessment_of_Walkability_Index_-_A_Case_Study_in_Chicago/10929488
+
+
