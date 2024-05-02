@@ -83,11 +83,10 @@ Diabetes is a common chronic illness that is caused due to consistently high blo
 
 In recent years, there have been speculations that lifestyle changes, specifically walkability of a region can impact the prevalence of diabetes in that given region. The Environmental Protection Agency has developed a standardized scale on which regions can be ranked based on how walkable it is. The scale ranges from 1-20 with 1 being the least walkable and 20 being the most walkable. It takes into account various things such as intersection density, and proximity to transit (Glazier et al.). According to a temporal analysis study done in 2016, areas with highest walkability score, which is a value calculated  had lower rates of diabetes prevalence (Creatore et. al). An area being walkable results in less reliance on cars, and forces the population to walk which is a form of exercise that is often overlooked and can have a meaningful impact on ones health.
 
-The study mentioned above by Creatore was done at a city level, where a lot of geographic factors
-are consistent across the entire study area. That brings up the question of whether the trend that was found in Creatore's study would hold across the United States. Our study shows that taking into account health and socioeconomic factors, the trend is inconsistent and that there is a positive correlation between a region's walkability score and its diabetes prevalence in the southern regions of the United States, which is the opposite of the result found in Creatore's study. There must be underlying geographic factors that contribute to this unexpected observation.
 
-It is crucial to understand this relationship, so that the correct actions can be taken to decrease the prevalence of diabetes in the necessary regions. If regions are showing positive correlation between the two variables, that would suggest that the walkability of the region is not doing enough to decrease the prevalence of diabetes, and they need to either increase the walkability of an area or implement other preventative measures.
+As of right now, there is no global standard for calculating something like a walkability index score. This leads to different organizations and institutions coming up with their own, and causing discrepancies in their results. As we will discuss later in the article, the United States standard for walkability index is created by the Environmental Protection Agency. If this really is being used at a government level as the standard, it is important for the methodology they use to calculate their scores to be thoroughly investigated to see if it is truly representative of a places walkability, and whether there are ways to improve their model.
 
+It is crucial to understand the availability index, so that the correct actions can be taken to decrease the prevalence of diabetes in the necessary regions. If regions are showing increase in disease prevalence, and their walkability index is showing it to be incorrect, then people like urban planners will not take the necessary steps to solve the issues.
 
 # Related Works
 
@@ -157,7 +156,7 @@ In addition to walkability, we felt it was important to account for a few differ
 
 
 ### Data Cleaning
- Originally, we had started working with 4 different dataset, which we then had to aggregate into one large dataset. The datasets had a lot of data since most came from annual government reports, so it was important to select only the relevant ones which were the spatial information and the chosen covariates. Each of the datasets that we had decided to use had originally been at the block group level. This was an issue as it led to at least one value of relevant data being missing in some block groups. Our solution for this issue was to average out the relevant columns from each dataset at the county level. This took care of the missing values as if one block group in a county was missing data, it was dropped from the calculation and there were other block groups which could be used as part of the average. 
+ Originally, we had started working with 4 different datasets, which we then had to aggregate into one large dataset. The datasets had a lot of data since most came from annual government reports, so it was important to select only the relevant ones which were the spatial information and the chosen covariates. Each of the datasets that we had decided to use had originally been at the block group level. This was an issue as it led to at least one value of relevant data being missing in some block groups. Our solution for this issue was to average out the relevant columns from each dataset at the county level. This took care of the missing values as if one block group in a county was missing data, it was dropped from the calculation and there were other block groups which could be used as part of the average. 
 
 ## Analysis
 ### Correlation Matrix
@@ -207,13 +206,70 @@ source("analysis/gwrAnalysis.R")
 # Generate data
 artificial_data = create_data2(new_spatial_dataset)
 
+
+
 # Convert data to spatial format and fit GWR
 gwr_result_sim <- fit_artificial_gwr(artificial_data)
 ```
 ```{r}
 # Output results (handle as needed)
+artificial_data<- na.omit(artificial_data)
+residuals <- gwr_result_sim$SDF$residual %>% scale()
 
-table <- knitr::kable(gwr_result_sim$GW.diagnostic$gwR2.adj)
+
+insert_position <- 2
+artificial_data <- cbind(artificial_data[, 1:insert_position], residuals = residuals, artificial_data[, (insert_position + 1):ncol(artificial_data)])
+
+
+sf_artificial_data<- st_as_sf(artificial_data)
+
+sim_residual_plot <- ggplot() +
+  geom_sf(data = sf_artificial_data, aes(fill = residuals),color = scales::alpha("black", 0.1)) +
+  scale_fill_gradient2(name = "Residuals", midpoint = 0) 
+
+ggsave("sim_residual_plot.png", sim_residual_plot, width = 8, height = 6, units = "in", dpi = 300)
+```
+
+
+
+```{r}
+coefficients <- gwr_result_sim$lm$coefficients
+
+names <- c("Intercept","NatWalkInd","OBESITY_CrudePrev","BPHIGH_CrudePrev","LPA_CrudePrev","CSMOKING_CrudePrev", "AvgSummerTemp","MedianHHIncome")
+
+coefficient_df <- data.frame(names,c(coefficients)) 
+
+coefficient_df <- coefficient_df[-1,]
+
+coefficient_df <- pivot_wider(coefficient_df, names_from = names, values_from = c.coefficients.)
+
+
+
+artificial_data$walk_coef_residual = abs(artificial_data$walk_coef - coefficient_df$NatWalkInd)
+artificial_data$obesity_coef_residual = abs(artificial_data$obesity_coef - coefficient_df$OBESITY_CrudePrev)
+artificial_data$bp_coef_residual = abs(artificial_data$bp_coef - coefficient_df$BPHIGH_CrudePrev)
+artificial_data$lpa_coef_residual = abs(artificial_data$lpa_coef - coefficient_df$LPA_CrudePrev)
+artificial_data$smoke_coef_residual = abs(artificial_data$smoke_coef - coefficient_df$CSMOKING_CrudePrev)
+artificial_data$temp_coef_residual = abs(artificial_data$temp_coef - coefficient_df$AvgSummerTemp)
+artificial_data$income_coef_residual = abs(artificial_data$income_coef - coefficient_df$MedianHHIncome)
+
+
+
+
+MAE_df = data.frame(Covariates=c("National Walkability Index", "Obesity Crude Prevalence", "High Blood Pressure Crude Prevalence", "Low Physical Activity Crude Prevalence", "Smoking Crude Prevalence", "Average Temperature", "Median Household Income"))
+
+vals <- c(sum(artificial_data$walk_coef_residual)/nrow(artificial_data), sum(artificial_data$obesity_coef_residual)/nrow(artificial_data), sum(artificial_data$bp_coef_residual)/nrow(artificial_data), sum(artificial_data$lpa_coef_residual)/nrow(artificial_data), sum(artificial_data$smoke_coef_residual)/nrow(artificial_data), sum(artificial_data$temp_coef_residual)/nrow(artificial_data), sum(artificial_data$income_coef_residual)/nrow(artificial_data))
+
+MAE_df$values <- scale(vals)
+
+
+MAE_df <- MAE_df %>% rename("Normalized Mean Absolute Error" = values )
+knitr::kable(MAE_df, caption = "Mean Absolute Error of Coefficient Predictions for Simulated Data")
+
+# MAE_df <- pivot_wider(MAE_df,names_from = names, values_from = values )
+
+
+
 ```
 
 
@@ -237,8 +293,27 @@ In summary, the insights from our model, both from simulated and real-world data
 
 
 ```{r echo={FALSE}, results='hide',message=FALSE, warning=FALSE}
+ # print( colnames(merged_income %>% select(-CountyFIPS, -StateAbbr)))<!---->
+ 
 plot_correlation_matrix(merged_income)
+
+
+# dev.new(width = 10, height = 10)
 ```
+
+
+
+
+
+![Normalized Residuals of GWR Model Results on Simulated Data](sim_residual_plot.png){fig-align="center"}
+
+
+
+
+
+
+![Correlation Matrix of Chosen Variables](correlation_plot.png){fig-align="center"}
+
 
 ```{r echo={FALSE}, results='hide',message=FALSE}
 new_spatial_dataset <- na.omit(new_spatial_dataset)
@@ -265,7 +340,7 @@ gwr_model_results = fit_gwr(sf_spatial_data)
 gwr_model_results
 ```
 ```{r echo={FALSE} , results='hide'}
-adjusted_tvalues <- gwr.t.adjust(gwr_model_results)$SDF %>% as("sf") 
+adjusted_tvalues <- gwr.t.adjust(gwr_model_results)$SDF %>% as("sf")
 selected_columns <- c(grep("_p$", colnames(adjusted_tvalues), value = TRUE),"geometry")
 subset_df <- adjusted_tvalues[, selected_columns]
 model_df <- gwr_model_results$SDF %>% as("sf")
@@ -274,7 +349,7 @@ for (i in seq_len(nrow(model_df))) {
   for (col_name in names(model_df)) {
     # Construct the corresponding column name in subset_df
     col_name_subset <- paste0(col_name, "_p")
-    
+
     # Check if the column exists in subset_df
     if (col_name_subset %in% names(subset_df)) {
       if (subset_df[[col_name_subset]][i] < 0.05) {
@@ -303,7 +378,7 @@ library(webshot)
 library(dplyr)
 
 gwr_mc2 <- data.frame(
-  "Variable" = c("(Intercept)", "NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", 
+  "Variable" = c("(Intercept)", "NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev",
                  "LPA_CrudePrev", "CSMOKING_CrudePrev", "Median.Household.Income", "avg_temp"),
   "Coefficient" = gwr_mc
 )
@@ -326,18 +401,18 @@ abbreviations <- c(
 # Replace the abbreviations in the Variable column
 gwr_mc2$Variable <- abbreviations[gwr_mc2$Variable]
 
-out <- data.frame(gwr_mc2$Variable,gwr_mc2$p.value) 
+out <- data.frame(gwr_mc2$Variable,gwr_mc2$p.value)
 
-out <- out %>%rename(Covariates = gwr_mc2.Variable) 
+out <- out %>%rename(Covariates = gwr_mc2.Variable)
 out <- out %>% rename(P_Value = gwr_mc2.p.value)
-table <- knitr::kable(out)
+table <- knitr::kable(out, caption = "Results of Monte Carlo Simulation")
 
 ```
 
 
 
 ```{r, echo=FALSE}
-table 
+table
 ```
 
 ```{r , results='hide',message=FALSE,echo={FALSE}}
@@ -360,9 +435,9 @@ moran_result <- moran.test(model_df$residual, w)
 ```{r  , results='hide',message=FALSE,echo={FALSE} }
 print(moran_result$estimate)
 
-out <- data.frame(moran_result$estimate) 
-out <- out %>%rename( "Value"  = 	moran_result.estimate) 
-val <- knitr::kable(out)
+out <- data.frame(moran_result$estimate)
+out <- out %>%rename( "Value"  = 	moran_result.estimate)
+val <- knitr::kable(out, caption = "Moran's I Test Results")
 ```
 ```{r echo=FALSE}
 val
@@ -373,7 +448,7 @@ val
 
 
 ```{r echo={FALSE} , results='hide'}
-adjusted_tvalues <- gwr.t.adjust(gwr_model_results)$SDF %>% as("sf") 
+adjusted_tvalues <- gwr.t.adjust(gwr_model_results)$SDF %>% as("sf")
 selected_columns <- c(grep("_p$", colnames(adjusted_tvalues), value = TRUE),"geometry")
 subset_df <- adjusted_tvalues[, selected_columns]
 model_df <- gwr_model_results$SDF %>% as("sf")
@@ -382,7 +457,7 @@ for (i in seq_len(nrow(model_df))) {
   for (col_name in names(model_df)) {
     # Construct the corresponding column name in subset_df
     col_name_subset <- paste0(col_name, "_p")
-    
+
     # Check if the column exists in subset_df
     if (col_name_subset %in% names(subset_df)) {
       if (subset_df[[col_name_subset]][i] < 0.05) {
@@ -415,7 +490,6 @@ plot1 <- plots %>%
   ggplot() +
   geom_sf(aes(fill = Impact_Value), color = scales::alpha("black", 0.1), ) +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0,name = "Impact") +
-  labs(title = "Estimated Impact of Covariates") +
    facet_wrap(~Impact_Type, labeller = labeller(Impact_Type = c(
     "walk_impact" = "Walk Impact",
     "lpa_impact" = "LPA Impact",
@@ -434,16 +508,15 @@ plot2 <- plots %>%
   ggplot() +
   geom_sf(aes(fill = walk_impact), color = scales::alpha("black", 0.1)) +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, name = "Impact") +
-  labs(title = "Estimated Impact of Walkability Index Score") +
   theme(legend.position = "bottom")
 ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 
 ```
 
-![](impact_plot.png "Figure 1: Impact of Walkability on Diabetes Prevalence"){fig-align="center"}
+![Impact of Walkability on Diabetes Prevalence](impact_plot.png){fig-align="center"}
 
-![](facet_plot.png "Figure 2: Impact of Covariates on Diabetes Prevalence"){fig-align="center"}
+![Impact of Covariates on Diabetes Prevalence](facet_plot.png ){fig-align="center"}
 
 
 
@@ -469,7 +542,7 @@ Our findings emphasize the importance of developing region-specific approaches t
 
 {{< pagebreak >}}
 # Appendix
-![](residual_plot.png "Figure 1: Resdiual Plot of GWR Model"){fig-align="center", }
+![esdiual Plot of GWR Model](residual_plot.png){fig-align="center"}
 
 
 {{< pagebreak >}}
@@ -477,13 +550,13 @@ Our findings emphasize the importance of developing region-specific approaches t
 # References
 - Smith, J., et al. (2020). Do the risk factors for type 2 diabetes mellitus vary by location? A spatial analysis of health insurance claims in Northeastern Germany using kernel density estimation and geographically weighted regression. *Journal of Public Health Research*.
 - Jones, D., & Taylor, B. (2019). Spatial Analysis of Incidence of Diagnosed Type 2 Diabetes Mellitus and Its Association With Obesity and Physical Inactivity. *Journal of Clinical Epidemiology*.
--  G. Xu et al., “Prevalence of diagnosed type 1 and type 2 diabetes among US adults in 2016 and 2017: population based study,” 
+-  G. Xu et al., “Prevalence of diagnosed type 1 and type 2 diabetes among US adults in 2016 and 2017: population based study,”
 - M. I. Creatore et al., “Association of Neighborhood Walkability With Change in Overweight, Obesity, and Diabetes”
 -  R. H. Glazier et al., “Density, Destinations or Both? A Comparison of Measures of Walkability in Relation to Transportation Behaviors, Obesity and Diabetes in Toronto, Canada,” PLoS ONE, vol. 9, no. 1, p. e85295, Jan. 2014, doi: 10.1371/journal.pone.0085295.
 -  M. A. Lazar, “How Obesity Causes Diabetes: Not a Tall Tale,” Science, vol. 307, no. 5708, pp. 373–375, Jan. 2005, doi: 10.1126/science.1104342.
 - C. Brunsdon, A. S. Fotheringham, and M. E. Charlton, “Geographically Weighted Regression: A Method for Exploring Spatial Nonstationarity,” Geographical Analysis, vol. 28, no. 4, pp. 281–298, Oct. 1996, doi: 10.1111/j.1538-4632.1996.tb00936.x.
-- Byrne, Graeme & Charlton, Martin & Fotheringham, Alexander. (2009). Multiple Dependent Hypothesis Tests in Geographically Weighted Regression. 
-- Bureau, US Census. “Small Area Income and Poverty Estimates (SAIPE) Program.” Census.Gov, 1 July 2022, www.census.gov/programs-surveys/saipe.html. 
+- Byrne, Graeme & Charlton, Martin & Fotheringham, Alexander. (2009). Multiple Dependent Hypothesis Tests in Geographically Weighted Regression.
+- Bureau, US Census. “Small Area Income and Poverty Estimates (SAIPE) Program.” Census.Gov, 1 July 2022, www.census.gov/programs-surveys/saipe.html.
 
 
 

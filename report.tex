@@ -209,24 +209,23 @@ in less reliance on cars, and forces the population to walk which is a
 form of exercise that is often overlooked and can have a meaningful
 impact on ones health.
 
-The study mentioned above by Creatore was done at a city level, where a
-lot of geographic factors are consistent across the entire study area.
-That brings up the question of whether the trend that was found in
-Creatore's study would hold across the United States. Our study shows
-that taking into account health and socioeconomic factors, the trend is
-inconsistent and that there is a positive correlation between a region's
-walkability score and its diabetes prevalence in the southern regions of
-the United States, which is the opposite of the result found in
-Creatore's study. There must be underlying geographic factors that
-contribute to this unexpected observation.
+As of right now, there is no global standard for calculating something
+like a walkability index score. This leads to different organizations
+and institutions coming up with their own, and causing discrepancies in
+their results. As we will discuss later in the article, the United
+States standard for walkability index is created by the Environmental
+Protection Agency. If this really is being used at a government level as
+the standard, it is important for the methodology they use to calculate
+their scores to be thoroughly investigated to see if it is truly
+representative of a places walkability, and whether there are ways to
+improve their model.
 
-It is crucial to understand this relationship, so that the correct
+It is crucial to understand the availability index, so that the correct
 actions can be taken to decrease the prevalence of diabetes in the
-necessary regions. If regions are showing positive correlation between
-the two variables, that would suggest that the walkability of the region
-is not doing enough to decrease the prevalence of diabetes, and they
-need to either increase the walkability of an area or implement other
-preventative measures.
+necessary regions. If regions are showing increase in disease
+prevalence, and their walkability index is showing it to be incorrect,
+then people like urban planners will not take the necessary steps to
+solve the issues.
 
 \section{Related Works}\label{related-works}
 
@@ -389,7 +388,7 @@ the model.
 
 \subsubsection{Data Cleaning}\label{data-cleaning}
 
-Originally, we had started working with 4 different dataset, which we
+Originally, we had started working with 4 different datasets, which we
 then had to aggregate into one large dataset. The datasets had a lot of
 data since most came from annual government reports, so it was important
 to select only the relevant ones which were the spatial information and
@@ -519,6 +518,38 @@ see if any of the covariates used could have been left out. In addition
 to this, we used a Moran's I Test as a way to test for spatial
 autocorrelation.
 
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5571}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4429}}@{}}
+\caption{Mean Absolute Error of Coefficient Predictions for Simulated
+Data}\tabularnewline
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Covariates
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Normalized Mean Absolute Error
+\end{minipage} \\
+\midrule\noalign{}
+\endfirsthead
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Covariates
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Normalized Mean Absolute Error
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+National Walkability Index & 1.6248465 \\
+Obesity Crude Prevalence & -0.6177126 \\
+High Blood Pressure Crude Prevalence & -0.9471830 \\
+Low Physical Activity Crude Prevalence & -0.1303446 \\
+Smoking Crude Prevalence & 0.1511048 \\
+Average Temperature & 0.9691171 \\
+Median Household Income & -1.0498282 \\
+\end{longtable}
+
 \section{Results}\label{results}
 
 The simulation study using artificial data demonstrates the strength of
@@ -575,9 +606,31 @@ simulation study and real data, coupled with the absence of
 multicollinearity issues, underscores the reliability and validity of
 our findings, supporting the robustness of our approach.
 
-\includegraphics{report_files/figure-pdf/unnamed-chunk-6-1.pdf}
+\begin{figure}[H]
+
+{\centering \includegraphics{sim_residual_plot.png}
+
+}
+
+\caption{Normalized Residuals of GWR Model Results on Simulated Data}
+
+\end{figure}%%
+\begin{figure}[H]
+
+{\centering \includegraphics{correlation_plot.png}
+
+}
+
+\caption{Correlation Matrix of Chosen Variables}
+
+\end{figure}%
 
 \begin{longtable}[]{@{}lr@{}}
+\caption{Results of Monte Carlo Simulation}\tabularnewline
+\toprule\noalign{}
+Covariates & P\_Value \\
+\midrule\noalign{}
+\endfirsthead
 \toprule\noalign{}
 Covariates & P\_Value \\
 \midrule\noalign{}
@@ -595,6 +648,11 @@ Average Temperature & 0.00 \\
 \end{longtable}
 
 \begin{longtable}[]{@{}lr@{}}
+\caption{Moran's I Test Results}\tabularnewline
+\toprule\noalign{}
+& Value \\
+\midrule\noalign{}
+\endfirsthead
 \toprule\noalign{}
 & Value \\
 \midrule\noalign{}
@@ -606,13 +664,24 @@ Expectation & -0.0003249 \\
 Variance & 0.0001135 \\
 \end{longtable}
 
-\begin{center}
-\includegraphics{impact_plot.png}
-\end{center}
+\begin{figure}[H]
 
-\begin{center}
-\includegraphics{facet_plot.png}
-\end{center}
+{\centering \includegraphics{impact_plot.png}
+
+}
+
+\caption{Impact of Walkability on Diabetes Prevalence}
+
+\end{figure}%%
+\begin{figure}[H]
+
+{\centering \includegraphics{facet_plot.png}
+
+}
+
+\caption{Impact of Covariates on Diabetes Prevalence}
+
+\end{figure}%
 
 \section{Discussion}\label{discussion}
 
@@ -679,7 +748,15 @@ strategies are both relevant and impactful (Taylor, et al., 2020).
 
 \section{Appendix}\label{appendix}
 
-\includegraphics{residual_plot.png}\{fig-align=``center'', \}
+\begin{figure}[H]
+
+{\centering \includegraphics{residual_plot.png}
+
+}
+
+\caption{esdiual Plot of GWR Model}
+
+\end{figure}%
 
 \newpage{}
 

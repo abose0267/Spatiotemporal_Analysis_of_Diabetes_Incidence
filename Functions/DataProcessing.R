@@ -80,18 +80,21 @@ clean_spatial <- function(data) {
 }
 
 
-plot_correlation_matrix <- function(data) {
-  
-  # Calculate correlation matrix
-  cor_matrix <- cor(data %>% select(-CountyFIPS, -StateAbbr), use = "complete.obs")  # Handling missing values by using complete observations
-  # Make correlation matrix
-  plot<- corrplot(cor_matrix, method = "circle", type = "upper", order = "hclust",
-                  tl.col = "black", tl.srt = 45,  # Text label color and rotation
-                  addCoef.col = "orange")  # Add correlation coefficients to plot
-  
-  return(plot)
+plot_correlation_matrix <- function(data, method = "square", order = "hclust", tl.col = "black", tl.srt = 45, addCoef.col = "orange", plot_width = 8, plot_height = 8) {
+  # Documentation, input validation, and correlation matrix calculation as before
+  data <- data %>% select(-CountyFIPS, -StateAbbr)
+  colnames(data) <- c("National Walkability Index", "Diabetes Crude Prevalence", "High Blood Pressure Crude Prevalence", "Obesity Crude Prevalence", "Low Physical Activity Cruede Prevalence" , "Smoking Prevalence","Average Temperature", "Median Household Income")
+  cor_matrix <- cor(data, use = "complete.obs")  # Handling 
+  png("correlation_plot.png", width = 800, height = 800)
+  # Make correlation matrix plot
+ corrplot(cor_matrix, method = method, type = "upper", order = order,
+                   tl.col = tl.col, tl.srt = tl.srt, addCoef.col = addCoef.col)
+ dev.off()
+  # Adjust plot size
+  # options(repr.plot.width = plot_width, repr.plot.height = plot_height)
+  # 
+  # return(plot)
 }
-
 
 test_train_split <- function(data,train) {
   
