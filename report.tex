@@ -161,20 +161,23 @@ M University\\College Station, TX,\ 77843\\}
 \maketitle
 \begin{abstract}
 The diabetes epidemic in the United States presents a nuanced public
-health challenge, influenced by factors such as socioeconomic status and
-climate. While the impact of these factors is well-documented, the
-influence of walkability on diabetes prevalence has been underexplored.
-This study investigates how both socioeconomic and climate variables,
-alongside walkability, affect diabetes prevalence in the Southern U.S.
-Contrary to expectations, our findings indicate that higher walkability
-indexes correlate with an increase in diabetes prevalence. This effect
-persists even when controlling for high blood pressure and low physical
-activity, which indicates significant regional variance. Our findings
-show that the relationship between walkability and diabetes prevalence
-varies significantly by region, driven by distinct socioeconomic and
-environmental contexts. This variability highlights the need for urban
-planning as a public health strategy that is tailored to the specific
-regional characteristics to effectively address diabetes.
+health challenge, shaped by factors such as socioeconomic status and
+climate. While the influence of these factors on diabetes is
+well-established, the role of walkability in managing diabetes
+prevalence remains contested. This study revisits the relationship
+between walkability and diabetes in the U.S., using walkability indexes
+calculated from CDC data. Contrary to some studies suggesting that
+increased walkability reduces diabetes prevalence, our findings,
+analyzed through Geographically Weighted Regression (GWR), reveal that
+walkability is not a significant predictor of diabetes prevalence and
+exhibits notable regional anomalies. Further analysis using Monte Carlo
+simulations, Global I Moran's Test, and Variance Inflation Ratio (VIR)
+supports these results. Our study also critiques the current methods of
+calculating the walkability index, proposing a revised model that
+incorporates additional relevant variables from the CDC. This nuanced
+understanding underscores the need for region-specific urban planning
+and public health strategies that recognize the complex interplay
+between walkability, environmental, and socioeconomic factors.
 \end{abstract}
 
 \section{Introduction}\label{sec-intro}
@@ -285,17 +288,6 @@ factors create different results.
 
 \subsection{Data}\label{data}
 
-In order to get a better understanding of the topic at hand, a study was
-performed using data from a few different sources. The walkability index
-data was from the Environment Protection Agency, using data from 2023 .
-The health factors data was provided by the Center for Disease Control
-and Prevention, which was last updated in 2023. Small area income and
-poverty estimates from the United States Census Bureau was used to get
-median household income data. Temperature and climate data was from GIS
-for Racial Equity. All of these datasets were thorough and cleaned with
-very few missing values. The data was cleaned and the relevant values
-were put into a new common dataset.
-
 \subsubsection{Walkability Index}\label{walkability-index}
 
 Walkability Index is a measurement of relative walkability that is
@@ -309,187 +301,223 @@ metrics that the EPA collects. The formula used is
 
 \[\text{Walkability Index} = \frac{w}{3} + \frac{x}{3} +\frac{y}{6} + \frac{z}{6} \]
 
-In this case\ldots{}
-
 \begin{itemize}
+\item
+  \(w\) is a block group's intersection density, which is calculated by
+  analyzing the number of different types of intersections.
+  Intersections were defined by the types of roads the they connect. The
+  types of road were defined as
 
-\item{ $w$ is a block group's intersection density, which is calculated by analyzing the number of different types of intersections. The five different types of intersections used were auto, multi-modal (3 leg \& 4 leg), and pedestrian oriented (3 leg \& 4 leg). These different intersections are classified based on what types of roads the intersections connects. The overall value of $w$ is calculated using a weighted sum of the different types of intersections, and penalizing specific intersections that inhibit pedestrians.}
+  \begin{itemize}
+  \item
+    Auto Oriented: This type of road includes all roads that are geared
+    for automotive use. Examples of this type of road includes highways
+    and tollways where you would not expect pedestrians or bicyclists.
+  \item
+    Multi-Modal: Roads that are designed so that both automotive and
+    pedestrians can simultaneously use it. This would include roads with
+    separate bike lanes, and roads that fall under a certain speed limit
+    depending on whether the road is one-way or two-way
+  \item
+    Pedestrian Oriented: Roads that are made primarily for pedestrian
+    use, this can include neighborhood roads, and even paths and trails
+    that auto-motives are not permitted on.
+  \end{itemize}
 
-\item{$x$ is a measurement of the distance to the closest transit stop in meters. This value can directly impact walkability 
-since people who live in places with higher walkability tend to rely less on cars and more on public transport whether it's by bus or train.
-}
-
-\item{$y$ is a block group's employment density mix. This is a variable that calculates the entropy of a block group based on the different jobs that are available in a certain area. This is one of the chosen factors for calculating walkability index since it takes into account the diversity of the area. The idea is that it will be a highly walkable place if there is a lot of different types of stores and businesses.}
-
-\item{$z$} is a block group's employment and household mix. This is a measurement of the diversity in a given region, in terms of businesses and occupied housing. Similar to the employment density mix, this measurement uses the entropy of businesses and housing to calculate an overall entropy value. This can be used to calculate a walkability score since it implies that with businesses and homes being close together, it is not necessary for employees to take a car to get to work, but rather take a form of public transit.
-
+  Based on these road types, intersection densities were calculated
+  based on what types of road any given intersection is connecting. Once
+  these intersection densities are calculated, an overall intersection
+  density for the block group is calculated using a weighted sum of the
+  components. This weighted sum penalizes intersections that are
+  barriers for pedestrians. For example, intersections that connect two
+  auto roads were given a weight of zero since it is expected to have
+  little to no pedestrians. Similarly intersections connecting
+  pedestrian oriented roads were given a high weight since it is
+  expected to encourage and be easy for pedestrians to use
+\item
+  \(x\) is a measurement of the distance to the closest transit stop in
+  meters. Specifically, geoprocessing models were used to calculate the
+  distance from the block group centroid to the nearest transit stop.
+  This value can directly impact walkability since people who live in
+  places with higher walkability tend to rely less on cars and more on
+  public transport whether it's by bus or train.
+\item
+  \(y\) is a block group's employment density mix. This is a variable
+  that calculates the entropy of a block group based on the different
+  jobs that are available in a certain area. This is one of the chosen
+  factors for calculating walkability index since it takes into account
+  the diversity of the area. In this case, a higher entropy would
+  indicate a more diverse distribution of employment groups in the block
+  group. The idea is that it will be a highly walkable place if there is
+  a lot of different types of stores and businesses.
+\item
+  \(z\) is a block group's employment and household mix. This is a
+  measurement of the diversity in a given region, in terms of businesses
+  and occupied housing. Similar to the employment density mix, this
+  measurement uses the entropy of businesses and housing to calculate an
+  overall entropy value. This can be used to calculate a walkability
+  score since it implies that with businesses and homes being close
+  together, it is not necessary for employees to take a car to get to
+  work, but rather take a form of public transit.
 \end{itemize}
 
 \emph{All formulas and variables were derived from the Environmental
 Protection Agency Smart Location Database}
 
-\subsubsection{Health Factors}\label{health-factors}
+\subsubsection{Other Covariates}\label{other-covariates}
 
-\subsubsection{Income Data}\label{income-data}
+In addition to walkability, we felt it was important to account for a
+few different variables when conducting our study. We decided that based
+on our research, it would be important to take into account several
+different health factors that can impact diabetes prevalence. According
+to an article by \emph{INSERT ARTICLE ABOUT DIABETES RISK FACTORS}, we
+decided to take common health issues into account as covariates for our
+model. The health complications that we focused on was the obesity, high
+blood pressure, smoking prevalence, and low-physical activity. All of
+the chosen factors have some sort of researched impact on diabetes
+prevalence and will allow for more thorough results. In addition to
+this, we took into account the median household income for all of the
+counties that we were working with, as well as the average temperature.
+The health factors data was provided by the CDC as part of their annual
+report \emph{INSERT SOURCE}, and the median household income data was
+provided by the United States Census Bureau, as part of their Small Area
+Income and Poverty Estimates Program (United States Census Bureau,
+2022). The average temperature data was found from the \emph{Insert
+Source Here}. Together these values will help lead to our model fitting
+to be more complete and allow for more of the data to be explained by
+the model.
 
-\subsubsection{Temperature Data}\label{temperature-data}
+\subsubsection{Data Cleaning}\label{data-cleaning}
 
-\subsection{Relevant Values}\label{relevant-values}
+Originally, we had started working with 4 different dataset, which we
+then had to aggregate into one large dataset. The datasets had a lot of
+data since most came from annual government reports, so it was important
+to select only the relevant ones which were the spatial information and
+the chosen covariates. Each of the datasets that we had decided to use
+had originally been at the block group level. This was an issue as it
+led to at least one value of relevant data being missing in some block
+groups. Our solution for this issue was to average out the relevant
+columns from each dataset at the county level. This took care of the
+missing values as if one block group in a county was missing data, it
+was dropped from the calculation and there were other block groups which
+could be used as part of the average.
 
-Diabetes as a disease has been studied extensively in the past, and as a
-result there is evidence of numerous factors being correlated to the
-prevalence of diabetes in the United States. According to a study done
-by Lazar, obesity can cause inflammations which can be a direct cause
-for diabetes (Lazar). Other relevant covariates that were picked were
-low physical activity, high blood pressure, median household income and
-walkability index. By choosing health risk factors and socioeconomic
-factors as the covariates, we are removing health factors from causing
-anomalies in the data, and help our model take those values into account
-when fitting the data.
+\subsection{Analysis}\label{analysis}
 
-\subsection{Correlation Matrix}\label{correlation-matrix}
+\subsubsection{Correlation Matrix}\label{correlation-matrix}
 
-In order to get a general understanding of the data at hand, a
-correlation matrix was generated to see the relationships between each
-of the variables. This was also used as a test for multicolinearity. In
-the case of our project, we used a threshold of 0.8 to find variables
-with concerning similarities, and depending on the values in the
-correlation matrix, conducted further analysis to ensure that the values
-that were similar were not impacting the results of the model heavily.
+In order to get a general understanding of the data at hand, we
+generated a correlation matrix to see the relationships between each of
+the variables. This was also used as an exploratory tool to see if there
+was any multicollinearity within our data. In the case of our project,
+we used a threshold of 0.8 to find variables with concerning
+similarities, and depending on the values in the correlation matrix,
+conducted further analysis to ensure that the values that were highly
+correlated were not impacting the results of the model heavily.
 
-\subsection{Spatial Analysis}\label{spatial-analysis}
+\subsubsection{Spatial Analysis}\label{spatial-analysis}
 
-Based on the type of the data that was available, it was clear that
-doing spatial analysis would provide the best results in terms of
-identifying diabetes patterns across the United States, and how that
-prevalence can be decreased with walkable areas. The model that was used
-in this study the a georaphically weighted regression model from the
-GWModel package in R. This model was chonen for a variety reasons. This
-model, originally created by Brunsdon, is based on the formula
-\[y_i = \alpha_{0} + \sum_{k=1}^{m} \alpha_{ik}x_{ik} + \varepsilon_{i}\]
-(Brunsdon et. al). This model was chosen for this specific problem
-because it is able to improve on regular regression models like global
-regression, and account for spatial heterogeneity. In the case of our
-data, county level data exhibits spatial heterogeneity due to how small
-the counties are relative to the size of the United States.
+Based on the type of the data that was available, we chose to do spatial
+analysis because we believed it would yield the best result. The model
+we used in this study was Geographically Weighted Regression.
+Specifically, we used the model provided by the GWModel Package
+\emph{INSERT SOURCE HERE}. This model, originally created by Brunsdon,
+is based on the formula
 
-\subsection{Adjusting P Values for
-Significance}\label{adjusting-p-values-for-significance}
+\[y_i = \alpha_{0} + \sum_{k=1}^{m} \alpha_{k}x_{ik} + \varepsilon_{i}\]
 
-Once the model was fit, it was important to adjust the P-values to deal
-with insignificant coefficients to make the visualization of the results
-more intuitive. By using the gwr.t.adjust() model in the GWModel
-package, the p-values were adjusted using the Fotheringham-Byrne
-procedures. This procedure has been thoruoghly investigated before, and
-therefore did not require any extra validation (Byrne et. al). Once this
-process was completed, p-values that were less than 0.05 were considered
-to be significant, and otherwise was set to 0 for plotting purposes.
+\begin{itemize}
+\tightlist
+\item
+  In the case of this formula:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \(y_i\) is the \(i\)th observation of the dependent variable
+  \item
+    \(\alpha_0\) is the intercept
+  \item
+    \(x_{ik}\) is the \(i\)th observation of the \(k\)th independent
+    variable
+  \item
+    \(\varepsilon_{i}\) is the normally distributed independent error
+    terms
+  \item
+    \(\alpha_{k}\) is estimated from \(n\) observations
+  \end{itemize}
+\end{itemize}
+
+This model was chosen for this specific problem because it is able to
+improve on regular regression models like global regression, and account
+for spatial heterogeneity. In the case of our data, county level data
+exhibits spatial heterogeneity due to how small the counties are
+relative to the size of the United States. Initially, we had wondered
+whether it would make sense to use this model in a predictive context,
+but eventually decided that in order to investigate the relationship of
+walkability on the diabetes prevalence, it would make more sense to use
+the model in an inferential context. The GWModel package allowed for us
+to set a formula where we set the diabetes prevalence as the response
+variable and the covariates as the independent variables. The package
+provides a function that, based on the inputted data identifies an ideal
+bandwidth to use for the model. This bandwidth can then be used to fit
+the model. Once the model was fit, it was important to adjust the
+P-values to deal with insignificant coefficients to make the
+visualization of the results more intuitive. Using the GWModel package,
+the p-values were adjusted using the Fotheringham-Byrne procedures. Once
+this process was completed, coefficients that had a significance level
+greater than 0.05 were zeroed out for plotting purposes to show only the
+statistically significant coefficients in the impact plot.
+
+\subsubsection{Impact Plots}\label{impact-plots}
+
+Once the insignificant coefficients were set to 0, we wanted to
+understand how each covariate impacted the fitted diabetes prevalence
+value in the GWR model. In order to do this, we used the original
+observed diabetes data for each county, and multiplied it by the
+predicted coefficients. It is important to note that since we adjusted
+the P-values, there were a lot of cases where the impact was calculated
+as 0 due to the adjusted coefficient. Once this calculation was done, it
+was plotted spatially. Once these plots were made, we were able to make
+inferences about the walkability index and it's relationship to
+diabetes.
 
 \subsection{Validation}\label{validation}
 
-A couple different methods were used to test the effectiveness of the
-geographically weighted regression model
-
 \subsubsection{Simulation Study}\label{simulation-study}
 
-A simulation study was conducted by creating an artificial dataset and
-putting it through the geographically weighted regression model to see
-if we could achieve similar results. In order to create the artificial
-data, we used the covariance matrix of the response and all the
-covariates from the original data set to understand the underlying
-relationships, and then used ``rmvnorm'' from the ``mvtnorm'' package to
-generate a dataset with similar covariances centered at the mean value
-of the original data. The results of the GWR on this artifical data were
-then compared to the results of the GWR on the real dataset to do
-validation
+We conducted a simulation study to ensure that the model we had chosen
+was truly a good model to fit on our type of data, and was not a random
+fluke due to specific values. We conducted the simulation study by using
+the original dataset along with spatially varying functions. The goal
+here was to create realistic spatially varying coefficients for each
+county, and that would be considered the ``true'' coefficient. The
+coefficients were generated using a method that we wrote, which accepts
+the latitude and longitude of a location, and generates realistic
+coefficients for each covariate with both the longitude and latitude
+being part of the calculation. This means that as each county's spatial
+area changes, the impact of that covariate will change proportionally to
+the distance. Once these ``true'' coefficients were calculated, we
+calculated our ``true'' diabetes prevalence which was done by summing
+the products of the ``true'' coefficient and the observed value for that
+county. This ``true'' diabetes prevalence was then passed into a GWR
+model as the response with the original observed values as the
+independent variables. Success of this model was measured using the
+adjusted R\^{}2 values, as well as a mean absolute error plot of the
+``true'' coefficients and the predicted coefficients
 
 \subsubsection{Diagnostics}\label{diagnostics}
 
-In order to check to make sure our model results were accurate, we used
-the gwr.collin.diagno() function to test the variance inflation factor
-of the coefficient estimates.
-
-\begin{verbatim}
-   ***********************************************************************
-   *                       Package   GWmodel                             *
-   ***********************************************************************
-   Program starts at: 2024-04-28 20:17:24.082228 
-   Call:
-   gwr.basic(formula = DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + 
-    BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + AvgSummerTemp + 
-    MedianHHIncome, data = data_sp, bw = merged_gwr_bw, kernel = "exponential")
-
-   Dependent (y) variable:  DIABETES_CrudePrev
-   Independent variables:  NatWalkInd OBESITY_CrudePrev BPHIGH_CrudePrev LPA_CrudePrev CSMOKING_CrudePrev AvgSummerTemp MedianHHIncome
-   Number of data points: 3079
-   ***********************************************************************
-   *                    Results of Global Regression                     *
-   ***********************************************************************
-
-   Call:
-    lm(formula = formula, data = data)
-
-   Residuals:
-    Min      1Q  Median      3Q     Max 
--3.3260 -0.6844 -0.0065  0.6590  3.5886 
-
-   Coefficients:
-                        Estimate Std. Error t value Pr(>|t|)    
-   (Intercept)        -6.668e+00  3.987e-01 -16.724  < 2e-16 ***
-   NatWalkInd          5.885e-02  1.143e-02   5.148 2.79e-07 ***
-   OBESITY_CrudePrev   5.012e-02  7.359e-03   6.812 1.16e-11 ***
-   BPHIGH_CrudePrev    3.164e-01  6.055e-03  52.253  < 2e-16 ***
-   LPA_CrudePrev       6.769e-02  6.911e-03   9.796  < 2e-16 ***
-   CSMOKING_CrudePrev  3.685e-02  7.950e-03   4.636 3.71e-06 ***
-   AvgSummerTemp       3.459e-02  2.093e-03  16.524  < 2e-16 ***
-   MedianHHIncome     -1.420e-05  1.734e-06  -8.189 3.81e-16 ***
-
-   ---Significance stars
-   Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
-   Residual standard error: 0.9929 on 3071 degrees of freedom
-   Multiple R-squared: 0.8577
-   Adjusted R-squared: 0.8573 
-   F-statistic:  2644 on 7 and 3071 DF,  p-value: < 2.2e-16 
-   ***Extra Diagnostic information
-   Residual sum of squares: 3027.727
-   Sigma(hat): 0.991961
-   AIC:  8704.119
-   AICc:  8704.177
-   BIC:  5751.701
-   ***********************************************************************
-   *          Results of Geographically Weighted Regression              *
-   ***********************************************************************
-
-   *********************Model calibration information*********************
-   Kernel function: exponential 
-   Fixed bandwidth: 3076 
-   Regression points: the same locations as observations are used.
-   Distance metric: Euclidean distance metric is used.
-
-   ****************Summary of GWR coefficient estimates:******************
-                             Min.     1st Qu.      Median     3rd Qu.    Max.
-   Intercept          -6.6690e+00 -6.6688e+00 -6.6687e+00 -6.6686e+00 -6.6673
-   NatWalkInd          5.8836e-02  5.8855e-02  5.8859e-02  5.8864e-02  0.0589
-   OBESITY_CrudePrev   5.0116e-02  5.0120e-02  5.0126e-02  5.0130e-02  0.0501
-   BPHIGH_CrudePrev    3.1637e-01  3.1638e-01  3.1638e-01  3.1640e-01  0.3164
-   LPA_CrudePrev       6.7685e-02  6.7692e-02  6.7695e-02  6.7699e-02  0.0677
-   CSMOKING_CrudePrev  3.6825e-02  3.6841e-02  3.6858e-02  3.6872e-02  0.0369
-   AvgSummerTemp       3.4585e-02  3.4593e-02  3.4595e-02  3.4596e-02  0.0346
-   MedianHHIncome     -1.4199e-05 -1.4197e-05 -1.4196e-05 -1.4195e-05  0.0000
-   ************************Diagnostic information*************************
-   Number of data points: 3079 
-   Effective number of parameters (2trace(S) - trace(S'S)): 8.076778 
-   Effective degrees of freedom (n-2trace(S) + trace(S'S)): 3070.923 
-   AICc (GWR book, Fotheringham, et al. 2002, p. 61, eq 2.33): 8704.198 
-   AIC (GWR book, Fotheringham, et al. 2002,GWR p. 96, eq. 4.22): 8694.1 
-   BIC (GWR book, Fotheringham, et al. 2002,GWR p. 61, eq. 2.34): 5671.629 
-   Residual sum of squares: 3027.671 
-   R-square value:  0.8576715 
-   Adjusted R-square value:  0.8572971 
-
-   ***********************************************************************
-   Program stops at: 2024-04-28 20:17:25.298382 
-\end{verbatim}
+In addition to the simulation study, we also ran a few different tests
+to not only verify the validity of our model, but also as a way to
+investigate why some of our results looked the way they did. The first
+test that we ran was a Monte Carlo simulation on the residuals of our
+model. The Monte Carlo simulation is conducted to identify which
+variables are statistically significant. We analyzed the p-values to see
+which of the chosen covariates are significantly spatially varying to
+see if any of the covariates used could have been left out. In addition
+to this, we used a Moran's I Test as a way to test for spatial
+autocorrelation.
 
 \section{Results}\label{results}
 
@@ -557,12 +585,12 @@ Covariates & P\_Value \\
 \bottomrule\noalign{}
 \endlastfoot
 Intercept & 0.00 \\
-National Walkability Index & 0.45 \\
+National Walkability Index & 0.34 \\
 Obesity Prevalence & 0.01 \\
 High Blood Pressure Prevalence & 0.00 \\
 Low Physical Activity Prevalence & 0.00 \\
 Current Smoking Prevalence & 0.00 \\
-Median Household Income & 0.90 \\
+Median Household Income & 0.93 \\
 Average Temperature & 0.00 \\
 \end{longtable}
 
@@ -693,6 +721,10 @@ strategies are both relevant and impactful (Taylor, et al., 2020).
   Byrne, Graeme \& Charlton, Martin \& Fotheringham, Alexander. (2009).
   Multiple Dependent Hypothesis Tests in Geographically Weighted
   Regression.
+\item
+  Bureau, US Census. ``Small Area Income and Poverty Estimates (SAIPE)
+  Program.'' Census.Gov, 1 July 2022,
+  www.census.gov/programs-surveys/saipe.html.
 \end{itemize}
 
 

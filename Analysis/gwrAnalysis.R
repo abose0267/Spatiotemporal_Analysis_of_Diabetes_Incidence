@@ -12,12 +12,12 @@ fit_artificial_gwr <- function(data) {
   }
   data_sp <- as(data, "Spatial")
   # Include new covariates in the model formula
-  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + AvgSummerTemp + MedianHHIncome,
+  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev_new ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + AvgSummerTemp + MedianHHIncome,
                           data = data_sp,
                           kernel = "exponential",
                           adaptive = TRUE)
   # Include new covariates in the model fitting
-  gwr.basic(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + AvgSummerTemp + MedianHHIncome,
+  gwr.basic(DIABETES_CrudePrev_new ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + AvgSummerTemp + MedianHHIncome,
             data = data_sp,
             bw = merged_gwr_bw,
             kernel = "exponential")
