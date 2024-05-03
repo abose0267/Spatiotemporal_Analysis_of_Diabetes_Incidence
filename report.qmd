@@ -274,7 +274,7 @@ MAE_df$values <- scale(vals)
 
 
 MAE_df <- MAE_df %>% rename("Normalized Mean Absolute Error" = values )
-knitr::kable(MAE_df, caption = "Mean Absolute Error of Coefficient Predictions for Simulated Data")
+MAE_table <- knitr::kable(MAE_df, caption = "Mean Absolute Error of Coefficient Predictions for Simulated Data")
 
 # MAE_df <- pivot_wider(MAE_df,names_from = names, values_from = values )
 
@@ -296,16 +296,6 @@ plot_correlation_matrix(merged_income)
 
 
 
-
-
-![Normalized Residuals of GWR Model Results on Simulated Data](sim_residual_plot.png){fig-align="center"}
-
-
-
-
-
-
-![Correlation Matrix of Chosen Variables](correlation_plot.png){fig-align="center"}
 
 
 ```{r echo={FALSE}, results='hide',message=FALSE}
@@ -398,15 +388,13 @@ out <- data.frame(gwr_mc2$Variable,gwr_mc2$p.value)
 
 out <- out %>%rename(Covariates = gwr_mc2.Variable)
 out <- out %>% rename(P_Value = gwr_mc2.p.value)
-table <- knitr::kable(out, caption = "Results of Monte Carlo Simulation")
+mc_table <- knitr::kable(out, caption = "Results of Monte Carlo Simulation")
 
 ```
 
 
 
-```{r, echo=FALSE}
-table
-```
+
 
 ```{r , results='hide',message=FALSE,echo={FALSE}}
 library(GWmodel)
@@ -432,9 +420,7 @@ out <- data.frame(moran_result$estimate)
 out <- out %>%rename( "Value"  = 	moran_result.estimate)
 val <- knitr::kable(out, caption = "Moran's I Test Results")
 ```
-```{r echo=FALSE}
-val
-```
+
 ```{r echo={FALSE}, results='hide'}
 # gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
 ```
@@ -512,16 +498,19 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 # Results
 
-#Results and Discussion
+## Simulation Study using Artificial Data
 
-##Simulation Study using Artificial Data
-
-From the simulation study using artificial data, we obtained results that demonstrate the strength of our GWR model. Our results depicted below provide valid estimates and coefficients when fitting a GWR on our simulated data. In our simulation study, the Mean Absolute Error ranged from -1.63 to 0.05, which was fairly close to zero for each covariate. This suggests the validity of our GWR model. Additionally, we obtained a relatively low R-squared value of 0.94 when fitting a GWR model on our artificial data, demonstrating strong explanatory power. Lastly, Plot 2 depicted below illustrates evenly dispersed residuals across the United States, confirming the validity of our GWR model.
+From the simulation study using artificial data, we obtained results that demonstrate the strength of our GWR model. Our results depicted below provide valid estimates and coefficients when fitting a GWR on our simulated data. In our simulation study, the Mean Absolute Error ranged from -1.63 to 0.05, which was fairly close to zero for each covariate. This suggests the validity of our GWR model. Additionally, we obtained a relatively high R-squared value of 0.94 when fitting a GWR model on our artificial data, demonstrating strong explanatory power. Lastly, Plot 2 depicted below illustrates evenly dispersed residuals across the United States, confirming the validity of our GWR model.
 
 ![Normalized Residuals of GWR Model Results on Simulated Data](sim_residual_plot.png){fig-align="center"}
 
+```{r}
+MAE_table
+```
 
-##Correlation Matrix
+
+
+## Correlation Matrix
 
 ![Correlation Matrix of Chosen Variables](correlation_plot.png){fig-align="center"}
 
@@ -530,7 +519,7 @@ From the Analysis of our Correlation Matrix plot above, we observed several fact
 
 
 
-##The Impact of Walkability on Diabetes Prevalence 
+## The Impact of Walkability on Diabetes Prevalence 
 
 ![Impact of Walkability on Diabetes Prevalence](impact_plot.png){fig-align="center"}
 
@@ -538,14 +527,10 @@ From the Analysis of our Correlation Matrix plot above, we observed several fact
 When fitting the GWR model on our real-world data, we expected there to be a consistent trend between walkability and diabetes prevalence across the U.S. Accounting for walkability, multiple health risk factors, temperature, income,etc, we expected there to be a consistent trend between walkability and diabetes prevalence.  However, from Figure 1 above, we can see that this is not the case. As seen in the West Coast, Pacific North West, and the Mountainous Regions in the Northern part of the U.S, there is a negative correlation between walkability and diabetes prevalence. However, in the East Coast and Southern Regions of the U.S there is a positive correlation between walkability and diabetes prevalence. Ultimately, since there is a lack of consistency across the U.S we believe that the walkability index score calculated by the CDC is inaccurate and fails to account for certain additional factors to explain the true impact of walkability on diabetes prevalence.
 
 
-##Possible explanations for The Variation of Diabetes Prevalence in Different Regions
+## Possible explanations for The Variation of Diabetes Prevalence in Different Regions
 
 
-The correlation between walkability and diabetes prevalence in the South can be attributed to various factors, with higher temperatures emerging as a key consideration. In warmer climates, such as those prevalent in the South, the positive relationship between walkability and diabetes may be influenced by people spending more time indoors to avoid the heat. This reduction in outdoor activity diminishes walkability and could potentially contribute to higher diabetes rates. 
-
-Conversely, in colder regions like the west coast and the Pacific Northwest, the impact of walkability on diabetes prevalence appears to be negative, as depicted in the plot. This suggests that regional differences, including climate variations, play a significant role in shaping the relationship between walkability and diabetes. 
-
-Moreover, the analysis identified various additional risk factors, notably health-related ones, contributing to elevated diabetes prevalence nationwide. From the facet plot depicted below, factors like smoking and obesity showed clear associations with higher rates of diabetes, as expected given their impact on overall health and predisposition to chronic conditions like diabetes. 
+The correlation between walkability and diabetes prevalence in the South can be attributed to various factors, with higher temperatures emerging as a key consideration. In warmer climates, such as those prevalent in the South, the positive relationship between walkability and diabetes may be influenced by people spending more time indoors to avoid the heat. This reduction in outdoor activity diminishes walkability and could potentially contribute to higher diabetes rates.Conversely, in colder regions like the west coast and the Pacific Northwest, the impact of walkability on diabetes prevalence appears to be negative, as depicted in the plot. This suggests that regional differences, including climate variations, play a significant role in shaping the relationship between walkability and diabetes. Moreover, the analysis identified various additional risk factors, notably health-related ones, contributing to elevated diabetes prevalence nationwide. From the facet plot depicted below, factors like smoking and obesity showed clear associations with higher rates of diabetes, as expected given their impact on overall health and predisposition to chronic conditions like diabetes. 
 
 
 
@@ -554,31 +539,38 @@ Moreover, the analysis identified various additional risk factors, notably healt
 
 
 
-##Validation
-
-To validate our model’s results we conducted multiple tests.
-
-Monte Carlo Significance Test
-
-We first conducted a Monte-Carlo Significance Test to check for spatial variation in each of our covariates. Figure 2 below depicts the results of our Monte-Carlo Significance Test. As we can see, the National Walkability Index has a p-value of 0.45. This emphasizes that the National Walkability Index is not significantly spatially varying. Thus, if we were to model the National Walkability Index on a global scale, it would not change our model’s results much. This value further proves our point that that the Walkability Index provided by the CDC may fail to account for other essential factors that could further explain the impact of walkability on diabetes prevalence.
+## Validation
 
 
+### Monte Carlo Significance Test
 
-Global Morans Eye Test on Residuals
-
-	Next we conducted a Global Morans Eye Test on the Residuals of our GWR model to check for spatial autocorrelation. From the Global Morans Eye Test we obtained a Morans 1 Statistic of 0.049. This indicates that there is slight positive autocorrelation in our model. We expect this to occur, as some of our covariates are similar in nature(eg. obesity, smoking, high blood pressure,etc.). Ultimately, there is not significant autocorrelation or an indication of high spatial dependence further showing that our model is indeed accurate. 
-
-Multicollinearity 
-
-In addition, we examined if there was any significant multicollinearity in our GWR model. We tested this by checking the Variance Inflation Factor(VIF) for each of our covariates. For each of our covariates, none of our values exceeded a VIF score of 13. This indiciates that there is not significant multicollinearity that poses an issue in our GWR model indiciating the validity of our model.
+We first conducted a Monte-Carlo Significance Test to check for spatial variation in each of our covariates. Table 3 below depicts the results of our Monte-Carlo Significance Test. As we can see, the National Walkability Index has a p-value of 0.45. This emphasizes that the National Walkability Index is not significantly spatially varying. Thus, if we were to model the National Walkability Index on a global scale, it would not change our model’s results much. This value further proves our point that that the Walkability Index provided by the CDC may fail to account for other essential factors that could further explain the impact of walkability on diabetes prevalence.
 
 
-Residuals
+```{r, echo=FALSE}
+mc_table
+```
+
+
+### Global Moran's Eye Test on Residuals
+
+Next we conducted a Global Moran's Eye Test on the Residuals of our GWR model to check for spatial autocorrelation. From the Global Moran's Eye Test we obtained a Moran's 1 Statistic of 0.049. This indicates that there is slight positive autocorrelation in our model. We expect this to occur, as some of our covariates are similar in nature(eg. obesity, smoking, high blood pressure,etc.). Ultimately, there is not significant autocorrelation or an indication of high spatial dependence further showing that our model is indeed accurate. 
+
+```{r echo=FALSE}
+val
+```
+
+### Multicollinearity 
+
+In addition, we examined if there was any significant multicollinearity in our GWR model. We tested this by checking the Variance Inflation Factor(VIF) for each of our covariates. For each of our covariates, none of our values exceeded a VIF score of 13. This indicates that there is not significant multicollinearity that poses an issue in our GWR model indicating the validity of our model.
+
+
+### Residuals
 
 The residual plot in the Appendix shows a fairly evenly scattered distribution of predicted values around zero, indicating a well-fitted model. This further emphasizes the validity of our model.
 
 
-In summary, the insights from our model, both from simulated and real-world data, shed light on the complex interplay between walkability, various risk factors, and diabetes prevalence across different regions. The consistency between metrics obtained from our simulation study and real data, coupled with the absence of multicollinearity issues and spatial dependence , underscores the reliability and validity of our findings, supporting the robustness of our approach. 
+In summary, the insights from our model, both from simulated and real-world data, shed light on the complex interplay between walkability, various risk factors, and diabetes prevalence across different regions. The consistency between metrics obtained from our simulation study and real data, coupled with the absence of multicollinearity issues and spatial dependence , underscores the reliability and validity of our findings, supporting the robustness of our approach. Based on the results of the model along with the plots that we made, we believe that the current formula used by the EPA and other government agencies fail to consider many extraneous factors, and the formula should be revised.
 
 
 

@@ -404,7 +404,7 @@ metrics that the EPA collects. The formula used is
 \end{itemize}
 
 \emph{All formulas and variables were derived from the Environmental
-Protection Agency Smart Location Database}
+Protection Agency Smart Location Database(Chapman et. al, 2021)}
 
 \subsubsection{Other Covariates}\label{other-covariates}
 
@@ -423,13 +423,14 @@ researched impact on diabetes prevalence and will allow for more
 thorough results. In addition to this, we took into account the median
 household income for all of the counties that we were working with, as
 well as the average temperature. The health factors data was provided by
-the CDC as part of their annual report \emph{INSERT SOURCE}, and the
-median household income data was provided by the United States Census
-Bureau, as part of their Small Area Income and Poverty Estimates Program
-(United States Census Bureau, 2022). The average temperature data was
-found from the \emph{Insert Source Here}. Together these values will
-help lead to our model fitting to be more complete and allow for more of
-the data to be explained by the model.
+the CDC as part of their annual report (Center for Disease Control and
+Prevention, 2023), and the median household income data was provided by
+the United States Census Bureau, as part of their Small Area Income and
+Poverty Estimates Program (United States Census Bureau, 2022). The
+average temperature data was found from the GIS for Racial Equity
+Website (Gilbert, 2023). Together these values will help lead to our
+model fitting to be more complete and allow for more of the data to be
+explained by the model.
 
 \subsubsection{Data Cleaning}\label{data-cleaning}
 
@@ -464,9 +465,9 @@ correlated were not impacting the results of the model heavily.
 Based on the type of the data that was available, we chose to do spatial
 analysis because we believed it would yield the best result. The model
 we used in this study was Geographically Weighted Regression.
-Specifically, we used the model provided by the GWModel Package
-\emph{INSERT SOURCE HERE}. This model, originally created by Brunsdon,
-is based on the formula
+Specifically, we used the model provided by the GWModel Package (Gollini
+et. al, 2015). This model, originally created by Brunsdon, is based on
+the formula
 
 \[y_i = \alpha_{0} + \sum_{k=1}^{m} \alpha_{k}x_{ik} + \varepsilon_{i}\]
 
@@ -508,10 +509,11 @@ bandwidth to use for the model. This bandwidth can then be used to fit
 the model. Once the model was fit, it was important to adjust the
 P-values to deal with insignificant coefficients to make the
 visualization of the results more intuitive. Using the GWModel package,
-the p-values were adjusted using the Fotheringham-Byrne procedures. Once
-this process was completed, coefficients that had a significance level
-greater than 0.05 were zeroed out for plotting purposes to show only the
-statistically significant coefficients in the impact plot.
+the p-values were adjusted using the Fotheringham-Byrne procedures
+(Gollini et. al,2015). Once this process was completed, coefficients
+that had a significance level greater than 0.05 were zeroed out for
+plotting purposes to show only the statistically significant
+coefficients in the impact plot.
 
 \subsubsection{Impact Plots}\label{impact-plots}
 
@@ -563,6 +565,32 @@ see if any of the covariates used could have been left out. In addition
 to this, we used a Moran's I Test as a way to test for spatial
 autocorrelation.
 
+\section{Results}\label{results}
+
+\subsection{Simulation Study using Artificial
+Data}\label{simulation-study-using-artificial-data}
+
+From the simulation study using artificial data, we obtained results
+that demonstrate the strength of our GWR model. Our results depicted
+below provide valid estimates and coefficients when fitting a GWR on our
+simulated data. In our simulation study, the Mean Absolute Error ranged
+from -1.63 to 0.05, which was fairly close to zero for each covariate.
+This suggests the validity of our GWR model. Additionally, we obtained a
+relatively high R-squared value of 0.94 when fitting a GWR model on our
+artificial data, demonstrating strong explanatory power. Lastly, Plot 2
+depicted below illustrates evenly dispersed residuals across the United
+States, confirming the validity of our GWR model.
+
+\begin{figure}[H]
+
+{\centering \includegraphics{sim_residual_plot.png}
+
+}
+
+\caption{Normalized Residuals of GWR Model Results on Simulated Data}
+
+\end{figure}%
+
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.5571}}
   >{\raggedleft\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.4429}}@{}}
@@ -595,71 +623,8 @@ Average Temperature & 0.9691171 \\
 Median Household Income & -1.0498282 \\
 \end{longtable}
 
-\section{Results}\label{results}
+\subsection{Correlation Matrix}\label{correlation-matrix-1}
 
-The simulation study using artificial data demonstrates the strength of
-our model. Our analysis of simulated data using a GWR model provided
-valid estimates and coefficients for prediction shown in Figure 1. In
-addition, the model's R-squared value was low with fairly evenly
-dispersed residuals, making it a reliable benchmark for comparison.
-
-Examining the GWR model with real-world data revealed a clear positive
-correlation between walkability and diabetes prevalence, which was
-particularly notable in the southern United States. Visual
-representations as seen in the impact plot highlighted this
-relationship, with the southern to southeastern regions showing higher
-walkability's impact on diabetes prevalence, depicted in shades of red.
-Conversely, contrasting trends were observed in other parts of the
-country, indicating a negative association between walkability and
-diabetes.
-
-The correlation between walkability and diabetes prevalence in the South
-can be attributed to various factors, with higher temperatures emerging
-as a key consideration. In warmer climates, such as those prevalent in
-the South, the positive relationship between walkability and diabetes
-may be influenced by people spending more time indoors to avoid the
-heat. This reduction in outdoor activity diminishes walkability and
-could potentially contribute to higher diabetes rates.
-
-Conversely, in colder regions like the west coast and the Pacific
-Northwest, the impact of walkability on diabetes prevalence appears to
-be negative, as depicted in the plot. This suggests that regional
-differences, including climate variations, play a significant role in
-shaping the relationship between walkability and diabetes.
-
-Moreover, the analysis identified various additional risk factors,
-notably health-related ones, contributing to elevated diabetes
-prevalence nationwide. From the facet plot, factors like smoking and
-obesity showed clear associations with higher rates of diabetes, as
-expected given their impact on overall health and predisposition to
-chronic conditions like diabetes.
-
-In addition, the appendix below provides a comprehensive assessment
-supporting the accuracy of our model's metrics. The residual plot shows
-a fairly evenly scattered distribution of predicted values around zero,
-indicating a well-fitted model. Additionally, the examination for
-multicollinearity yielded reassuring results, with none of the
-covariates exhibiting significantly high variance inflation factors
-(VIF), confirming the absence of multicollinearity issues within our
-model.
-
-In summary, the insights from our model, both from simulated and
-real-world data, shed light on the complex interplay between
-walkability, various risk factors, and diabetes prevalence across
-different regions. The consistency between metrics obtained from our
-simulation study and real data, coupled with the absence of
-multicollinearity issues, underscores the reliability and validity of
-our findings, supporting the robustness of our approach.
-
-\begin{figure}[H]
-
-{\centering \includegraphics{sim_residual_plot.png}
-
-}
-
-\caption{Normalized Residuals of GWR Model Results on Simulated Data}
-
-\end{figure}%%
 \begin{figure}[H]
 
 {\centering \includegraphics{correlation_plot.png}
@@ -669,6 +634,100 @@ our findings, supporting the robustness of our approach.
 \caption{Correlation Matrix of Chosen Variables}
 
 \end{figure}%
+
+From the Analysis of our Correlation Matrix plot above, we observed
+several factors highly correlated with Diabetes Prevalence, notably High
+Blood Pressure (correlation of 0.89) and Obesity (correlation of 0.74).
+These health risk factors were incorporated into our model, providing
+valuable insights into the multifaceted nature of diabetes prevalence
+and its associated risks. While these factors demonstrate strong
+positive associations, other covariates such as Average Temperature
+(correlation of 0.01) and National Walkability Index (correlation of
+-0.44) were also included in our analysis. Despite their lower
+correlations with Diabetes Prevalence, these variables offer diverse
+perspectives and contribute to a comprehensive understanding of the
+relationships between various covariates and their impacts on diabetes
+prevalence in the U.S. Including these factors, allows us to explore the
+intricate interplay between different factors, providing a more nuanced
+understanding in shaping diabetes prevalence trends across the entirety
+of the U.S.
+
+\subsection{The Impact of Walkability on Diabetes
+Prevalence}\label{the-impact-of-walkability-on-diabetes-prevalence}
+
+\begin{figure}[H]
+
+{\centering \includegraphics{impact_plot.png}
+
+}
+
+\caption{Impact of Walkability on Diabetes Prevalence}
+
+\end{figure}%
+
+When fitting the GWR model on our real-world data, we expected there to
+be a consistent trend between walkability and diabetes prevalence across
+the U.S. Accounting for walkability, multiple health risk factors,
+temperature, income,etc, we expected there to be a consistent trend
+between walkability and diabetes prevalence. However, from Figure 1
+above, we can see that this is not the case. As seen in the West Coast,
+Pacific North West, and the Mountainous Regions in the Northern part of
+the U.S, there is a negative correlation between walkability and
+diabetes prevalence. However, in the East Coast and Southern Regions of
+the U.S there is a positive correlation between walkability and diabetes
+prevalence. Ultimately, since there is a lack of consistency across the
+U.S we believe that the walkability index score calculated by the CDC is
+inaccurate and fails to account for certain additional factors to
+explain the true impact of walkability on diabetes prevalence.
+
+\subsection{Possible explanations for The Variation of Diabetes
+Prevalence in Different
+Regions}\label{possible-explanations-for-the-variation-of-diabetes-prevalence-in-different-regions}
+
+The correlation between walkability and diabetes prevalence in the South
+can be attributed to various factors, with higher temperatures emerging
+as a key consideration. In warmer climates, such as those prevalent in
+the South, the positive relationship between walkability and diabetes
+may be influenced by people spending more time indoors to avoid the
+heat. This reduction in outdoor activity diminishes walkability and
+could potentially contribute to higher diabetes rates.Conversely, in
+colder regions like the west coast and the Pacific Northwest, the impact
+of walkability on diabetes prevalence appears to be negative, as
+depicted in the plot. This suggests that regional differences, including
+climate variations, play a significant role in shaping the relationship
+between walkability and diabetes. Moreover, the analysis identified
+various additional risk factors, notably health-related ones,
+contributing to elevated diabetes prevalence nationwide. From the facet
+plot depicted below, factors like smoking and obesity showed clear
+associations with higher rates of diabetes, as expected given their
+impact on overall health and predisposition to chronic conditions like
+diabetes.
+
+\begin{figure}[H]
+
+{\centering \includegraphics{facet_plot.png}
+
+}
+
+\caption{Impact of Covariates on Diabetes Prevalence}
+
+\end{figure}%
+
+\subsection{Validation}\label{validation-1}
+
+\subsubsection{Monte Carlo Significance
+Test}\label{monte-carlo-significance-test}
+
+We first conducted a Monte-Carlo Significance Test to check for spatial
+variation in each of our covariates. Table 3 below depicts the results
+of our Monte-Carlo Significance Test. As we can see, the National
+Walkability Index has a p-value of 0.45. This emphasizes that the
+National Walkability Index is not significantly spatially varying. Thus,
+if we were to model the National Walkability Index on a global scale, it
+would not change our model's results much. This value further proves our
+point that that the Walkability Index provided by the CDC may fail to
+account for other essential factors that could further explain the
+impact of walkability on diabetes prevalence.
 
 \begin{longtable}[]{@{}lr@{}}
 \caption{Results of Monte Carlo Simulation}\tabularnewline
@@ -692,6 +751,18 @@ Median Household Income & 0.93 \\
 Average Temperature & 0.00 \\
 \end{longtable}
 
+\subsubsection{Global Moran's Eye Test on
+Residuals}\label{global-morans-eye-test-on-residuals}
+
+Next we conducted a Global Moran's Eye Test on the Residuals of our GWR
+model to check for spatial autocorrelation. From the Global Moran's Eye
+Test we obtained a Moran's 1 Statistic of 0.049. This indicates that
+there is slight positive autocorrelation in our model. We expect this to
+occur, as some of our covariates are similar in nature(eg. obesity,
+smoking, high blood pressure,etc.). Ultimately, there is not significant
+autocorrelation or an indication of high spatial dependence further
+showing that our model is indeed accurate.
+
 \begin{longtable}[]{@{}lr@{}}
 \caption{Moran's I Test Results}\tabularnewline
 \toprule\noalign{}
@@ -709,24 +780,32 @@ Expectation & -0.0003249 \\
 Variance & 0.0001135 \\
 \end{longtable}
 
-\begin{figure}[H]
+\subsubsection{Multicollinearity}\label{multicollinearity}
 
-{\centering \includegraphics{impact_plot.png}
+In addition, we examined if there was any significant multicollinearity
+in our GWR model. We tested this by checking the Variance Inflation
+Factor(VIF) for each of our covariates. For each of our covariates, none
+of our values exceeded a VIF score of 13. This indicates that there is
+not significant multicollinearity that poses an issue in our GWR model
+indicating the validity of our model.
 
-}
+\subsubsection{Residuals}\label{residuals}
 
-\caption{Impact of Walkability on Diabetes Prevalence}
+The residual plot in the Appendix shows a fairly evenly scattered
+distribution of predicted values around zero, indicating a well-fitted
+model. This further emphasizes the validity of our model.
 
-\end{figure}%%
-\begin{figure}[H]
-
-{\centering \includegraphics{facet_plot.png}
-
-}
-
-\caption{Impact of Covariates on Diabetes Prevalence}
-
-\end{figure}%
+In summary, the insights from our model, both from simulated and
+real-world data, shed light on the complex interplay between
+walkability, various risk factors, and diabetes prevalence across
+different regions. The consistency between metrics obtained from our
+simulation study and real data, coupled with the absence of
+multicollinearity issues and spatial dependence , underscores the
+reliability and validity of our findings, supporting the robustness of
+our approach. Based on the results of the model along with the plots
+that we made, we believe that the current formula used by the EPA and
+other government agencies fail to consider many extraneous factors, and
+the formula should be revised.
 
 \section{Discussion}\label{discussion}
 
@@ -916,6 +995,20 @@ strategies are both relevant and impactful (Taylor, et al., 2020).
   Guide Version 3.0,'' Jun.~2021, {[}Online{]}. Available:
   \href{https://www.epa.gov/system/files/documents/2023-10/epa_sld_3.0_technicaldocumentationuserguide_may2021_0.pdf}{EPA
   Smart Location Database}
+\item
+  I. Gollini, B. Lu, M. Charlton, C. Brunsdon, and P. Harris, ``GWmodel:
+  An R Package for Exploring Spatial Heterogeneity Using Geographically
+  Weighted Models,'' J. Stat. Soft., vol.~63, no. 17, 2015, doi:
+  10.18637/jss.v063.i17.
+\item
+  ``Places: Census Tract Data (GIS Friendly Format), 2021 Release.''
+  Centers for Disease Control and Prevention, Centers for Disease
+  Control and Prevention, 2023,
+  data.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2021-/mb5y-ytti/about\_data.
+\item
+  Gilbert, Mark. ``Heat Health Census Tracts.'' GIS For Racial Equity,
+  gis-for-racialequity.hub.arcgis.com/datasets/climatesolutions::heat-health-census-tracts/about.
+  Accessed 3 May 2024.
 \end{itemize}
 
 
