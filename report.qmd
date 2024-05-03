@@ -158,10 +158,10 @@ since people who live in places with higher walkability tend to rely less on car
 
 
 
-*All formulas and variables were derived from the Environmental Protection Agency Smart Location Database*
+*All formulas and variables were derived from the Environmental Protection Agency Smart Location Database(Chapman et. al, 2021)*
 
 ### Other Covariates
-In addition to walkability, we felt it was important to account for a few different variables when conducting our study. We decided that based on our research, it would be important to take into account several different health factors that can impact diabetes prevalence. According to an article by *INSERT ARTICLE ABOUT DIABETES RISK FACTORS*, we decided to take common health issues into account as covariates for our model. The health complications that we focused on was the obesity, high blood pressure, smoking prevalence, and low-physical activity. All of the chosen factors have some sort of researched impact on diabetes prevalence and will allow for more thorough results. In addition to this, we took into account the median household income for all of the counties that we were working with, as well as the average temperature. The health factors data was provided by the CDC as part of their annual report *INSERT SOURCE*, and the median household income data was provided by the United States Census Bureau, as part of their Small Area Income and Poverty Estimates Program (United States Census Bureau, 2022). The average temperature data was found from the *Insert Source Here*. Together these values will help lead to our model fitting to be more complete and allow for more of the data to be explained by the model.
+In addition to walkability, we felt it was important to account for a few different variables when conducting our study. We decided that based on our research, it would be important to take into account several different health factors that can impact diabetes prevalence. According to an article by Mokdad et. al, there is a strong association between diabetes and obesity, and obesity is tied into several other health risks such as high blood pressure, and low physical activity. As a response to this research, we decided to take common health issues into account as covariates for our model. The health complications that we focused on was the obesity, high blood pressure, smoking prevalence, and low-physical activity. All of the chosen factors have some sort of researched impact on diabetes prevalence and will allow for more thorough results. In addition to this, we took into account the median household income for all of the counties that we were working with, as well as the average temperature. The health factors data was provided by the CDC as part of their annual report (Center for Disease Control and Prevention, 2023), and the median household income data was provided by the United States Census Bureau, as part of their Small Area Income and Poverty Estimates Program (United States Census Bureau, 2022). The average temperature data was found from the GIS for Racial Equity Website (Gilbert, 2023). Together these values will help lead to our model fitting to be more complete and allow for more of the data to be explained by the model.
 
 
 
@@ -175,7 +175,7 @@ In order to get a general understanding of the data at hand, we generated a corr
 
 
 ### Spatial Analysis
-Based on the type of the data that was available, we chose to do spatial analysis because we believed it would yield the best result. The model we used in this study was Geographically Weighted Regression. Specifically, we used the model provided by the GWModel Package *INSERT SOURCE HERE*. This model, originally created by Brunsdon, is based on the formula
+Based on the type of the data that was available, we chose to do spatial analysis because we believed it would yield the best result. The model we used in this study was Geographically Weighted Regression. Specifically, we used the model provided by the GWModel Package (Gollini et. al, 2015). This model, originally created by Brunsdon, is based on the formula
 
 
 
@@ -191,7 +191,7 @@ $$y_i = \alpha_{0} + \sum_{k=1}^{m} \alpha_{k}x_{ik} + \varepsilon_{i}$$
   - $\varepsilon_{i}$ is the normally distributed independent error terms
   - $\alpha_{k}$ is estimated from $n$ observations
   
-This model was chosen for this specific problem because it is able to improve on regular regression models like global regression, and account for spatial heterogeneity. In the case of our data, county level data exhibits spatial heterogeneity due to how small the counties are relative to the size of the United States. Initially, we had wondered whether it would make sense to use this model in a predictive context, but eventually decided that in order to investigate the relationship of walkability on the diabetes prevalence, it would make more sense to use the model in an inferential context. The GWModel package allowed for us to set a formula where we set the diabetes prevalence as the response variable and the covariates as the independent variables. The package provides a function that, based on the inputted data identifies an ideal bandwidth to use for the model. This bandwidth can then be used to fit the model. Once the model was fit, it was important to adjust the P-values to deal with insignificant coefficients to make the visualization of the results more intuitive. Using the GWModel package, the p-values were adjusted using the Fotheringham-Byrne procedures. Once this process was completed, coefficients that had a significance level greater than 0.05 were zeroed out for plotting purposes to show only the statistically significant coefficients in the impact plot.
+This model was chosen for this specific problem because it is able to improve on regular regression models like global regression, and account for spatial heterogeneity. In the case of our data, county level data exhibits spatial heterogeneity due to how small the counties are relative to the size of the United States. Initially, we had wondered whether it would make sense to use this model in a predictive context, but eventually decided that in order to investigate the relationship of walkability on the diabetes prevalence, it would make more sense to use the model in an inferential context. The GWModel package allowed for us to set a formula where we set the diabetes prevalence as the response variable and the covariates as the independent variables. The package provides a function that, based on the inputted data identifies an ideal bandwidth to use for the model. This bandwidth can then be used to fit the model. Once the model was fit, it was important to adjust the P-values to deal with insignificant coefficients to make the visualization of the results more intuitive. Using the GWModel package, the p-values were adjusted using the Fotheringham-Byrne procedures (Gollini et. al,2015). Once this process was completed, coefficients that had a significance level greater than 0.05 were zeroed out for plotting purposes to show only the statistically significant coefficients in the impact plot.
 
 
 ### Impact Plots
@@ -613,7 +613,7 @@ Our findings emphasize the importance of developing region-specific approaches t
 
 {{< pagebreak >}}
 # Appendix
-![esdiual Plot of GWR Model](residual_plot.png){fig-align="center"}
+![Resdiual Plot of GWR Model](residual_plot.png){fig-align="center"}
 
 
 {{< pagebreak >}}
@@ -633,3 +633,11 @@ Our findings emphasize the importance of developing region-specific approaches t
 - R. H. Glazier et al., "Planning and Design Support Tools for Walkability," Sustainability, vol. 12, no. 11, May 2020. Available: [Planning and Design Support Tools for Walkability](https://www.mdpi.com/2071-1050/12/11/4405)
 - V. Schuurman et al., "Spatial Pattern of the Walkability Index, Walk Score and Walk Score Modification for Elderly," International Journal of Health Geographics, vol. 11, no. 5, 2020. Available: [Spatial Pattern of the Walkability Index, Walk Score and Walk Score Modification for Elderly](https://www.mdpi.com/2220-9964/11/5/279)
 - L. Giles-Corti et al., "Development of a Child-Focused Walkability Index," International Journal of Health Geographics, vol. 12, 2013. Available: [Development of a Child-Focused Walkability Index](https://ij-healthgeographics.biomedcentral.com/articles/10.1186/1476-072X-12-61)
+- A. H. Mokdad et al., “Prevalence of Obesity, Diabetes, and Obesity-Related Health Risk Factors, 2001,” JAMA, vol. 289, no. 1, p. 76, Jan. 2003, doi: 10.1001/jama.289.1.76.
+- J. Chapman, E. Fox, W. Bachman, L. Frank, J. Thomas, and A. Rourk Reyes, “Smart Location Database Technical Documentation and User Guide Version 3.0,” Jun. 2021, [Online]. Available: [EPA Smart Location Database](https://www.epa.gov/system/files/documents/2023-10/epa_sld_3.0_technicaldocumentationuserguide_may2021_0.pdf)
+- I. Gollini, B. Lu, M. Charlton, C. Brunsdon, and P. Harris, “GWmodel: An R Package for Exploring Spatial Heterogeneity Using Geographically Weighted Models,” J. Stat. Soft., vol. 63, no. 17, 2015, doi: 10.18637/jss.v063.i17.
+- “Places: Census Tract Data (GIS Friendly Format), 2021 Release.” Centers for Disease Control and Prevention, Centers for Disease Control and Prevention, 2023, data.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2021-/mb5y-ytti/about_data. 
+- Gilbert, Mark. “Heat Health Census Tracts.” GIS For Racial Equity, gis-for-racialequity.hub.arcgis.com/datasets/climatesolutions::heat-health-census-tracts/about. Accessed 3 May 2024. 
+
+
+
