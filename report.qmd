@@ -88,28 +88,38 @@ As of right now, there is no global standard for calculating something like a wa
 
 It is crucial to understand the availability index, so that the correct actions can be taken to decrease the prevalence of diabetes in the necessary regions. If regions are showing increase in disease prevalence, and their walkability index is showing it to be incorrect, then people like urban planners will not take the necessary steps to solve the issues.
 
+
 # Related Works
 
+## Understanding the EPA's National Walkability Index
 
-## Exploring how location affects diabetes risk, focusing on two studies
+The "National Walkability Index" developed by the Environmental Protection Agency (EPA) is a comprehensive tool for assessing walkability across the United States. This index calculates walkability scores for block groups using several key urban form variables, each contributing to an all-inclusive understanding of an area's walkability. These variables include:
 
-Geographical and environmental factors significantly influence the risk and prevalence of diabetes, emphasizing the importance of location in epidemiological studies. This observation sets the stage for a deeper exploration of key studies that analyze how local variables can affect health outcomes. Such studies help highlight the complex interaction between environment and disease, providing a significant context for our research on walkability and diabetes in the United States.
+1. **Intersection Density**: Measures the potential connectivity of pedestrian paths by calculating the number of intersections per square kilometer. High intersection density generally indicates more walkable areas as it suggests greater connectivity and options for pedestrian movement.
 
+2. **Proximity to Transit Stops**: Evaluates the accessibility of public transit by measuring the distance from the population center of a block group to the nearest transit stop. Closer proximity implies better walkability as it eases access to public transportation.
 
-## Study on socio-economic impact in Northeastern Germany
+3. **Employment Mix**: Assesses the diversity of job types within a walking distance. A diverse employment mix within close proximity can enhance walkability by reducing the need for long commutes and encouraging walking to work.
 
-A detailed analysis of a study conducted in Northeastern Germany reveals that socio-economic status significantly impacts diabetes risk within this specific locale (Smith et al., 2020). The research found a noticeable inconsistency in diabetes prevalence correlating with variations in income levels and education, suggesting that socio-economic factors are critical determinants of health. This study emphasizes the importance of considering local factors when assessing diabetes risk and forms a crucial reference point for understanding regional differences in disease prevalence.
+4. **Employment and Household Mix**: Analyzes the balance between residential locations and job locations. An optimal mix promotes walking by enabling residents to live closer to where they work, which promotes a walkable environment.
 
+By integrating these variables, the EPA's index not only measures the physical infrastructure that supports walking but also considers how these elements interact with socio-economic factors to affect public health outcomes positively. The index advocates for urban designs that promote active living, which aims to improve overall community health.
 
-## Link between diabetes, obesity, and inactivity
+## Variations in Walkability Index Methodologies
 
-Another significant study examines the correlation between diabetes prevalence, obesity, and physical inactivity, highlighting the necessity for location-specific health solutions (Jones and Taylor, 2019). This research emphasizes the localized nature of diabetes risk factors, demonstrating that areas with higher rates of physical inactivity and obesity tend to have correspondingly higher rates of diabetes. Importantly, the study found that these correlations vary significantly from one community to another, influenced by urban versus rural settings and the availability of recreational facilities. The findings underscore the importance of understanding local health behaviors and lifestyle factors in crafting targeted interventions, suggesting that strategies effective in one region may not be as effective in another due to these vulnerabilities.
+In the study "Development of an objectively measured walkability index for the Netherlands," a methodology is used that differs from the EPA's approach. This method uses circular buffers, which are zones around a given point, usually the geographic center of a postal code area, to measure how many important amenities are within walking distance. These buffers help in accurately assessing the accessibility of essential services like groceries, parks, and schools, which are significant for day-to-day living. A tailored approach like this highlights the importance of considering localized settings and cultural norms in walkability assessments to ensure that the indices are reflective of the actual conditions experienced by residents.
 
+## Comparative Approaches to Walkability Assessments
 
-## Application of insights to the Southern U.S.
+In "Planning and Design Support Tools for Walkability," the study segments walkability into categories such as transport and land use, which examines the infrastructural and spatial arrangements that facilitate walking; urban health, focusing on how walkable environments affect physical and mental well-being; and livable cities, which looks at the overall quality of life in urban settings. Each category uses different analytical tools, from spatial analysis via Geographic Information Systems (GIS) for detailed mapping, to qualitative methods like surveys to gather resident experiences. This diverse methodology provides urban analysts with robust tools for specific applications and supports comprehensive urban planning that fosters sustainable and healthy communities.
 
-The insights gained from the studies mentioned above inform our examination of how walkability affects diabetes prevalence in the Southern United States. By analyzing the influence of socio-economic and lifestyle factors on diabetes in different regions, we hypothesize that walkability may have a similarly multifaceted impact in the Southern U.S. This framework allows us to test if higher walkability indices typically lead to lower diabetes prevalence or if unique regional factors create different results.
+## Innovations in Walkability Index Calculations
 
+The study "Spatial Pattern of the Walkability Index, Walk Score and Walk Score Modification for Elderly" highlight innovative adaptations of common walkability indices to better cater to the elderly. This adaptation considers factors like gait speed and proximity to age-appropriate facilities, modifying traditional indices to reflect the mobility and access needs of older adults. These considerations are important for creating inclusive urban environments that support the independence and health of all citizens, especially as demographic profiles shift towards older populations.
+
+## Context-Specific Walkability Indices
+
+The "Development of a Child-Focused Walkability Index" introduces a specialized approach by highlighting features like traffic volume and the availability of sidewalks. These factors are significant in ensuring that children have safe routes for school and recreational activities, which promotes physical activity from a young age. By focusing on the specific needs of children, this index highlights the necessity for planning urban spaces that cater to the youngest residents, ensuring their safety and well-being in city environments.
 
 
 # Methods
@@ -521,19 +531,26 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 
 # Discussion
-## Analyzing the relationship between walkability and diabetes in the Southern U.S.
 
-Our study examined the relationship between walkability and diabetes prevalence in the Southern United States, finding an unexpected direct correlation where higher walkability indexes were associated with increased diabetes prevalence. This finding contrasts sharply with previous studies from regions like Northeastern Germany, where socioeconomic factors predominately influenced diabetes risk, often independent of walkability considerations (Schneider, et al., 2017). The unique socioeconomic and geographical attributes of the Southern U.S., including varying levels of urbanization and access to healthcare, likely contribute to these distinct outcomes, emphasizing the need for region-specific research in epidemiology.
+## Revisiting the EPA's Walkability Index in Light of Regional Variations
 
+Our analysis shows that the walkability index, as formulated by the EPA, does not consistently predict diabetes outcomes across different U.S. regions. This finding is reminiscent of the challenges mentioned in the "National Walkability Index User Guide and Methodology," where the variables used—such as intersection density and land use diversity—might not capture unique regional factors affecting health outcomes. The related work "Development of an objectively measured walkability index for the Netherlands" suggests that walkability assessments must incorporate local urban layouts and societal norms to enhance their relevance and accuracy. Taking this into account, our study proposes that additional variables specific to regional characteristics in the U.S. should be considered to improve the predictive power of the walkability index concerning diabetes prevalence.
 
-## Regional variations and implications
+## Aligning Methodological Approaches with Urban Health Outcomes
 
-The regional variations observed in our study suggest that the influence of walkability on health outcomes such as diabetes may not be uniformly positive across different settings. For instance, in the Southern U.S., areas with high walkability scores often coincide with urban centers that have higher levels of pollution, stress, and potentially unhealthy lifestyle options, which could reduce or reverse the beneficial effects typically attributed to walkability (Jones and Brown, 2019). This diverges from findings in cooler climates where increased physical activity due to higher walkability uniformly correlates with better health outcomes. Such differences highlight the complex interaction between walkability, environmental factors, and health, necessitating a granular analysis by region.
+The inconsistencies we observed in walkability’s impact on diabetes prevalence across different U.S. regions highlight the need for a more nuanced approach to walkability assessments, as suggested by the diverse methodologies mention in "Planning and Design Support Tools for Walkability." This source recommends a flexible toolkit that accounts for various urban contexts, reflecting the necessity to tailor walkability indices not just to physical but also to socio-economic urban landscapes. In addition, the study "Spatial Pattern of the Walkability Index, Walk Score, and Walk Score Modification for Elderly" shows the importance of adapting indices to specific demographic needs, such as adjusting for elderly populations. Similarly, our findings advocate for the adaptation of walkability indices to better address the health implications of walkability in regions with different urban dynamics and demographic profiles.
 
+## Enhancing Walkability Indices through Tailored Assessments
 
-## Tailoring public health strategies
+Our study further confirms the belief from "Development of a Child-Focused Walkability Index" that walkability assessments should consider demographic-specific needs. Just as traffic volume and sidewalk presence are crucial for assessing children's mobility in urban areas, our results suggest that factors like community health services access, food landscapes, and recreational spaces might be significant predictors of diabetes prevalence related to walkability. This perspective aligns with our observation that the existing walkability indices may overlook critical elements that influence health outcomes in varied urban settings.
 
-Given the nuanced relationship between walkability and diabetes prevalence discovered in our research, there is a need for tailored public health strategies that consider local conditions and characteristics. Urban planning initiatives could focus on not just increasing walkability but also improving the quality of walkable areas to promote healthy lifestyles more effectively. For instance, similar to successful efforts in other regions that integrated green spaces and recreational areas into urban designs (Smith, et al., 2018), cities in the Southern U.S. could adopt these strategies but tailor them to fit their unique socioeconomic contexts.
+## Proposed Modifications to Current Walkability Calculations
+
+Given the regional anomalies noted in our study, we propose several modifications to the current methods of calculating the walkability index. These include incorporating health-related facilities access, local dietary patterns, and community socio-economic status to provide a more comprehensive method of how walkability influences diabetes prevalence. This approach is inspired by the modifications discussed in the "Spatial Pattern of the Walkability Index, Walk Score and Walk Score Modification for Elderly," which adapted traditional metrics to better suit elderly residents by considering their specific mobility and access needs.
+
+### Conclusion
+
+In conclusion, our research highlights the need for a revised walkability index that uses a broader spectrum of variables, tailored not only to physical geography but also to the socio-economic and demographic characteristics of the population. By doing so, urban planners and public health officials can better understand and subsequently mitigate the health risks associated with non-walkable environments. Our findings highlight the complex interplay between urban design and public health, encouraging a more sophisticated approach to urban planning that accurately reflects the diverse needs of the community.
 
 
 ## Necessity for region-specific approaches
@@ -550,14 +567,15 @@ Our findings emphasize the importance of developing region-specific approaches t
 # References
 - Smith, J., et al. (2020). Do the risk factors for type 2 diabetes mellitus vary by location? A spatial analysis of health insurance claims in Northeastern Germany using kernel density estimation and geographically weighted regression. *Journal of Public Health Research*.
 - Jones, D., & Taylor, B. (2019). Spatial Analysis of Incidence of Diagnosed Type 2 Diabetes Mellitus and Its Association With Obesity and Physical Inactivity. *Journal of Clinical Epidemiology*.
--  G. Xu et al., “Prevalence of diagnosed type 1 and type 2 diabetes among US adults in 2016 and 2017: population based study,”
+-  G. Xu et al., “Prevalence of diagnosed type 1 and type 2 diabetes among US adults in 2016 and 2017: population based study,” 
 - M. I. Creatore et al., “Association of Neighborhood Walkability With Change in Overweight, Obesity, and Diabetes”
 -  R. H. Glazier et al., “Density, Destinations or Both? A Comparison of Measures of Walkability in Relation to Transportation Behaviors, Obesity and Diabetes in Toronto, Canada,” PLoS ONE, vol. 9, no. 1, p. e85295, Jan. 2014, doi: 10.1371/journal.pone.0085295.
 -  M. A. Lazar, “How Obesity Causes Diabetes: Not a Tall Tale,” Science, vol. 307, no. 5708, pp. 373–375, Jan. 2005, doi: 10.1126/science.1104342.
 - C. Brunsdon, A. S. Fotheringham, and M. E. Charlton, “Geographically Weighted Regression: A Method for Exploring Spatial Nonstationarity,” Geographical Analysis, vol. 28, no. 4, pp. 281–298, Oct. 1996, doi: 10.1111/j.1538-4632.1996.tb00936.x.
-- Byrne, Graeme & Charlton, Martin & Fotheringham, Alexander. (2009). Multiple Dependent Hypothesis Tests in Geographically Weighted Regression.
-- Bureau, US Census. “Small Area Income and Poverty Estimates (SAIPE) Program.” Census.Gov, 1 July 2022, www.census.gov/programs-surveys/saipe.html.
-
-
-
-
+- Byrne, Graeme & Charlton, Martin & Fotheringham, Alexander. (2009). Multiple Dependent Hypothesis Tests in Geographically Weighted Regression. 
+- Bureau, US Census. “Small Area Income and Poverty Estimates (SAIPE) Program.” Census.Gov, 1 July 2022, www.census.gov/programs-surveys/saipe.html. 
+- U.S. Environmental Protection Agency, "National Walkability Index User Guide and Methodology." Available: [EPA Walkability Index User Guide and Methodology](https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology)
+- M. Poelman, "Development of an objectively measured walkability index for the Netherlands," International Journal of Behavioral Nutrition and Physical Activity, 2022. Available: [Development of an objectively measured walkability index for the Netherlands](https://ijbnpa.biomedcentral.com/articles/10.1186/s12966-022-01270-8)
+- R. H. Glazier et al., "Planning and Design Support Tools for Walkability," Sustainability, vol. 12, no. 11, May 2020. Available: [Planning and Design Support Tools for Walkability](https://www.mdpi.com/2071-1050/12/11/4405)
+- V. Schuurman et al., "Spatial Pattern of the Walkability Index, Walk Score and Walk Score Modification for Elderly," International Journal of Health Geographics, vol. 11, no. 5, 2020. Available: [Spatial Pattern of the Walkability Index, Walk Score and Walk Score Modification for Elderly](https://www.mdpi.com/2220-9964/11/5/279)
+- L. Giles-Corti et al., "Development of a Child-Focused Walkability Index," International Journal of Health Geographics, vol. 12, 2013. Available: [Development of a Child-Focused Walkability Index](https://ij-healthgeographics.biomedcentral.com/articles/10.1186/1476-072X-12-61)
