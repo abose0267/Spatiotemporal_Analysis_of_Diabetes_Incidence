@@ -91,6 +91,14 @@ It is crucial to understand the availability index, so that the correct actions 
 
 # Related Works
 
+## Significance of Walkability on Diabetes Prevalence
+
+The study "Walkability and its association with prevalent and incident diabetes in a pooled sample from five German cohorts" highlights the crucial impact of walkability on diabetes prevalence. By integrating Geographically Weighted Regression (GWR) to analyze the relationship between neighborhood walkability and diabetes across Germany, the study finds that higher walkability scores are generally associated with lower rates of diabetes. This supports our hypothesis that improving walkability in U.S. counties could serve as an effective preventive measure against diabetes. These findings are directly applicable to our research, which suggests that enhancements in urban design that prioritize walkability could significantly contribute to public health improvements.
+
+## Comparative Analysis with Similar Research
+
+The study "Neighborhood walkability and pre-diabetes incidence in a multiethnic population" provides a significant comparative analysis to our work. It examines the potential of walkable neighborhoods to mitigate early stages of diabetes, using a comprehensive dataset from Southern Ontario, Canada. The use of GWR to map spatial variances in pre-diabetes incidence reveals that walkability can significantly influence diabetes management across diverse populations. This parallels our findings and methodological approach, which emphasizes the importance of considering ethnic and demographic factors when assessing the health impacts of urban walkability.
+
 ## Understanding the EPA's National Walkability Index
 
 The "National Walkability Index" developed by the Environmental Protection Agency (EPA) is a comprehensive tool for assessing walkability across the United States. These variables include:
@@ -527,13 +535,6 @@ From the Analysis of our Correlation Matrix plot above, we observed several fact
 When fitting the GWR model on our real-world data, we expected there to be a consistent trend between walkability and diabetes prevalence across the U.S. Accounting for walkability, multiple health risk factors, temperature, income,etc, we expected there to be a consistent trend between walkability and diabetes prevalence.  However, from Figure 1 above, we can see that this is not the case. As seen in the West Coast, Pacific North West, and the Mountainous Regions in the Northern part of the U.S, there is a negative correlation between walkability and diabetes prevalence. However, in the East Coast and Southern Regions of the U.S there is a positive correlation between walkability and diabetes prevalence. Ultimately, since there is a lack of consistency across the U.S we believe that the walkability index score calculated by the CDC is inaccurate and fails to account for certain additional factors to explain the true impact of walkability on diabetes prevalence.
 
 
-## Possible explanations for The Variation of Diabetes Prevalence in Different Regions
-
-
-The correlation between walkability and diabetes prevalence in the South can be attributed to various factors, with higher temperatures emerging as a key consideration. In warmer climates, such as those prevalent in the South, the positive relationship between walkability and diabetes may be influenced by people spending more time indoors to avoid the heat. This reduction in outdoor activity diminishes walkability and could potentially contribute to higher diabetes rates.Conversely, in colder regions like the west coast and the Pacific Northwest, the impact of walkability on diabetes prevalence appears to be negative, as depicted in the plot. This suggests that regional differences, including climate variations, play a significant role in shaping the relationship between walkability and diabetes. Moreover, the analysis identified various additional risk factors, notably health-related ones, contributing to elevated diabetes prevalence nationwide. From the facet plot depicted below, factors like smoking and obesity showed clear associations with higher rates of diabetes, as expected given their impact on overall health and predisposition to chronic conditions like diabetes. 
-
-
-
 ![Impact of Covariates on Diabetes Prevalence](facet_plot.png ){fig-align="center"}
 
 
@@ -552,9 +553,9 @@ mc_table
 ```
 
 
-### Global Moran's Eye Test on Residuals
+### Global Moran's I Test on Residuals
 
-Next we conducted a Global Moran's Eye Test on the Residuals of our GWR model to check for spatial autocorrelation. From the Global Moran's Eye Test we obtained a Moran's 1 Statistic of 0.049. This indicates that there is slight positive autocorrelation in our model. We expect this to occur, as some of our covariates are similar in nature(eg. obesity, smoking, high blood pressure,etc.). Ultimately, there is not significant autocorrelation or an indication of high spatial dependence further showing that our model is indeed accurate. 
+Next we conducted a Global Moran's I Test on the Residuals of our GWR model to check for spatial autocorrelation. From the Global Moran's I Test we obtained a Moran's 1 Statistic of 0.049. This indicates that there is slight positive autocorrelation in our model. We expect this to occur, as some of our covariates are similar in nature(eg. obesity, smoking, high blood pressure,etc.). Ultimately, there is not significant autocorrelation or an indication of high spatial dependence further showing that our model is indeed accurate. 
 
 ```{r echo=FALSE}
 val
@@ -578,6 +579,10 @@ In summary, the insights from our model, both from simulated and real-world data
 
 # Discussion
 
+## Possible explanations for The Variation of Diabetes Prevalence in Different Regions
+
+The correlation between walkability and diabetes prevalence in the South can be attributed to various factors, with higher temperatures emerging as a key consideration. In warmer climates, such as those prevalent in the South, the positive relationship between walkability and diabetes may be influenced by people spending more time indoors to avoid the heat. This reduction in outdoor activity diminishes walkability and could potentially contribute to higher diabetes rates.Conversely, in colder regions like the west coast and the Pacific Northwest, the impact of walkability on diabetes prevalence appears to be negative, as depicted in the plot. This suggests that regional differences, including climate variations, play a significant role in shaping the relationship between walkability and diabetes. Moreover, the analysis identified various additional risk factors, notably health-related ones, contributing to elevated diabetes prevalence nationwide. From the facet plot depicted below, factors like smoking and obesity showed clear associations with higher rates of diabetes, as expected given their impact on overall health and predisposition to chronic conditions like diabetes. 
+
 ## Revisiting the EPA's Walkability Index in Light of Regional Variations
 
 Our analysis shows that the walkability index, as formulated by the EPA, does not consistently predict diabetes outcomes across different U.S. regions. This finding reflects the challenges mentioned in the "National Walkability Index User Guide and Methodology," where variables like intersection density and land use diversity may not sufficiently capture regional factors that influence health outcomes.The related work "Development of an objectively measured walkability index for the Netherlands" suggests that walkability assessments must use local urban layouts and societal norms to enhance their relevance and accuracy. Taking this into account, our study proposes that additional variables specific to regional characteristics in the U.S. should be considered to improve the predictive power of the walkability index concerning diabetes prevalence.
@@ -596,7 +601,7 @@ Given the regional anomalies noted in our study, we propose several modification
 
 ### Conclusion
 
-In conclusion, our research highlights the need for a revised walkability index that uses a broader spectrum of variables, tailored not only to physical geography but also to the socio-economic and demographic characteristics of the population. By doing so, urban planners and public health officials can better understand and mitigate the health risks associated with non-walkable environments. Our findings emphasize the complex relationship between urban design and public health, pushing for a more detailed approach to urban planning that meets the varied needs of the community.
+In conclusion, our study shows that we need to improve the walkability index by including more detailed factors that consider both the physical layout and the social and economic conditions of neighborhoods. By adding these details to walkability assessments, city planners and health officials can better understand how city design affects public health, and work more effectively to reduce health risks related to areas that are hard to walk in. Our research points out the complex ways in which city planning and public health are connected, suggesting that city planning should take a more detailed and specific approach that meets the diverse needs of different communities. Looking ahead, more studies are needed that follow how changes in city planning affect public health over time. This will provide solid evidence to guide decisions in making cities healthier and more walkable.
 
 
 {{< pagebreak >}}
@@ -626,6 +631,5 @@ In conclusion, our research highlights the need for a revised walkability index 
 - I. Gollini, B. Lu, M. Charlton, C. Brunsdon, and P. Harris, “GWmodel: An R Package for Exploring Spatial Heterogeneity Using Geographically Weighted Models,” J. Stat. Soft., vol. 63, no. 17, 2015, doi: 10.18637/jss.v063.i17.
 - “Places: Census Tract Data (GIS Friendly Format), 2021 Release.” Centers for Disease Control and Prevention, Centers for Disease Control and Prevention, 2023, data.cdc.gov/500-Cities-Places/PLACES-Census-Tract-Data-GIS-Friendly-Format-2021-/mb5y-ytti/about_data. 
 - Gilbert, Mark. “Heat Health Census Tracts.” GIS For Racial Equity, gis-for-racialequity.hub.arcgis.com/datasets/climatesolutions::heat-health-census-tracts/about. Accessed 3 May 2024. 
-
-
-
+- S. Gebel, M. Rapp, A. Voigtländer, A. Schneider, R. Döring, and S. Karrasch, "Walkability and its association with prevalent and incident diabetes in a pooled sample from five German cohorts," BMC Endocrine Disorders, vol. 19, no. 101, 2019, doi: 10.1186/s12902-019-0485-x
+- J. Booth, J. R. Parks, and T. L. Frost, "Neighborhood walkability and pre-diabetes incidence in a multiethnic population," BMJ Open Diabetes Research & Care, vol. 8, no. 1, 2020, doi: 10.1136/bmjdrc-2020-001533
