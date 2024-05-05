@@ -31,7 +31,7 @@ clean_walkability <- function(data) {
 clean_income <- function(data) {
   data$CountyFIPS <- sprintf("%02d%03d", data$State.FIPS.Code, data$County.FIPS.Code)
   data$Median.Household.Income <- gsub(",", "", data$Median.Household.Income)
-  data$Median.Household.Income <- as.numeric(data$Median.Household.Income)
+  data$Median.Household.Income <- log(as.numeric(data$Median.Household.Income))
   cleaned_income <- subset(data, select = c(CountyFIPS ,Median.Household.Income))
   return(cleaned_income)
 }
@@ -119,6 +119,24 @@ fit_gwr <- function(data) {
                           kernel = "exponential",
                           
   ) 
+  
+  
+  return(merged_gwr)
+}
+
+fit_gwr_mixed <- function(data) {
+  
+  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
+                          data = data,
+                          kernel = "exponential",
+  )
+  merged_gwr <- gwr.mixed(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev+ Median.Household.Income + avg_temp,
+                          data = data,
+                          fixed.vars = c("NatWalkInd"),
+                          intercept.fixed = TRUE,
+                          bw = merged_gwr_bw,
+                          kernel = "exponential",
+                          ) 
   
   
   return(merged_gwr)

@@ -69,6 +69,7 @@ cleaned_diabetes = loadedData$original_diabetes %>% clean_diabetes()
 spatial_data = loadedData$spatial_data %>% clean_spatial()
 temp_data = loadedData$temp_data %>% cleaned_weather()
 income_data = loadedData$income_data %>% clean_income()
+
 new_dataset = merge(cleaned_walkability, cleaned_diabetes, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% subset( !(StateAbbr %in% c("AK", "HI"))) %>% merge(temp_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE)
 merged_income = merge(new_dataset,income_data,by = "CountyFIPS", all.x = TRUE, all.y = TRUE ) %>% na.omit()
 new_spatial_dataset = merge(merged_income,spatial_data, by = "CountyFIPS", all.x = TRUE, all.y = TRUE) %>% na.omit()
@@ -228,11 +229,12 @@ artificial_data = create_data2(new_spatial_dataset)
 
 # Convert data to spatial format and fit GWR
 gwr_result_sim <- fit_artificial_gwr(artificial_data)
+gwr_result_sim
 ```
 ```{r}
 # Output results (handle as needed)
 artificial_data<- na.omit(artificial_data)
-residuals <- gwr_result_sim$SDF$residual %>% scale()
+residuals <- gwr_result_sim$SDF$residual 
 
 
 insert_position <- 2
@@ -278,10 +280,10 @@ MAE_df = data.frame(Covariates=c("National Walkability Index", "Obesity Crude Pr
 
 vals <- c(sum(artificial_data$walk_coef_residual)/nrow(artificial_data), sum(artificial_data$obesity_coef_residual)/nrow(artificial_data), sum(artificial_data$bp_coef_residual)/nrow(artificial_data), sum(artificial_data$lpa_coef_residual)/nrow(artificial_data), sum(artificial_data$smoke_coef_residual)/nrow(artificial_data), sum(artificial_data$temp_coef_residual)/nrow(artificial_data), sum(artificial_data$income_coef_residual)/nrow(artificial_data))
 
-MAE_df$values <- scale(vals)
+MAE_df$values <- vals
 
 
-MAE_df <- MAE_df %>% rename("Normalized Mean Absolute Error" = values )
+MAE_df <- MAE_df %>% rename("Mean Absolute Error" = values )
 MAE_table <- knitr::kable(MAE_df, caption = "Mean Absolute Error of Coefficient Predictions for Simulated Data")
 
 # MAE_df <- pivot_wider(MAE_df,names_from = names, values_from = values )
@@ -327,8 +329,22 @@ ggsave("original_diabetes_plot.png", plot, width = 8, height = 6, units = "in", 
 
 
 ```{r , results='hide',message=FALSE,echo={FALSE}}
+
+source("./functions/DataProcessing.R")
+
 gwr_model_results = fit_gwr(sf_spatial_data)
-gwr_model_results
+
+
+  # merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
+  #                         data = sf_spatial_data,
+  #                         kernel = "exponential",
+  # )
+  # merged_gwr <- gwr.mixed(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev+ Median.Household.Income + avg_temp,
+  #                         data = sf_spatial_data,
+  #                         fixed.vars = c("NatWalkInd"),
+  #                         bw = merged_gwr_bw,
+  #                         kernel = "exponential"
+  #                         ) 
 ```
 ```{r echo={FALSE} , results='hide'}
 adjusted_tvalues <- gwr.t.adjust(gwr_model_results)$SDF %>% as("sf")
@@ -510,7 +526,7 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 From the simulation study using artificial data, we obtained results that demonstrate the strength of our GWR model. Our results depicted below provide valid estimates and coefficients when fitting a GWR on our simulated data. In our simulation study, the Mean Absolute Error ranged from -1.63 to 0.05, which was fairly close to zero for each covariate. This suggests the validity of our GWR model. Additionally, we obtained a relatively high R-squared value of 0.94 when fitting a GWR model on our artificial data, demonstrating strong explanatory power. Lastly, Plot 2 depicted below illustrates evenly dispersed residuals across the United States, confirming the validity of our GWR model.
 
-![Normalized Residuals of GWR Model Results on Simulated Data](sim_residual_plot.png){fig-align="center"}
+![Residuals of GWR Model Results on Simulated Data](sim_residual_plot.png){fig-align="center"}
 
 ```{r}
 MAE_table
@@ -529,13 +545,13 @@ From the Analysis of our Correlation Matrix plot above, we observed several fact
 
 ## The Impact of Walkability on Diabetes Prevalence 
 
-![Impact of Walkability on Diabetes Prevalence](impact_plot.png){fig-align="center"}
+![Impact of Walkability on Diabetes Prevalence: Observed * Predicted Coefficients](impact_plot.png){fig-align="center"}
 
 
 When fitting the GWR model on our real-world data, we expected there to be a consistent trend between walkability and diabetes prevalence across the U.S. Accounting for walkability, multiple health risk factors, temperature, income,etc, we expected there to be a consistent trend between walkability and diabetes prevalence.  However, from Figure 1 above, we can see that this is not the case. As seen in the West Coast, Pacific North West, and the Mountainous Regions in the Northern part of the U.S, there is a negative correlation between walkability and diabetes prevalence. However, in the East Coast and Southern Regions of the U.S there is a positive correlation between walkability and diabetes prevalence. Ultimately, since there is a lack of consistency across the U.S we believe that the walkability index score calculated by the CDC is inaccurate and fails to account for certain additional factors to explain the true impact of walkability on diabetes prevalence.
 
 
-![Impact of Covariates on Diabetes Prevalence](facet_plot.png ){fig-align="center"}
+![Impact of Covariates on Diabetes Prevalence: Observed * Predicted Coefficients](facet_plot.png ){fig-align="center"}
 
 
 
