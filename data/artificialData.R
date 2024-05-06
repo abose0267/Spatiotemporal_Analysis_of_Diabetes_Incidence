@@ -113,7 +113,7 @@ create_coefficients <- function(lat,long) {
   lpa_coef = (0.0005 * lat) + (0.002*long)
   smoke_coef = (0.0092*lat) + 0.01
   temp_coef = (0.01*long) + (0.001*lat)
-  income_coef = (0.004 *lat) + (0.02*long)
+  income_coef = (0.0000004 *lat) + (0.0000002*long)
   
   # Adjust coefficients to ensure the sum of products is under 100
   coefficients <- c(walk_coef, bp_coef, obesity_coef, lpa_coef, smoke_coef, temp_coef, income_coef)

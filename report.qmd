@@ -3,9 +3,8 @@ title: "The Positive Relationship of Walkability on Diabetes Prevalence in the S
 format:
   arxiv-pdf:
     keep-tex: true  
-    linenumbers: true
-    doublespacing: true
-    runninghead: "A Preprint"
+    linenumbers: false
+    doublespacing: false
   arxiv-html: default
 author:
   - name: Arkaprabho Bose
@@ -175,7 +174,7 @@ In addition to walkability, we felt it was important to account for a few differ
 
 
 ### Data Cleaning
- Originally, we had started working with 4 different datasets, which we then had to aggregate into one large dataset. The datasets had a lot of data since most came from annual government reports, so it was important to select only the relevant ones which were the spatial information and the chosen covariates. Each of the datasets that we had decided to use had originally been at the block group level. This was an issue as it led to at least one value of relevant data being missing in some block groups. Our solution for this issue was to average out the relevant columns from each dataset at the county level. This took care of the missing values as if one block group in a county was missing data, it was dropped from the calculation and there were other block groups which could be used as part of the average. 
+ Originally, we had started working with 4 different datasets, which we then had to aggregate into one large dataset. The datasets had a lot of data since most came from annual government reports, so it was important to select only the relevant ones which were the spatial information and the chosen covariates. Each of the datasets that we had decided to use had originally been at the block group level. This was an issue as it led to at least one value of relevant data being missing in some block groups. Our solution for this issue was to average out the relevant columns from each dataset at the county level. This took care of the missing values as if one block group in a county was missing data, it was dropped from the calculation and there were other block groups which could be used as part of the average. In order to better fit median household income as a covariate, we log transformed the values to make the values on a more reasonable scale along with the rest of our predictors.
 
 ## Analysis
 ### Correlation Matrix
@@ -334,17 +333,17 @@ source("./functions/DataProcessing.R")
 
 gwr_model_results = fit_gwr(sf_spatial_data)
 
-merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,data = sf_spatial_data,
-                        kernel = "exponential")
+# merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,data = sf_spatial_data,
+#                         kernel = "exponential")
 ```
 
 ```{r , results='hide',message=FALSE,echo={FALSE}}
-merged_gwr <- gwr.mixed(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
-                         data = sf_spatial_data,
-                         fixed.vars = list(c("NatWalkInd")),
-                         bw = merged_gwr_bw,
-                         kernel = "exponential"
-)
+# merged_gwr <- gwr.mixed(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
+#                          data = sf_spatial_data,
+#                          fixed.vars = list(c("NatWalkInd")),
+#                          bw = merged_gwr_bw,
+#                          kernel = "exponential"
+# )
 
 
 ```
@@ -529,7 +528,7 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 ### Monte Carlo Significance Test
 
-We initially conducted a Monte Carlo Significance Test to assess spatial variation in each of our covariates. Table 2 below presents the results of this test. It reveals that the National Walkability Index has a p-value of 0.45, indicating that it is not significantly spatially varying. Consequently, if we were to model the National Walkability Index on a global scale, it would not substantially alter our model's results. This finding reinforces our argument that the Walkability Index provided by the CDC may overlook other crucial factors that could accurately explain the relationship between walkability and diabetes prevalence.
+We initially conducted a Monte Carlo Significance Test to assess spatial variation in each of our covariates. Table 1 below presents the results of this test. It reveals that the National Walkability Index has a p-value of 0.35, indicating that it is not significantly spatially varying. Consequently, if we were to model the National Walkability Index on a global scale, it would not substantially alter our model's results. This finding reinforces our argument that the Walkability Index provided by the CDC may overlook other crucial factors that could accurately explain the relationship between walkability and diabetes prevalence.
   
 
 ```{r, echo=FALSE}
@@ -539,7 +538,7 @@ mc_table
 
 ### Global Moran's I Test on Residuals
 
-Next we conducted a Global Moran's I Test on the Residuals of our GWR model to check for spatial autocorrelation. From the Global Moran's I Test in Table 3 we obtained a Moran's 1 Statistic of 0.045. This indicates that there is slight positive autocorrelation in our model. We expect this to occur, as some of our covariates are similar in nature(eg. obesity, smoking, high blood pressure,etc.). Ultimately, there is not significant autocorrelation or an indication of high spatial dependence further showing that our model is indeed accurate. 
+Next we conducted a Global Moran's I Test on the Residuals of our GWR model to check for spatial autocorrelation. From the Global Moran's I Test in Table 2 we obtained a Moran's I Statistic of 0.045. This indicates that there is slight positive autocorrelation in our model. We expect this to occur, as some of our covariates are similar in nature(eg. obesity, smoking, high blood pressure,etc.). Ultimately, there is not significant autocorrelation or an indication of high spatial dependence further showing that our model is indeed accurate. 
 
 ```{r echo=FALSE}
 val
@@ -547,17 +546,16 @@ val
 
 ### Multicollinearity 
 
-In addition, we examined if there was any significant multicollinearity in our GWR model. From the Correlation Matrix from Figure 2, we can see that the only highly correlated variables included the health risk factors such as diabetes, obesity rates, etc.  However, these health risk factors were incorporated into our model, providing valuable insights into the multifaceted nature of diabetes prevalence and its associated risks. These covariates can account for spatial variation and capture an accurate representation of diabetes prevalence. In addition, the importance of including these risk factors is further explained by the paper M. I. Creatore et al., “Association of Neighborhood Walkability With Change in Overweight, Obesity, and Diabetes”. In addition, we tested the multicollinearity of our GWR model by checking the Variance Inflation Factor(VIF) for each of our covariates. For each of our covariates, none of our values exceeded a VIF score of 13. Thus, from the Correlation Matrix and when checking the Variance Inflation Factor of each of the covariates, there is not significant multicollinearity that poses an issue in our GWR model , further indicating the validity of our model.
+In addition, we examined if there was any significant multicollinearity in our GWR model. From the Correlation Matrix from Figure 2, we can see that the only highly correlated variables included the health risk factors such as diabetes, obesity rates, etc.  However, these health risk factors were incorporated into our model, providing valuable insights into the multifaceted nature of diabetes prevalence and its associated risks. These covariates can account for spatial variation and capture an accurate representation of diabetes prevalence. In addition, the importance of including these risk factors is further explained by the paper M. I. Creatore et al., “Association of Neighborhood Walkability With Change in Overweight, Obesity, and Diabetes”. In addition, we tested the multicollinearity of our GWR model by checking the Variance Inflation Factor(VIF) for each of our covariates. For each of our covariates, none of our values exceeded a VIF score of 13. Thus, from the Correlation Matrix and when checking the Variance Inflation Factor of each of the covariates, there is not significant multicollinearity that poses an issue in our GWR model , further indicating the validity of our model.Lastly, Figure 5 depicted in the Appendix illustrates evenly dispersed residuals across the United States, confirming the validity of our GWR model.
 
 
 ### Residuals
 
 The residual plot in the Appendix shows a fairly evenly scattered distribution of predicted values around zero, indicating a well-fitted model. This further emphasizes the validity of our model.
 
-
 ## Simulation Study using Artificial Data
 
-From the simulation study using artificial data, we obtained results that demonstrate the strength of our GWR model. Our results depicted below provide valid estimates and coefficients when fitting a GWR on our simulated data. In our simulation study, the Mean Absolute Error ranged from -1.63 to 0.05, which was fairly close to zero for each covariate. This suggests the validity of our GWR model. Additionally, we obtained a relatively high R-squared value of 0.94 when fitting a GWR model on our artificial data, demonstrating strong explanatory power. Lastly, Plot 2 depicted below illustrates evenly dispersed residuals across the United States, confirming the validity of our GWR model.
+From the simulation study using artificial data, we obtained results that demonstrate the strength of our GWR model. Our results depicted below provide valid estimates and coefficients when fitting a GWR on our simulated data. In our simulation study, the Mean Absolute Error ranged from 0.13 to 1.41 for all covariates aside from Median Household Income. The Mean Absolute Error of the predicted coefficient for Median Household Income from our simulated data when fitting a GWR model was 14.22. This relatively high Mean Absolute Error we assume is from the discrepancy in coastal areas where there are extremely high cost of living areas relative to the average cost of living. This also supports our previous diagnostics where the model struggled to fit the Walkability Index Score and the Median Household Income as they were both not significantly spatially varying. However, the other covariates had a relatively low Mean Absolute Error close to 0 suggesting that they are significantly spatially varying, suggesting the validity of our GWR model on real world. Additionally, we obtained a relatively high R-squared value of 0.91 when fitting a GWR model on our artificial data, demonstrating strong explanatory power.
 
 ![Residuals of GWR Model Results on Simulated Data](sim_residual_plot.png){fig-align="center"}
 
@@ -571,7 +569,7 @@ MAE_table
 
 ![Correlation Matrix of Chosen Variables](correlation_plot.png){fig-align="center"}
 
-From the Analysis of our Correlation Matrix plot above in Figure 2, we observed several factors highly correlated with Diabetes Prevalence, notably High Blood Pressure (correlation of 0.89) and Obesity (correlation of 0.74). These health risk factors were incorporated into our model, providing valuable insights into the multifaceted nature of diabetes prevalence and its associated risks. While these factors demonstrate strong positive associations, they are still important to include. As explained previously in our validation section and in the paper M. I. Creatore et al., “Association of Neighborhood Walkability With Change in Overweight, Obesity, and Diabetes", these factors are indeed important to include in our GWR model. other covariates such as Average Temperature (correlation of 0.01) and National Walkability Index (correlation of -0.44) were also included in our analysis. Despite their lower correlations with Diabetes Prevalence, these variables offer diverse perspectives and contribute to a comprehensive understanding of the relationships between various covariates and their impacts on diabetes prevalence in the U.S.. Including these factors, allows us to explore the intricate interplay between different factors, providing a more nuanced understanding in shaping diabetes prevalence trends across the entirety of the U.S.
+From the Analysis of our Correlation Matrix plot above in Figure 2, we observed several factors highly correlated with Diabetes Prevalence, notably High Blood Pressure (correlation of 0.89) and Obesity (correlation of 0.74). These health risk factors were incorporated into our model, providing valuable insights into the multifaceted nature of diabetes prevalence and its associated risks. While these factors demonstrate strong positive associations, they are still important to include. As explained previously in our validation section and in the paper M. I. Creatore et al., “Association of Neighborhood Walkability With Change in Overweight, Obesity, and Diabetes", these factors are indeed important to include in our GWR model. Other covariates such as Average Temperature (correlation of 0.01) and National Walkability Index (correlation of -0.44) were also included in our analysis. Despite their lower correlations with Diabetes Prevalence, these variables offer diverse perspectives and contribute to a comprehensive understanding of the relationships between various covariates and their impacts on diabetes prevalence in the U.S.. Including these factors, allows us to explore the intricate interplay between different factors, providing a more nuanced understanding in shaping diabetes prevalence trends across the entirety of the U.S.
 
 
 
@@ -622,7 +620,8 @@ In conclusion, our study shows that we need to improve the walkability index by 
 
 {{< pagebreak >}}
 # Appendix
-![Resdiual Plot of GWR Model](residual_plot.png){fig-align="center"}
+![Resdiual Plot of GWR Model on Real Data](residual_plot.png){fig-align="center"}
+
 
 
 {{< pagebreak >}}
