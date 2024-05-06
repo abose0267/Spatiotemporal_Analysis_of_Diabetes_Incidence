@@ -21,6 +21,8 @@ fit_artificial_gwr <- function(data) {
             data = data_sp,
             bw = merged_gwr_bw,
             kernel = "exponential")
+  
+
 }
 
 

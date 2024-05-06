@@ -1,5 +1,5 @@
 ---
-title: "The Positive Relationship of Walkability on Diabetes Prevalence in the Southern United States"
+title: "Understanding Walkability: Calculating the Index and Investigating Its Connection to Diabetes Prevalence"
 format:
   arxiv-pdf:
     keep-tex: true  
