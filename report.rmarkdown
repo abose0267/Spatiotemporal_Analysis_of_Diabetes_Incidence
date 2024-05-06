@@ -78,6 +78,7 @@ summary(new_spatial_dataset)
 ```
 
 
+
 # Introduction {#sec-intro}
 
 Diabetes is a common chronic illness that is caused due to consistently high blood sugar levels, and can be prevented through sugar intake management, exercise and dieting. In a study done on 2016 and 2017 National Center for Health Statistics data, it was shown that among adults in the United States, there was a prevalence of 9.7% (Xu, et. al). This high prevalence can impact humans on a daily basis by directly impacting the quality of life both physically and mentally. Diabetes can affect organs all around the body such as the eyes, pancreas and kidneys. In addition to having direct impact on people, high prevalence of diabetes puts stress on the existing healthcare systems by forcing hospitals and doctors to put resources into solving issues that are preventable.
@@ -218,6 +219,7 @@ In addition to the simulation study, we also ran a few different tests to not on
 
 
 
+
 ```{r echo=FALSE, message=FALSE, results='hide'}
 
 source("data/artificialData.R")
@@ -231,6 +233,7 @@ artificial_data = create_data2(new_spatial_dataset)
 gwr_result_sim <- fit_artificial_gwr(artificial_data)
 gwr_result_sim
 ```
+
 ```{r}
 # Output results (handle as needed)
 artificial_data<- na.omit(artificial_data)
@@ -249,8 +252,6 @@ sim_residual_plot <- ggplot() +
 
 ggsave("sim_residual_plot.png", sim_residual_plot, width = 8, height = 6, units = "in", dpi = 300)
 ```
-
-
 
 ```{r}
 coefficients <- gwr_result_sim$lm$coefficients
@@ -292,9 +293,6 @@ MAE_table <- knitr::kable(MAE_df, caption = "Mean Absolute Error of Coefficient 
 
 ```
 
-
-
-
 ```{r echo={FALSE}, results='hide',message=FALSE, warning=FALSE}
  # print( colnames(merged_income %>% select(-CountyFIPS, -StateAbbr)))<!---->
  
@@ -304,19 +302,11 @@ plot_correlation_matrix(merged_income)
 # dev.new(width = 10, height = 10)
 ```
 
-
-
-
-
 ```{r echo={FALSE}, results='hide',message=FALSE}
 new_spatial_dataset <- na.omit(new_spatial_dataset)
 sf_spatial_data<- st_as_sf(new_spatial_dataset)
 sf_spatial_data <- as(sf_spatial_data, "Spatial")
 ```
-
-
-
-
 
 ```{r echo={FALSE}, results='hide'}
 plot<- ggplot() +
@@ -326,7 +316,6 @@ plot<- ggplot() +
 
 ggsave("original_diabetes_plot.png", plot, width = 8, height = 6, units = "in", dpi = 300)
 ```
-
 
 ```{r , results='hide',message=FALSE,echo={FALSE}}
 
@@ -370,7 +359,6 @@ for (i in seq_len(nrow(model_df))) {
   }
 }
 ```
-
 
 ```{r , results='hide',message=FALSE,echo={FALSE}}
 library(GWmodel)
@@ -419,10 +407,6 @@ mc_table <- knitr::kable(out, caption = "Results of Monte Carlo Simulation")
 
 ```
 
-
-
-
-
 ```{r , results='hide',message=FALSE,echo={FALSE}}
 library(GWmodel)
 library(sp)
@@ -440,6 +424,7 @@ moran_result <- moran.test(model_df$residual, w)
 
 
 ```
+
 ```{r  , results='hide',message=FALSE,echo={FALSE} }
 print(moran_result$estimate)
 
@@ -451,7 +436,6 @@ val <- knitr::kable(out, caption = "Moran's I Test Results")
 ```{r echo={FALSE}, results='hide'}
 # gwr.collin.diagno(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp, sf_spatial_data, gwr_model_results$GW.arguments$bw, kernel="exponential",adaptive=FALSE)
 ```
-
 
 ```{r echo={FALSE} , results='hide'}
 adjusted_tvalues <- gwr.t.adjust(gwr_model_results)$SDF %>% as("sf")
@@ -482,8 +466,6 @@ plot(model_df$residual)
 dev.off()
 
 ```
-
-
 
 ```{r echo={FALSE}, results='hide'}
 plots = data.frame(CountyFIPS = new_spatial_dataset$CountyFIPS,Walkability_Obs = new_spatial_dataset$NatWalkInd,HBP_Obs = new_spatial_dataset$BPHIGH_CrudePrev,walkability_coef= model_df$NatWalkInd, income_impact = new_spatial_dataset$Median.Household.Income * model_df$Median.Household.Income,temp_impact = new_spatial_dataset$avg_temp * model_df$avg_temp, walk_impact = new_spatial_dataset$NatWalkInd * model_df$NatWalkInd, bp_impact = new_spatial_dataset$BPHIGH_CrudePrev * model_df$BPHIGH_CrudePrev, lpa_impact = new_spatial_dataset$LPA_CrudePrev*model_df$LPA_CrudePrev,obesity_impact=new_spatial_dataset$OBESITY_CrudePrev * model_df$OBESITY_CrudePrev, smoking_impact = new_spatial_dataset$CSMOKING_CrudePrev * model_df$CSMOKING_CrudePrev, INTPTLAT=new_spatial_dataset$INTPTLAT, INTPTLON = new_spatial_dataset$INTPTLON, geometry =  new_spatial_dataset$geometry  ) %>%   pivot_longer(cols = c(bp_impact,lpa_impact,smoking_impact,obesity_impact, income_impact, temp_impact),
@@ -522,6 +504,7 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 
 
 
+
 # Results
 
 ## Validation
@@ -532,18 +515,22 @@ ggsave("impact_plot.png", plot2, width = 8, height = 6, units = "in", dpi = 300)
 We initially conducted a Monte Carlo Significance Test to assess spatial variation in each of our covariates. Table 2 below presents the results of this test. It reveals that the National Walkability Index has a p-value of 0.45, indicating that it is not significantly spatially varying. Consequently, if we were to model the National Walkability Index on a global scale, it would not substantially alter our model's results. This finding reinforces our argument that the Walkability Index provided by the CDC may overlook other crucial factors that could accurately explain the relationship between walkability and diabetes prevalence.
   
 
+
 ```{r, echo=FALSE}
 mc_table
 ```
+
 
 
 ### Global Moran's I Test on Residuals
 
 Next we conducted a Global Moran's I Test on the Residuals of our GWR model to check for spatial autocorrelation. From the Global Moran's I Test in Table 3 we obtained a Moran's 1 Statistic of 0.045. This indicates that there is slight positive autocorrelation in our model. We expect this to occur, as some of our covariates are similar in nature(eg. obesity, smoking, high blood pressure,etc.). Ultimately, there is not significant autocorrelation or an indication of high spatial dependence further showing that our model is indeed accurate. 
 
+
 ```{r echo=FALSE}
 val
 ```
+
 
 ### Multicollinearity 
 
@@ -561,9 +548,11 @@ From the simulation study using artificial data, we obtained results that demons
 
 ![Residuals of GWR Model Results on Simulated Data](sim_residual_plot.png){fig-align="center"}
 
+
 ```{r}
 MAE_table
 ```
+
 
 
 
@@ -620,12 +609,18 @@ Given the regional anomalies noted in our study, we propose several modification
 In conclusion, our study shows that we need to improve the walkability index by including more detailed factors that consider both the physical layout and the social and economic conditions of neighborhoods. By adding these details to walkability assessments, city planners and health officials can better understand how city design affects public health, and work more effectively to reduce health risks related to areas that are hard to walk in. Our research points out the complex ways in which city planning and public health are connected, suggesting that city planning should take a more detailed and specific approach that meets the diverse needs of different communities. Looking ahead, more studies are needed that follow how changes in city planning affect public health over time. This will provide solid evidence to guide decisions in making cities healthier and more walkable.
 
 
+
 {{< pagebreak >}}
+
+
 # Appendix
 ![Resdiual Plot of GWR Model](residual_plot.png){fig-align="center"}
 
 
+
 {{< pagebreak >}}
+
+
 
 # References
 - Smith, J., et al. (2020). Do the risk factors for type 2 diabetes mellitus vary by location? A spatial analysis of health insurance claims in Northeastern Germany using kernel density estimation and geographically weighted regression. *Journal of Public Health Research*.
