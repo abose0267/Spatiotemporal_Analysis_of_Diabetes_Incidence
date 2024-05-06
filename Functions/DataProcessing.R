@@ -4,6 +4,8 @@ library(caret)
 library(sp)
 
 
+
+## This function loads in and returns all the datasets from the data folder
 loadData <- function() {
   data <- read.csv("./Data/data.csv")
   data2 <- read.csv("./Data/500cities.csv")
@@ -13,7 +15,7 @@ loadData <- function() {
   return(list( original_walkability= data, original_diabetes = data2, spatial_data=spatial_data, temp_data=temp_data,income_data=income_data))
 }
 
-
+## This function takes in the walkability dataset, and cleans it and returns the relevant columns
 clean_walkability <- function(data) {
   
   data$STATEFP <- sprintf("%02d", as.numeric(data$STATEFP))
@@ -28,6 +30,7 @@ clean_walkability <- function(data) {
   return(cleaned_walk_data)
 }
 
+## This function takes in the income dataset, and cleans it and returns the relevant columns
 clean_income <- function(data) {
   data$CountyFIPS <- sprintf("%02d%03d", data$State.FIPS.Code, data$County.FIPS.Code)
   data$Median.Household.Income <- gsub(",", "", data$Median.Household.Income)
@@ -36,6 +39,8 @@ clean_income <- function(data) {
   return(cleaned_income)
 }
 
+
+## This function takes in the temperature dataset, and cleans it and returns the relevant columns
 cleaned_weather <- function(temp_data) {
   temp_data$GEOID <- as.character(temp_data$GEOID)
   temp_data$GEOID <- sprintf("%011s", temp_data$GEOID)
@@ -50,7 +55,7 @@ cleaned_weather <- function(temp_data) {
 
 
 
-
+## This function takes in the diabetes dataset, and cleans it and returns the relevant columns
 clean_diabetes <- function(data) {
   data$CountyFIPS <- sprintf("%05s", paste0(data$CountyFIPS))
   
@@ -67,6 +72,7 @@ clean_diabetes <- function(data) {
   
 }
 
+## This function takes in a dataset, and extracts and returns the spatials columns
 clean_spatial <- function(data) {
   data$CountyFIPS <- sprintf("%05s", paste0(data$GEOID))
   
@@ -79,9 +85,8 @@ clean_spatial <- function(data) {
   return(cleaned_spatial)
 }
 
-
+## This function uses the corrplot packages to plot a correlation matrix
 plot_correlation_matrix <- function(data, method = "square", order = "hclust", tl.col = "black", tl.srt = 45, addCoef.col = "orange", plot_width = 8, plot_height = 8) {
-  # Documentation, input validation, and correlation matrix calculation as before
   data <- data %>% select(-CountyFIPS, -StateAbbr)
   colnames(data) <- c("National Walkability Index", "Diabetes Crude Prevalence", "High Blood Pressure Crude Prevalence", "Obesity Crude Prevalence", "Low Physical Activity Cruede Prevalence" , "Smoking Prevalence","Average Temperature", "Median Household Income")
   cor_matrix <- cor(data, use = "complete.obs")  # Handling 
@@ -90,22 +95,11 @@ plot_correlation_matrix <- function(data, method = "square", order = "hclust", t
  corrplot(cor_matrix, method = method, type = "upper", order = order,
                    tl.col = tl.col, tl.srt = tl.srt, addCoef.col = addCoef.col)
  dev.off()
-  # Adjust plot size
-  # options(repr.plot.width = plot_width, repr.plot.height = plot_height)
-  # 
-  # return(plot)
 }
 
-test_train_split <- function(data,train) {
-  
-  set.seed(123)  
-  train_indices <- sample(1:nrow(data), train * nrow(data))
-  train_data <- data[train_indices, ]
-  test_data <- data[-train_indices, ]
-  
-  return(list(test_data=test_data,train_data=train_data))
-}
 
+
+## This function fits a gwr model on a spatial dataset using an ideal bandwidth, and returns the results
 fit_gwr <- function(data) {
   
   merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
@@ -124,6 +118,7 @@ fit_gwr <- function(data) {
   return(merged_gwr)
 }
 
+## This function fits a mixed gwr model on a spatial dataset with an optimal bandwidth and returns the results
 fit_gwr_mixed <- function(data) {
   
   merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
@@ -143,98 +138,14 @@ fit_gwr_mixed <- function(data) {
 }
 
 
-fit_gwr_monte <- function(data) {
-  
-  distMat <- gw.dist()
-  merged_gwr_bw <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
-                          data = data,
-                          kernel = "exponential",
-  )
-  
-  merged_gwr_monte <- gwr.montecarlo(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev+ Median.Household.Income + avg_temp,
-                                     data = data,
-                                     kernel = "exponential",
-                                     dis
-                                     )
-  
-}
-
-fit_gwr2<-function(data) {
-  
-  merged_gwr_bw2 <- bw.gwr(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev + Median.Household.Income + avg_temp,
-                          data = data,
-                          kernel = "gaussian",
-  )
-  
-  merged_gwr2 <- gwr.basic(DIABETES_CrudePrev ~ NatWalkInd + OBESITY_CrudePrev + BPHIGH_CrudePrev + LPA_CrudePrev + CSMOKING_CrudePrev+ Median.Household.Income + avg_temp,
-                          data = data,
-                          bw = merged_gwr_bw2,
-                          kernel = "gaussian",
-  ) 
-  
-  return(merged_gwr2)
-}
-
-
-
-test_model <- function(model,data) {
-  
-  return(predict(model,data))
-}
-
-
-
-rmse <- function(predicted_values,actual_values) {
-  return(sqrt(mean((predicted_values - actual_values)^2)))
-}
-
-
-plotDiabetes <- function(model_results,new_dataset) {
-  
-  # Plot the spatial distribution of DIABETES_CrudePrev
-  ggplot() +
-    geom_sf(data = new_dataset, aes(fill = DIABETES_CrudePrev), color="black",size=0.2) +
-    scale_fill_viridis_c(name = "Diabetes Crude Prev") +
-    labs(title = "Spatial Distribution of Diabetes Crude Prevalence")
-  
-  # Plot the spatial distribution of GWR results
-  ggplot() +
-    geom_sf(data = model_results, aes(fill = yhat), color = "black", size = 0.2) +
-    scale_fill_viridis_c(name = "Predicted Diabetes Crude Prev") +
-    labs(title = "GWR Predicted Diabetes Crude Prevalence using GWR") +
-    theme_bw()
-}
-
-
-runRandomForest <- function(data) {
-  set.seed(123) # for reproducibility
-  
-  merged_df <- as.data.frame(data)
-  
-  index <- createDataPartition(merged_df$DIABETES_CrudePrev, p = 0.8, list = FALSE)
-  train_df <- merged_df[index, ]
-  test_df <- merged_df[-index, ]
-  
-  rf_train <- train(
-    x = train_df[, c("NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", "LPA_CrudePrev", "CSMOKING_CrudePrev", "avg_temp", "Median.Household.Income")],
-    y = train_df$DIABETES_CrudePrev,
-    method = "rf"
-  )
-  
-  rf_pred <- predict(rf_train, newdata = test_df[, c("NatWalkInd", "OBESITY_CrudePrev", "BPHIGH_CrudePrev", "LPA_CrudePrev", "CSMOKING_CrudePrev", "avg_temp", "Median.Household.Income")])
-  
-  return_frame = data.frame( test_df, predictedValues = rf_pred)
-  return(return_frame)
-}
 
 
 
 
-plotGWR <- function(model, value) {
-  
-  
-}
 
-plotValue <- function(data, value) {
-  
-}
+
+
+
+
+
+

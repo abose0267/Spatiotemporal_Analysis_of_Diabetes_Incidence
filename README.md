@@ -10,7 +10,9 @@ The diabetes epidemic in the United States presents a nuanced public health chal
 ## Organization
 
 - Report.qmd: Used to render the pdf version of the report
-- Poster.qmd: Used to Render the poster version of the report
+- Poster Folder:
+  - Poster.qmd: This file contains the code to render the poster that we made for the report
+  - Images Folder: Store the images that go in the poster
 - Analysis Folder:
   - gwrAnalysis.R: This file contains the code for running a gwr model on artifical data
 - Functions Folder:
