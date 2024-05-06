@@ -1,7 +1,7 @@
 library(sf)
 library(sp)
 library(GWmodel)
-
+set.seed(123)
 ## Helper function to fit the GWR
 prepare_sf <- function(data) {
   st_as_sf(data, coords = c("INTPTLON", "INTPTLAT"), crs = 4326, remove = FALSE)

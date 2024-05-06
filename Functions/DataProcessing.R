@@ -2,6 +2,7 @@
 library(randomForest)
 library(caret)
 library(sp)
+set.seed(123)
 
 
 

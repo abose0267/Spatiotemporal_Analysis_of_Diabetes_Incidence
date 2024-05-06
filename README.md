@@ -15,8 +15,11 @@ The diabetes epidemic in the United States presents a nuanced public health chal
   - Images Folder: Store the images that go in the poster
 - Analysis Folder:
   - gwrAnalysis.R: This file contains the code for running a gwr model on artifical data
+  - simulationStudy.R: This file contains the code that conducts a simulation study by artificially generating data and fitting a GWR Model and generates corresponding plots and tables
+  - realDataAnalysis.R: This file contains all analysis done on the real datasets. This includes loading the datasets, cleaning the data, fitting a model and running diagnostics.
 - Functions Folder:
   - DataProcessing.R: This file contains the code used to render the report. This includes data cleaning, fitting models, and running diagnostics
+  - SimulationStudyFunctions.R: This file contains helper functions for the
 - Data Folder:
   - This folder is used to store all the necessary datasets
     - 500cities.csv: This dataset contains health factor data from the CDC
